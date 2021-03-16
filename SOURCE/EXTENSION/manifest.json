@@ -1,0 +1,25 @@
+{
+    "manifest_version": 3, 
+    "version": "1.0", 
+    "name": "Hello World!",
+    "description": "Learning how to make a chrome extension!",
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "images/cat.jpg",
+            "32": "images/cat.jpg",
+            "48": "images/cat.jpg",
+            "128": "images/cat.jpg"
+          }
+    },
+    "icons": {
+        "16": "images/cat.jpg",
+        "32": "images/cat.jpg",
+        "48": "images/cat.jpg",
+        "128": "images/cat.jpg"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "permissions": ["storage", "activeTab", "scripting", "background", "webNavigation"]
+}

@@ -54,6 +54,10 @@ server.get("/test", (req,res)=>{
   });
 });
 
+server.get("/elian", (req,res)=>{
+  res.status(200).json({"data": "test"});
+});
+
 
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
