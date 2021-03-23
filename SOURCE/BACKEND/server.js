@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const express = require('express');
+const session = require('express-session');
 const dotenv = require('dotenv');
 const cors = require('cors');
 dotenv.config();
@@ -24,6 +25,11 @@ server.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', true);
   next();
 });
+server.use(session({
+	secret: 'secret',
+	resave: true,
+	saveUninitialized: true
+}));
 
 if(production) {
     mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_DOMAIN}:${process.env.DB_PORT}/${process.env.DB_TABLE}?authSource=admin`);
@@ -33,9 +39,6 @@ if(production) {
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  console.log("db connection succesful")
-});
 
 server.get("/test", (req,res)=>{
   USER.getUsers((error, users)=>{
@@ -45,19 +48,7 @@ server.get("/test", (req,res)=>{
       res.status(200).json(users);
     }
   });
-  USER.addUser("Nils", "google.de", (error, user)=>{
-    if(error) {
-      console.log("Fehler:", error.message);
-    } else {
-      console.log(users);
-    }
-  });
 });
-
-server.get("/elian", (req,res)=>{
-  res.status(200).json({"data": "test"});
-});
-
 
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
