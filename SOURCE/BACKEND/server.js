@@ -3,6 +3,7 @@ const express = require('express');
 const session = require('express-session');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const bodyParser = require("body-parser");
 dotenv.config();
 const production = process.env.PRODUCTION == "true";
 const hostname = process.env.APP_HOSTNAME;
@@ -30,6 +31,8 @@ server.use(session({
 	resave: true,
 	saveUninitialized: true
 }));
+server.use(bodyParser.urlencoded({ extended: false }));
+server.use(bodyParser.json());
 
 if(production) {
     mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_DOMAIN}:${process.env.DB_PORT}/${process.env.DB_TABLE}?authSource=admin`);
@@ -50,6 +53,16 @@ server.get("/test", (req,res)=>{
   });
 });
 
+server.post("/test2", (req,res)=>{
+  res.send({"data": req.body});
+  console.log({"data": req.body})
+});
+
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
+});
+
+server.post("/login", (req,res)=>{
+  res.send({token: "1234567"});
+  console.log({"data": req.body})
 });
