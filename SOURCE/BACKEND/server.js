@@ -53,7 +53,7 @@ server.get("/test", (req,res)=>{
   });
 });
 
-server.post("/test2", (req,res)=>{
+server.post("/tracking", (req,res)=>{
   res.send({"data": req.body});
   console.log({"data": req.body})
 });
