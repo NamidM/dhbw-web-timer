@@ -1,6 +1,8 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ChartOptions, ChartType, ChartDataSets } from 'chart.js';
 import { Label } from 'ng2-charts';
+import { ApiService } from 'src/app/services/api/api.service';
 
 @Component({
   selector: 'app-statistics',
@@ -9,7 +11,7 @@ import { Label } from 'ng2-charts';
 })
 export class StatisticsComponent implements OnInit {
 
-  constructor() { 
+  constructor(private apiService: ApiService) { 
   }
 
   public barChartOptions: ChartOptions = {
@@ -25,6 +27,9 @@ export class StatisticsComponent implements OnInit {
     { data: [28, 48, 40, 19, 86, 27, 90], label: 'Series B' }
   ];
 
-  ngOnInit(): void {}
-
+  ngOnInit(): void {
+    this.apiService.getData().subscribe(data=>{
+      console.log(data);
+    });
+  }
 }

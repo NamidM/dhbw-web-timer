@@ -10,6 +10,7 @@ const hostname = process.env.APP_HOSTNAME;
 const port = process.env.APP_PORT;
 const server = express();
 const USER = require('./models/user');
+const WEBACTIVITY = require('./models/webActivity');
 server.use(cors());
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
@@ -53,13 +54,19 @@ server.get("/test", (req,res)=>{
   });
 });
 
-server.post("/tracking", (req,res)=>{
-  res.send({"data": req.body});
-  console.log({"data": req.body})
+server.post("/tracking", async (req,res)=>{
+  for(i in req.body){
+    let obj = req.body[i];
+    WEBACTIVITY.addWebActivity(obj.url, obj.startTime, obj.endTime, "0");
+  }
+  console.log(req.body[0])
 });
 
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
+  WEBACTIVITY.getWebActivitiesInTimespan(0, 1617103561082,"0", (error, webActivities)=>{
+    console.log(webActivities)
+  });
 });
 
 server.post("/login", (req,res)=>{
