@@ -3,19 +3,18 @@ const TIMELIMIT = 30000;
 startTimer();
 // Function on tab change
 chrome.tabs.onActivated.addListener(async (e) => {
-  try {
-    chrome.tabs.get(e.tabId, (x)=>{
-      if(x.url !== "chrome://newtab/" && x.url !== "" && x.url !== "chrome://") {
-        chrome.storage.sync.get(['tabs'], res=>{
-          pushNewTabEntry(e.tabId, x.url, res.tabs)
-        });
-        executeEventListener(e.tabId);
-      }
-    });
-  } catch(e) {}
+  chrome.tabs.get(e.tabId, (x)=>{
+    if(x.url !== "chrome://newtab/" && x.url !== "" && x.url !== "chrome://") {
+      chrome.storage.sync.get(['tabs'], res=>{
+        pushNewTabEntry(e.tabId, x.url, res.tabs)
+      });
+      executeEventListener(e.tabId);
+    }
+  });
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log("test");
     chrome.storage.sync.get(['tabs'], res=>{
       updateTabEntry(sender.tab.id, res.tabs, false);
     });
@@ -114,29 +113,35 @@ function startTimer() {
         postData('http://127.0.0.1:3000/tracking', tabs)
         .then(async response => {
           if(response.status == 200) {
-            // SUCCESS
             let res = await response.json();
             console.log(res.data)
+            chrome.storage.sync.set({"tabs": newTabs});
           } else {
-            // FAIL
+            console.log("Failed to reach backend")
           }
         });
-        chrome.storage.sync.set({"tabs": newTabs});
+
       }
       startTimer();
     });
-  }, 1000000);
+  }, 600000);
 }
 
 function executeEventListener(id){
-  let lastSent;
   let code = function() {
+    let lastSent;
+    let msg;
     document.addEventListener('keydown', (event) => {
-      chrome.runtime.sendMessage({}, ()=>{});
+      if(!lastSent || !msg && (new Date().getTime() - lastSent) > 1000) {
+        msg = true;
+        chrome.runtime.sendMessage({}, ()=>{msg=false});
+        lastSent = new Date().getTime()  
+      }
     }, false)
     document.addEventListener('mousemove', (event) => {
-      if(!lastSent || (lastSent - new Date().getTime()) > 1000) {
-        chrome.runtime.sendMessage({}, ()=>{});
+      msg = true;
+      if(!lastSent || !msg && (new Date().getTime() - lastSent) > 1000) {
+        chrome.runtime.sendMessage({}, ()=>{msg=false});
         lastSent = new Date().getTime()
       }
     }, false)
