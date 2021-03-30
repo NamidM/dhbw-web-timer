@@ -1,49 +1,63 @@
 let token;
 const TIMELIMIT = 30000;
+let tabs = [];
+
+/**
+ * TODO:
+ * -Login mit Oath/JWT
+ * -IFrame mit Hauptstatistik in Popup.js
+ * -Push bei Chrome schließen
+ * -Evtl. "Cannot open chrome:// URL" Fehler fixen (wenn er denn mal kommt :))
+ */
+
+
 startTimer();
 // Function on tab change
 chrome.tabs.onActivated.addListener(async (e) => {
-  chrome.tabs.get(e.tabId, (x)=>{
+  pushNewTabEntry(e.tabId);
+})
+
+function pushNewTabEntry(id){
+  chrome.tabs.get(id, (x)=>{
     if(x.url !== "chrome://newtab/" && x.url !== "" && x.url !== "chrome://") {
-      chrome.storage.sync.get(['tabs'], res=>{
-        pushNewTabEntry(e.tabId, x.url, res.tabs)
+
+      if(tabs.length != 0){
+        tabs[tabs.length-1].active = false;
+      }
+
+      tabs.push({
+        id: id,
+        url: x.url,
+        startTime: new Date().getTime(),
+        endTime: new Date().getTime(),
+        active: true
       });
-      executeEventListener(e.tabId);
+      addEventListenerToPage(id);
     }
   });
-});
+}
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log("test");
-    chrome.storage.sync.get(['tabs'], res=>{
-      updateTabEntry(sender.tab.id, res.tabs, false);
-    });
+  updateTabEntry(sender.tab.id, false);
   }
 );
 
 chrome.tabs.onRemoved.addListener(tabId => {
-  chrome.storage.sync.get(['tabs'], res=>{
-    updateTabEntry(tabId, res.tabs, true);
-  });
+    updateTabEntry(tabId, true);
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   if(changeInfo.url) {
-    chrome.storage.sync.get(['tabs'], res=>{
-      let tabs = res.tabs;
       //let baseUrl = url.split('/')[2];
       //let baseUrl = url.split('/')[2].split('.').slice(url.split('/')[2].split('.').length-2, url.split('/')[2].split('.').length).join('.');
-      executeEventListener(tabId);
       if(tabs.length != 0 && (tabs[tabs.length-1].url.split('/')[2] == changeInfo.url.split('/')[2])) {
+        addEventListenerToPage(tabId);
         tabs[tabs.length-1].endTime = new Date().getTime();
         tabs[tabs.length-1].url = changeInfo.url;
-        chrome.storage.sync.set({"tabs": tabs});
-      } else {
-        if(changeInfo.url != "chrome://newtab/" && changeInfo.url != "") {
-          pushNewTabEntry(tabId, changeInfo.url, res.tabs);
-        }
-      } 
-    });
+      }
+      else {
+        pushNewTabEntry(tabId);
+      }
   }
 });
 
@@ -58,49 +72,35 @@ async function postData(url = '', data = {}) {
   return response;
 }
 
-// set last active tab to false and Push new Tab to Storage 
-function pushNewTabEntry(id, url, tabs) {
-  if(!tabs || tabs.length == 0){
-    tabs = [];
-  } else {
-    tabs[tabs.length-1].active = false;
-  }
-  tabs.push({
-    id: id,
-    url: url,
-    startTime: new Date().getTime(),
-    endTime: new Date().getTime(),
-    active: true
-  });
-  chrome.storage.sync.set({"tabs": tabs});
-}
 
 // Update tab entry if no timeout or create new if timeout
-function updateTabEntry (id, tabs, isCloseEvent) {
-  let tab = tabs[tabs.length-1]
-  let currentTime = new Date().getTime();
-  if((currentTime - tab.endTime) < TIMELIMIT) {
-    tabs[tabs.length-1].endTime = currentTime;
-    if(isCloseEvent) tabs[tabs.length-1].active = false;
-  } else {
-    tabs[tabs.length-1].active = false;
-    tabs[tabs.length-1].endTime = tab.endTime + TIMELIMIT;
-    tabs.push({
-      id: tab.id,
-      url: tab.url,
-      startTime: currentTime,
-      endTime: currentTime,
-      active: true
-    });
+function updateTabEntry (id, isCloseEvent) {
+
+  if(tabs.length != 0){
+    let tab = tabs[tabs.length-1]
+    let currentTime = new Date().getTime();
+    if((currentTime - tab.endTime) < TIMELIMIT) {
+      tabs[tabs.length-1].endTime = currentTime;
+      //TODO das hier funktioniert manchmal nicht? Endtime wird nicht immer richtig gesetzt....
+      if(isCloseEvent) tabs[tabs.length-1].active = false;
+    } else {
+      tabs[tabs.length-1].active = false;
+      tabs[tabs.length-1].endTime = tab.endTime + TIMELIMIT;
+      tabs.push({
+        id: tab.id,
+        url: tab.url,
+        startTime: currentTime,
+        endTime: currentTime,
+        active: true
+      });
+    }
   }
-  chrome.storage.sync.set({"tabs": tabs});
 }
 
 function startTimer() {
   setTimeout(() => {
-    chrome.storage.sync.get(['tabs'], res=>{
-      let tabs = res.tabs;
-      if(tabs) {
+    if(tabs.length != 0){
+
         let newTabs = [];
         let activeTabExists = (tabs[tabs.length-1].endTime - new Date().getTime()) < TIMELIMIT;
         if(activeTabExists) {
@@ -110,38 +110,38 @@ function startTimer() {
           tabs[tabs.length-1].endTime = tabs[tabs.length-1].endTime + TIMELIMIT;
           tabs[tabs.length-1].active = false;
         }
+
         postData('http://127.0.0.1:3000/tracking', tabs)
         .then(async response => {
           if(response.status == 200) {
             let res = await response.json();
             console.log(res.data)
-            chrome.storage.sync.set({"tabs": newTabs});
+            tabs = newTabs;
           } else {
             console.log("Failed to reach backend")
           }
         });
 
-      }
+    }
       startTimer();
-    });
+
   }, 600000);
 }
 
-function executeEventListener(id){
+function addEventListenerToPage(id){
   let code = function() {
     let lastSent;
-    let msg;
     document.addEventListener('keydown', (event) => {
-      if(!lastSent || !msg && (new Date().getTime() - lastSent) > 1000) {
-        msg = true;
-        chrome.runtime.sendMessage({}, ()=>{msg=false});
+      if(!lastSent || (new Date().getTime() - lastSent)> 1000) {
+        console.log("Hey :) keydown eventlistener wurde geaddet");
+        chrome.runtime.sendMessage({});
         lastSent = new Date().getTime()  
       }
     }, false)
     document.addEventListener('mousemove', (event) => {
-      msg = true;
-      if(!lastSent || !msg && (new Date().getTime() - lastSent) > 1000) {
-        chrome.runtime.sendMessage({}, ()=>{msg=false});
+
+      if(!lastSent || (new Date().getTime() - lastSent) > 1000) {
+        chrome.runtime.sendMessage({});
         lastSent = new Date().getTime()
       }
     }, false)

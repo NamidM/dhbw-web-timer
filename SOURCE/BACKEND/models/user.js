@@ -20,3 +20,7 @@ module.exports.getUsers = (callback, limit)=>{
 module.exports.addUser = (name, email, callback)=>{
     USER.create({name, email}, callback);
 };
+
+module.exports.getUser = (name, password, callback)=>{
+    USER.findOne(callback);
+};
