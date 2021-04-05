@@ -54,6 +54,20 @@ server.get("/test", (req,res)=>{
   });
 });
 
+server.get("/webActivities", (req,res)=>{
+  let userID = req.query.userID;
+  let startTime = req.query.startTime;
+  let endTime = req.query.endTime;
+
+  WEBACTIVITY.getWebActivitiesInTimespan(startTime, endTime, userID,(error, webActivities) => {
+    if(error){
+      res.status(500).send("Backendfehler beim Laden von Web Activites");
+    }else{
+      res.status(200).json(webActivities);
+    }
+  });
+});
+
 server.post("/tracking", async (req,res)=>{
   for(i in req.body){
     let obj = req.body[i];

@@ -6,5 +6,16 @@
         Toast Test
     </button>
 
+  <div style="display: block" id="experienceChart" class="chart">
+    <label>Vorerfahrungen der Probanden im Vergleich</label>
+    <canvas baseChart
+            [datasets]="experienceChart.data"
+            [labels]="experienceChart.labels"
+            [options]="experienceChart.options"
+            [legend]="experienceChart.legend"
+            [chartType]="experienceChart.type">
+    </canvas>
+  </div>
+
 </div>
 

@@ -35,7 +35,7 @@ export class StatisticsComponent implements OnInit {
     });
 
     let data = await this.apiService.getTest();
-  console.log(data);
+    console.log(data);
 
     let experience = Math.floor(100 / 55 * 69);
     this.experienceChart = {
