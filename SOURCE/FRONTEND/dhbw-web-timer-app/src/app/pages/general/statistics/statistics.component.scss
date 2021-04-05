@@ -1,3 +1,15 @@
 #barChart {
-    width: 50%
+    //width: 50%
+}
+.timeStatistics {
+    border: 1px solid gray;
+    border-radius: 3px;
+}
+.statisticsHeader {
+    padding: 10px;
+}
+.day-form, .week-form, .month-form {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
 }

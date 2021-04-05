@@ -1,23 +1,69 @@
-<div>
-    <div style="display: block"  id="barChart">
-        <canvas baseChart
-        [datasets]="barChartData"
-        [labels]="barChartLabels"
-        [options]="barChartOptions"
-        [plugins]="barChartPlugins"
-        [legend]="barChartLegend"
-        [chartType]="barChartType">
-      </canvas>
-    </div>
+<div class="statisticsHeader container">
+  <h1>Statistiken zu Benutzung</h1>
 </div>
 
-<div style="display: block" id="experienceChart" class="chart">
-  <label>Vorerfahrungen der Probanden im Vergleich</label>
-  <canvas baseChart
-          [datasets]="experienceChart.data"
-          [labels]="experienceChart.labels"
-          [options]="experienceChart.options"
-          [legend]="experienceChart.legend"
-          [chartType]="experienceChart.type">
-  </canvas>
+<div class="timeStatistics container">
+
+  <mat-tab-group mat-stretch-tabs>
+    <mat-tab label="Tag">
+      <form class="day-form">
+        <mat-form-field appearance="fill">
+          <mat-label>Datum auswählen</mat-label>
+          <input matInput [matDatepicker]="picker1">
+          <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+          <mat-datepicker #picker1></mat-datepicker>
+        </mat-form-field>
+      </form>
+      <div style="display: block"  id="barChart">
+          <canvas baseChart
+          [datasets]="barChartData"
+          [labels]="barChartLabels"
+          [options]="barChartOptions"
+          [plugins]="barChartPlugins"
+          [legend]="barChartLegend"
+          [chartType]="barChartType">
+        </canvas>
+      </div>
+    </mat-tab>
+    <mat-tab label="Woche">
+      <form class="week-form">
+        <mat-form-field appearance="fill">
+          <mat-label>Woche auswählen</mat-label>
+          <mat-date-range-input [formGroup]="range" [rangePicker]="picker2" >
+            <input matStartDate formControlName="start" (dateChange)="startDateSelectionWeek()">
+            <input matEndDate formControlName="end" (dateChange)="endDateSelectionWeek()" >
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker2></mat-date-range-picker>
+          <mat-error *ngIf="range.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+          <mat-error *ngIf="range.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+        </mat-form-field>
+      </form>
+      <div style="display: block" id="experienceChart" class="chart">
+        <canvas baseChart
+                [datasets]="experienceChart.data"
+                [labels]="experienceChart.labels"
+                [options]="experienceChart.options"
+                [legend]="experienceChart.legend"
+                [chartType]="experienceChart.type">
+        </canvas>
+      </div>
+    </mat-tab>
+    <mat-tab label="Monat">
+      <form class="month-form">
+        <mat-form-field appearance="fill">
+          <mat-label>Monat auswählen</mat-label>
+          <mat-date-range-input [formGroup]="range" [rangePicker]="picker3" >
+            <input matStartDate formControlName="start" (dateChange)="startDateSelectionMonth()">
+            <input matEndDate formControlName="end" (dateChange)="endDateSelectionMonth()" >
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker3></mat-date-range-picker>
+          <mat-error *ngIf="range.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+          <mat-error *ngIf="range.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+        </mat-form-field>
+      </form> 
+      Content 3 
+    </mat-tab>
+  </mat-tab-group>
 </div>

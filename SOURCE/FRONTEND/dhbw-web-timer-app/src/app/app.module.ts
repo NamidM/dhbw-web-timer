@@ -16,8 +16,12 @@ import { CommunityComponent } from './pages/general/community/community.componen
 import { GeneralComponent } from './pages/general/general.component';
 import { ChartsModule } from 'ng2-charts';
 import { LoginComponent } from './pages/general/login/login.component';
-
-
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatNativeDateModule, MAT_DATE_FORMATS } from '@angular/material/core';
+import {MatInputModule} from '@angular/material/input';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -38,9 +42,14 @@ import { LoginComponent } from './pages/general/login/login.component';
     BrowserAnimationsModule,
     MatSnackBarModule,
     MatButtonModule,
-    ChartsModule
+    ChartsModule,
+    MatTabsModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatNativeDateModule,
+    MatInputModule,
+    ReactiveFormsModule
   ],
-  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

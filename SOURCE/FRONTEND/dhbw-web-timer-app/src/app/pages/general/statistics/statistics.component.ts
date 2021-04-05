@@ -1,5 +1,5 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChartOptions, ChartType, ChartDataSets } from 'chart.js';
 import { Label } from 'ng2-charts';
 import { ApiService } from 'src/app/services/api/api.service';
@@ -11,6 +11,10 @@ import { ApiService } from 'src/app/services/api/api.service';
 })
 export class StatisticsComponent implements OnInit {
 
+  range = new FormGroup({
+    start: new FormControl(),
+    end: new FormControl()
+  });
   constructor(private apiService: ApiService) {
   }
 
@@ -22,8 +26,6 @@ export class StatisticsComponent implements OnInit {
   public barChartLegend = true;
   public barChartPlugins = [];
   public experienceChart: any;
-
-
   public barChartData: ChartDataSets[] = [
     { data: [65, 59, 80, 81, 56, 55, 40], label: 'Series A' },
     { data: [28, 48, 40, 19, 86, 27, 90], label: 'Series B' }
@@ -51,6 +53,29 @@ export class StatisticsComponent implements OnInit {
     }
   }
 
-
-
+  startDateSelectionWeek(){
+    console.log(new Date(this.range.controls["start"].value));
+    let start = new Date(this.range.controls["start"].value);
+    start.setDate(start.getDate() - start.getDay());
+    this.range.controls["start"].setValue(start);
+    console.log("Danach", this.range.controls["start"].value);
+  }
+  endDateSelectionWeek(){
+    let start = new Date(this.range.controls["start"].value);
+    let end = new Date(start);
+    end.setDate(start.getDate() + 6); 
+    this.range.controls["end"].setValue(end);
+  }
+  startDateSelectionMonth(){
+    console.log(new Date(this.range.controls["start"].value));
+    let start = new Date(this.range.controls["start"].value);
+    start.setDate(1);
+    this.range.controls["start"].setValue(start);
+    console.log("Danach", this.range.controls["start"].value);
+  }
+  endDateSelectionMonth(){
+    let start = new Date(this.range.controls["start"].value);
+    let end = new Date(start.getUTCFullYear(), start.getMonth()+1, 0)
+    this.range.controls["end"].setValue(end);
+  }
 }
