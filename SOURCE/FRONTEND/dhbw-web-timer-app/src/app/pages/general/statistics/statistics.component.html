@@ -6,22 +6,21 @@
 
   <mat-tab-group mat-stretch-tabs>
     <mat-tab label="Tag">
-      <form class="day-form">
+      <form class="day-form" [formGroup]="range">
         <mat-form-field appearance="fill">
           <mat-label>Datum auswählen</mat-label>
-          <input matInput [matDatepicker]="picker1">
+          <input [formGroup]="range" matInput [matDatepicker]="picker1" formControlName="start" (dateChange)="dateSelectionDay()">
           <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
           <mat-datepicker #picker1></mat-datepicker>
         </mat-form-field>
       </form>
-      <div style="display: block"  id="barChart">
-          <canvas baseChart
-          [datasets]="barChartData"
-          [labels]="barChartLabels"
-          [options]="barChartOptions"
-          [plugins]="barChartPlugins"
-          [legend]="barChartLegend"
-          [chartType]="barChartType">
+      <div style="display: block" id="experienceChart" class="chart">
+        <canvas baseChart
+                [datasets]="experienceChart.data"
+                [labels]="experienceChart.labels"
+                [options]="experienceChart.options"
+                [legend]="experienceChart.legend"
+                [chartType]="experienceChart.type">
         </canvas>
       </div>
     </mat-tab>
@@ -39,13 +38,14 @@
           <mat-error *ngIf="range.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
         </mat-form-field>
       </form>
-      <div style="display: block" id="experienceChart" class="chart">
-        <canvas baseChart
-                [datasets]="experienceChart.data"
-                [labels]="experienceChart.labels"
-                [options]="experienceChart.options"
-                [legend]="experienceChart.legend"
-                [chartType]="experienceChart.type">
+      <div style="display: block"  id="weekChart">
+        <canvas baseChart *ngIf="weekChart"
+          [datasets]="weekChart.data"
+          [labels]="weekChart.labels"
+          [options]="weekChart.options"
+          [plugins]="weekChart.plugins"
+          [legend]="weekChart.legend"
+          [chartType]="weekChart.type">
         </canvas>
       </div>
     </mat-tab>
