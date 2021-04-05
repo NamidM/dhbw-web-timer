@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 
@@ -15,5 +15,14 @@ export class ApiService {
 
   getTest(){
     return this.http.get(`${this.baseUrl}test`);
+  }
+
+  getWebActivitiesInTimespan(userID: string, startTime: string, endTime: string ){
+    let params = new HttpParams();
+    params = params.append('userID', userID);
+    params = params.append('startTime', startTime);
+    params = params.append('endTime', endTime);
+
+    return this.http.get(`${this.baseUrl}webActivities`, { params: params });
   }
 }
