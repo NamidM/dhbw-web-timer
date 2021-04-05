@@ -13,14 +13,10 @@ export class HomeComponent implements OnInit {
   constructor(private snackService: SnackBarService, private apiService: ApiService) { }
 
   public experienceChart: any;
-
-
+  public siteNames: string[] = [];
+  public times: number[] = [];
 
   async ngOnInit(){
-    let data = await this.apiService.getTest();
-    //console.log(data);
-
-    this.createDoughnut();
     this.grabWebActivityData();
   }
 
@@ -34,29 +30,35 @@ export class HomeComponent implements OnInit {
     console.log()
 
     this.apiService.getWebActivitiesInTimespan('0', startOfDay.toString(), currentTime.toString()).subscribe((timespanData : any) => {
-      console.log("Timespandata inc:");
-      console.log(timespanData);
-
-      let sites = [];
+      let sites = new Map<string, number>();
+      sites.clear();
 
       for(let entry of timespanData){
 
-        console.log(entry.url.split('/')[2]);
+        let baseUrl = entry.url.split('/')[2];
+        let timespan = entry.endtime - entry.starttime;
 
-        //if baseurl schon vorhanden -> aufaddieren
-        //sonst neu anlegen
-
-
-
-
-        sites.push({
-          baseUrl: entry.url.split('/')[2],
-          time: entry.endtime - entry.starttime
-        });
-
-
+        if(sites.get(baseUrl) != null){
+          let oldTime = sites.get(baseUrl);
+          // @ts-ignore
+          sites.set(baseUrl, oldTime + timespan);
+        }
+        else {
+          sites.set(baseUrl, timespan);
+        }
       }
+
+      for(var[siteName, time] of sites.entries()){
+        this.siteNames.push(siteName);
+        this.times.push(time);
+      }
+
+      console.log(this.siteNames);
+      console.log(this.times);
+
+      this.createDoughnut();
     });
+
   }
 
   test(){
@@ -64,16 +66,15 @@ export class HomeComponent implements OnInit {
   }
 
   createDoughnut(){
-    let experience = Math.floor(100 / 55 * 69);
     this.experienceChart = {
       options: {scaleShowVerticalLines: false,
         responsive: true,
         scales: {yAxes: [{ticks: {beginAtZero: true}}]}},
-      labels: ['Probanden mit Vorerfahrung (%)', 'Probanden ohne Vorerfahrung (%)'],
+      labels: this.siteNames,
       type: 'doughnut',
       legend: true,
       data: [
-        {data: [experience, 100-experience], label: 'Prozent'},
+        {data: this.times, label: 'times'},
       ],
     }
   }
