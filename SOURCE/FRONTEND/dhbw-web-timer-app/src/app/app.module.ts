@@ -15,6 +15,7 @@ import { StatisticsComponent } from './pages/general/statistics/statistics.compo
 import { CommunityComponent } from './pages/general/community/community.component';
 import { GeneralComponent } from './pages/general/general.component';
 import { ChartsModule } from 'ng2-charts';
+import { LoginComponent } from './pages/general/login/login.component';
 
 
 
@@ -27,7 +28,8 @@ import { ChartsModule } from 'ng2-charts';
     NavbarComponent,
     StatisticsComponent,
     CommunityComponent,
-    GeneralComponent
+    GeneralComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,

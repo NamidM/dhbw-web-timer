@@ -12,4 +12,8 @@ export class ApiService {
   getData(){
     return this.http.get(`${this.baseUrl}test`);
   }
+
+  getTest(){
+    return this.http.get(`${this.baseUrl}test`);
+  }
 }

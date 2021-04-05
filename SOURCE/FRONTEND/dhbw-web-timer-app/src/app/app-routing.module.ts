@@ -5,6 +5,7 @@ import { CommunityComponent } from './pages/general/community/community.componen
 import { GeneralComponent } from './pages/general/general.component';
 import { HomeComponent } from './pages/general/home/home.component';
 import { StatisticsComponent } from './pages/general/statistics/statistics.component';
+import {LoginComponent} from "./pages/general/login/login.component";
 
 const routes: Routes = [
   {
@@ -26,13 +27,17 @@ const routes: Routes = [
       {
         path: 'community',
         component: CommunityComponent
+      },
+      {
+        path: 'login',
+        component: LoginComponent
       }
     ]
   },
-  { 
-    path: '**', 
+  {
+    path: '**',
     redirectTo: '/',
-    pathMatch: 'full' 
+    pathMatch: 'full'
   }
 ];
 

@@ -45,12 +45,12 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 
 server.get("/test", (req,res)=>{
-  USER.getUsers((error, users)=>{
-    if(error) {
-      res.status(500).send("Fehler!");
-    } else {
-      res.status(200).json(users);
-    }
+  WEBACTIVITY.getWebActivities((error, webActivities) => {
+      if(error){
+        res.status(500).send("Backendfehler beim Laden von Web Activites");
+      }else{
+        res.status(200).json(webActivities);
+      }
   });
 });
 
@@ -73,3 +73,4 @@ server.post("/login", (req,res)=>{
   res.send({token: "1234567"});
   console.log({"data": req.body})
 });
+
