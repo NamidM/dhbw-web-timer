@@ -12,6 +12,8 @@ import { ApiService } from 'src/app/services/api/api.service';
 export class StatisticsComponent implements OnInit {
   public experienceChart: any;
   public weekChart: any;
+  public siteNames: string[] = [];
+  public times: number[] = [];
   range = new FormGroup({
     start: new FormControl(),
     end: new FormControl()
@@ -43,6 +45,7 @@ export class StatisticsComponent implements OnInit {
   }
 
   dateSelectionDay(){
+    console.log(this.range.controls["start"].value);
     this.updateDayChart(new Date(this.range.controls["start"].value));
   }
 
@@ -98,6 +101,43 @@ export class StatisticsComponent implements OnInit {
   }
 
   updateDayChart(day: Date){
-    console.log(day);
+    this.times = [];
+    this.siteNames = [];
+    let millisecondsInDay = day.getHours()*60*60*1000 + day.getMinutes()*60*1000;
+    let startOfDay = day.getTime() - millisecondsInDay;
+    let endOfDay = startOfDay + 24*60*60*1000;
+    this.apiService.getWebActivitiesInTimespan('0', startOfDay.toString(), endOfDay.toString()).subscribe((timespanData : any) => {
+      let sites = new Map<string, number>();
+      sites.clear();
+      for(let entry of timespanData){
+        let baseUrl = entry.url.split('/')[2];
+        let timespan = entry.endtime - entry.starttime;
+        if(sites.get(baseUrl) != null){
+          let oldTime = sites.get(baseUrl);
+          // @ts-ignore
+          sites.set(baseUrl, oldTime + timespan);
+        } else {
+          sites.set(baseUrl, timespan);
+        }
+      }
+      for(var[siteName, time] of sites.entries()){
+        this.siteNames.push(siteName);
+        this.times.push(time);
+      }
+      this.createDoughnut();
+    });
+  }
+  createDoughnut(){
+    this.experienceChart = {
+      options: {scaleShowVerticalLines: false,
+        responsive: true,
+        scales: {yAxes: [{ticks: {beginAtZero: true}}]}},
+      labels: this.siteNames,
+      type: 'doughnut',
+      legend: true,
+      data: [
+        {data: this.times, label: 'times'},
+      ],
+    }
   }
 }
