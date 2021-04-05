@@ -8,7 +8,7 @@
 
   <div style="display: block" id="experienceChart" class="chart">
     <label>Vorerfahrungen der Probanden im Vergleich</label>
-    <canvas baseChart
+    <canvas baseChart *ngIf="experienceChart"
             [datasets]="experienceChart.data"
             [labels]="experienceChart.labels"
             [options]="experienceChart.options"
