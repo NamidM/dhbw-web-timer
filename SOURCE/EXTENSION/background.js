@@ -38,7 +38,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 );
 
 chrome.tabs.onRemoved.addListener(tabId => {
-    console.log("test")
     updateTabEntry(tabId, true);
 });
 

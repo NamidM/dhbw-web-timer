@@ -92,27 +92,108 @@ export class StatisticsComponent implements OnInit {
 
   updateWeekChart(startOfWeek: Date, endOfWeek: Date) {
     this.apiService.getWebActivitiesInTimespan('0', startOfWeek.getTime().toString(), endOfWeek.getTime().toString()).subscribe((timespanData : any) => {
-      let weekTime = [0,0,0,0,0,0,0];
+      let weekTime = [];
+      let week: any[] = [];
+      let urls = [];
       let startTime = new Date();
+      let counter = 0;
       for(let e of timespanData) {
+        let baseUrl = e.url.split('/')[2];
         startTime.setTime(e.starttime);
-        weekTime[startTime.getDay()] += (e.endtime - e.starttime);
+        let weekIndex = startTime.getDay();
+
+        if(!week[weekIndex]) {
+          week[weekIndex] = [];
+        }
+        let urlIndex = week[weekIndex].findIndex((e: any) => e.url == baseUrl);
+        if(urlIndex == -1){
+          week[weekIndex].push({time: (e.endtime - e.starttime), url: baseUrl, startTime: e.starttime})
+        } else {
+          week[weekIndex][urlIndex].time += (e.endtime - e.starttime);
+        }
       }
-      console.log(weekTime)
-      for(let i = 0; i<weekTime.length; i++){
-        weekTime[i] = Math.floor(((weekTime[i]/1000))/6)/100;
-      }     
-      console.log(weekTime)
+      for(let i = 0; i<7; i++){
+        if(week[i]) {
+          week[i].sort((a: any, b: any)=>{
+            return b.time-a.time;
+          });
+          if(week[i].length > 10) {
+            let others = {time: 0, url: "Andere", startTime: 0};
+
+            for(let j = 9; j < week[i].length; j++) {
+              others.startTime = week[i][j].startTime;
+              others.time += week[i][j].time;
+            }
+            week[i].splice(9, 0, others);
+            week[i].splice(10, week[i].length-1);
+          }
+
+          for(let j = 0; j < week[i].length; j++) {
+            let baseUrl = week[i][j].url;
+            startTime.setTime(week[i][j].startTime);
+            let weekIndex = startTime.getDay();
+            if(!urls[baseUrl]){
+              let r = Math.floor(Math.random() * 255);
+              let g = Math.floor(Math.random() * 255);
+              let b = Math.floor(Math.random() * 255);
+              urls[baseUrl] = { num: counter, color: `rgba(${r}, ${g}, ${b}, 0.6)`};
+              counter++;
+            }
+      
+            if(!weekTime[urls[baseUrl].num]){
+              weekTime[urls[baseUrl].num] = {
+                data: [0,0,0,0,0,0,0], 
+                label: baseUrl, 
+                stack: 'a', 
+                backgroundColor: urls[baseUrl].color, 
+                hoverBackgroundColor: urls[baseUrl].color
+              };
+            }
+            weekTime[urls[baseUrl].num].data[weekIndex] += Math.floor(week[i][j].time/1000/6)/10;
+          }
+          console.log(weekTime)
+        }
+      }
+
+      // for(let i = 0; i<weekTime.length; i++){
+      //   weekTime[i] = Math.floor(((weekTime[i]/1000))/6)/100;
+      // }     
+      // [
+      //   { data: [65, 59, 80, 81, 56, 55, 40], label: 'Series A', stack: 'a' },
+      //   { data: [28, 48, 40, 19, 86, 27, 90], label: 'Series B', stack: 'a' },
+      //   { data: [28, 48, 40, 19, 86], label: 'Series B', stack: 'a' }
+      // ]
+      console.log("22",weekTime)
+      // this.weekChart = {
+      //   labels:  ['2006', '2007', '2008', '2009', '2010', '2011', '2012'],
+      //   type: "bar",
+      //   legend: true,
+      //   plugins: [],
+      //   options: {},
+      //   data: [
+      //     { data: [65, 59, 80, 81, 56, 55, 40], label: 'Series A', stack: 'a' },
+      //     { data: [28, 48, 40, 19, 86, 27, 90], label: 'Series B', stack: 'a' },
+      //     { data: [28, 48, 40, 19, 86], label: 'Series B', stack: 'a' }
+      //   ]
+      // }
+            
       this.weekChart = {
         options: {scaleShowVerticalLines: false,
           responsive: true,
-          scales: {yAxes: [{ticks: {beginAtZero: true}}]}},
+          scales: {
+            x: {
+              stacked: true
+            },
+            y: {
+              stacked: true
+            },
+            yAxes: [{ticks: {beginAtZero: true}}]
+          }
+        },
         labels: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
         type: 'bar',
         legend: false,
-        data: [
-          { data: weekTime, label: 'Aktivität' }
-        ],
+        data: weekTime
       }
     });
   }
