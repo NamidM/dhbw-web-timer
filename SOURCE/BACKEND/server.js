@@ -76,15 +76,15 @@ server.post("/tracking", async (req,res)=>{
   console.log(req.body[0])
 });
 
+server.post("/login", (req,res)=>{
+  res.send({token: "1234567"});
+  console.log({"data": req.body})
+});
+
+
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
   WEBACTIVITY.getWebActivitiesInTimespan(0, 1617103561082,"0", (error, webActivities)=>{
     console.log(webActivities)
   });
 });
-
-server.post("/login", (req,res)=>{
-  res.send({token: "1234567"});
-  console.log({"data": req.body})
-});
-
