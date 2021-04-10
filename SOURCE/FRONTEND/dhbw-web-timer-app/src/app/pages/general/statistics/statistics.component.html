@@ -6,50 +6,57 @@
 
   <mat-tab-group mat-stretch-tabs>
     <mat-tab label="Tag">
-      <form class="day-form" [formGroup]="rangeDay" onsubmit="return false;">
-        <button mat-icon-button class="next-icon" (click)="prevDay()">
-          <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_before</mat-icon>
-        </button>
-        <mat-form-field appearance="fill">
-          <mat-label>Datum auswählen</mat-label>
-          <input [formGroup]="rangeDay" matInput [matDatepicker]="picker1" formControlName="startDay" (dateChange)="dateSelectionDay()">
-          <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-          <mat-datepicker #picker1></mat-datepicker>
-        </mat-form-field>
-        <button mat-icon-button class="next-icon" (click)="nextDay()">
-          <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_next</mat-icon>
-        </button>
-      </form>
-      <div style="display: block" id="experienceChart" class="chart">
-        <canvas baseChart
-                [datasets]="experienceChart.data"
-                [labels]="experienceChart.labels"
-                [options]="experienceChart.options"
-                [legend]="experienceChart.legend"
-                [chartType]="experienceChart.type">
-        </canvas>
+      <div class="day-wrapper">
+        <div class="date-wrapper">
+          <form class="day-form" [formGroup]="rangeDay" onsubmit="return false;">
+            <button mat-icon-button class="next-icon" (click)="prevDay()">
+              <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_before</mat-icon>
+            </button>
+            <mat-form-field appearance="fill">
+              <mat-label>Datum auswählen</mat-label>
+              <input [formGroup]="rangeDay" matInput [matDatepicker]="picker1" formControlName="startDay" (dateChange)="dateSelectionDay()">
+              <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+              <mat-datepicker #picker1></mat-datepicker>
+            </mat-form-field>
+            <button mat-icon-button class="next-icon" (click)="nextDay()">
+              <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_next</mat-icon>
+            </button>
+          </form>
+        </div>
+        <div id="dayChart" class="chart">
+          <canvas baseChart *ngIf="dayChart"
+                  [datasets]="dayChart.data"
+                  [labels]="dayChart.labels"
+                  [options]="dayChart.options"
+                  [legend]="dayChart.legend"
+                  [chartType]="dayChart.type">
+          </canvas>
+        </div>
       </div>
     </mat-tab>
     <mat-tab label="Woche">
-      <form class="week-form" onsubmit="return false;">
-        <button mat-icon-button class="next-icon" (click)="prevWeek()">
-          <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_before</mat-icon>
-        </button>
-        <mat-form-field appearance="fill">
-          <mat-label>Woche auswählen</mat-label>
-          <mat-date-range-input [formGroup]="rangeWeek" [rangePicker]="picker2" >
-            <input matStartDate formControlName="startWeek" (dateChange)="startDateSelectionWeek()">
-            <input matEndDate formControlName="endWeek" (dateChange)="endDateSelectionWeek()" >
-          </mat-date-range-input>
-          <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-          <mat-date-range-picker #picker2></mat-date-range-picker>
-          <mat-error *ngIf="rangeWeek.controls.startWeek.hasError('matStartDateInvalid')">Invalid start date</mat-error>
-          <mat-error *ngIf="rangeWeek.controls.endWeek.hasError('matEndDateInvalid')">Invalid end date</mat-error>
-        </mat-form-field>
-        <button mat-icon-button class="next-icon" (click)="nextWeek()">
-          <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_next</mat-icon>
-        </button>
-      </form>
+      <div class="date-wrapper">
+        <button mat-raised-button color="primary" (click)="addWeek()">Woche hinzufügen</button>
+        <form class="week-form" onsubmit="return false;">
+          <button mat-icon-button class="next-icon" (click)="prevWeek()">
+            <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_before</mat-icon>
+          </button>
+          <mat-form-field appearance="fill">
+            <mat-label>Woche auswählen</mat-label>
+            <mat-date-range-input [formGroup]="rangeWeek" [rangePicker]="picker2" >
+              <input matStartDate formControlName="startWeek" (dateChange)="startDateSelectionWeek()">
+              <input matEndDate formControlName="endWeek" (dateChange)="endDateSelectionWeek()" >
+            </mat-date-range-input>
+            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker2></mat-date-range-picker>
+            <mat-error *ngIf="rangeWeek.controls.startWeek.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+            <mat-error *ngIf="rangeWeek.controls.endWeek.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+          </mat-form-field>
+          <button mat-icon-button class="next-icon" (click)="nextWeek()">
+            <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_next</mat-icon>
+          </button>
+        </form>
+      </div>
       <div style="display: block"  id="weekChart">
         <canvas baseChart *ngIf="weekChart"
           [datasets]="weekChart.data"
@@ -62,26 +69,37 @@
       </div>
     </mat-tab>
     <mat-tab label="Monat">
-      <form class="month-form" onsubmit="return false;">
-        <button mat-icon-button class="next-icon" (click)="prevMonth()">
-          <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_before</mat-icon>
-        </button>
-        <mat-form-field appearance="fill">
-          <mat-label>Monat auswählen</mat-label>
-          <mat-date-range-input [formGroup]="rangeMonth" [rangePicker]="picker3" >
-            <input matStartDate formControlName="startMonth" (dateChange)="startDateSelectionMonth()">
-            <input matEndDate formControlName="endMonth" (dateChange)="endDateSelectionMonth()" >
-          </mat-date-range-input>
-          <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
-          <mat-date-range-picker #picker3></mat-date-range-picker>
-          <mat-error *ngIf="rangeMonth.controls.startMonth.hasError('matStartDateInvalid')">Invalid start date</mat-error>
-          <mat-error *ngIf="rangeMonth.controls.endMonth.hasError('matEndDateInvalid')">Invalid end date</mat-error>
-        </mat-form-field>
-        <button mat-icon-button class="next-icon" (click)="nextMonth()">
-          <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_next</mat-icon>
-        </button>
-      </form> 
-      Content 3 
+      <div class="date-wrapper">
+        <form class="month-form" onsubmit="return false;">
+          <button mat-icon-button class="next-icon" (click)="prevMonth()">
+            <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_before</mat-icon>
+          </button>
+          <mat-form-field appearance="fill">
+            <mat-label>Monat auswählen</mat-label>
+            <mat-date-range-input [formGroup]="rangeMonth" [rangePicker]="picker3" >
+              <input matStartDate formControlName="startMonth" (dateChange)="startDateSelectionMonth()">
+              <input matEndDate formControlName="endMonth" (dateChange)="endDateSelectionMonth()" >
+            </mat-date-range-input>
+            <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker3></mat-date-range-picker>
+            <mat-error *ngIf="rangeMonth.controls.startMonth.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+            <mat-error *ngIf="rangeMonth.controls.endMonth.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+          </mat-form-field>
+          <button mat-icon-button class="next-icon" (click)="nextMonth()">
+            <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_next</mat-icon>
+          </button>
+        </form>
+      </div>
+      <div style="display: block"  id="monthChart">
+        <canvas baseChart *ngIf="monthChart"
+          [datasets]="monthChart.data"
+          [labels]="monthChart.labels"
+          [options]="monthChart.options"
+          [plugins]="monthChart.plugins"
+          [legend]="monthChart.legend"
+          [chartType]="monthChart.type">
+        </canvas>
+      </div>
     </mat-tab>
   </mat-tab-group>
 </div>
