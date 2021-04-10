@@ -137,11 +137,13 @@ function sendTabs(){
       tabs[tabs.length-1].active = false;
     }
     // TODO -> send UserID
+    console.log("Sending data");
+    console.log(tabs);
     postData('http://127.0.0.1:3000/tracking', tabs)
     .then(async response => {
       if(response.status == 200) {
         let res = await response.json();
-        console.log(res.data)
+        console.log("Success: " +  res.data);
         tabs = newTabs;
       } else {
         console.log("Failed to reach backend")
