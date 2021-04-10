@@ -23,6 +23,7 @@ import { MatNativeDateModule, MAT_DATE_FORMATS } from '@angular/material/core';
 import {MatInputModule} from '@angular/material/input';
 import { ReactiveFormsModule } from '@angular/forms';
 import {MatIconModule} from '@angular/material/icon';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import {MatIconModule} from '@angular/material/icon';
     MatNativeDateModule,
     MatInputModule,
     ReactiveFormsModule,
-    MatIconModule
+    MatIconModule,
+    MatCheckboxModule
   ],
   bootstrap: [AppComponent]
 })

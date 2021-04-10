@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ChartOptions, ChartType, ChartDataSets } from 'chart.js';
-import { Label } from 'ng2-charts';
+import { FormGroup, FormControl } from '@angular/forms';
 import { ApiService } from 'src/app/services/api/api.service';
 
 @Component({
@@ -10,10 +8,10 @@ import { ApiService } from 'src/app/services/api/api.service';
   styleUrls: ['./statistics.component.scss']
 })
 export class StatisticsComponent implements OnInit {
-  public experienceChart: any;
+  public dayChart: any;
   public weekChart: any;
+  public monthChart: any;
   public siteNames: string[] = [];
-  public times: number[] = [];
   rangeWeek = new FormGroup({
     startWeek: new FormControl(),
     endWeek: new FormControl()
@@ -36,6 +34,9 @@ export class StatisticsComponent implements OnInit {
     let startOfMonth = new Date();
     startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
     endOfWeek.setDate(startOfWeek.getDate() + 6); 
+    endOfWeek.setHours(0);
+    endOfWeek.setMinutes(0);
+    endOfWeek.setDate(endOfWeek.getDate()+1);
     startOfMonth.setDate(1);
     let endOfMonth = new Date(startOfMonth.getUTCFullYear(), startOfMonth.getMonth()+1, 0)
     this.rangeDay.controls["startDay"].setValue(new Date());
@@ -46,18 +47,7 @@ export class StatisticsComponent implements OnInit {
 
     this.updateWeekChart(startOfWeek, endOfWeek);
     this.updateDayChart(currentDate);
-    let experience = Math.floor(100 / 55 * 69);
-    this.experienceChart = {
-      options: {scaleShowVerticalLines: false,
-        responsive: true,
-        scales: {yAxes: [{ticks: {beginAtZero: true}}]}},
-      labels: ['Probanden mit Vorerfahrung (%)', 'Probanden ohne Vorerfahrung (%)'],
-      type: 'doughnut',
-      legend: true,
-      data: [
-        {data: [experience, 100-experience], label: 'Prozent'},
-      ],
-    }
+    this.updateMonthChart(startOfMonth, endOfMonth);
   }
 
   dateSelectionDay(){
@@ -72,8 +62,9 @@ export class StatisticsComponent implements OnInit {
 
   endDateSelectionWeek(){
     let start = new Date(this.rangeWeek.controls["startWeek"].value);
+    start.setDate(start.getDate()+1)
     let end = new Date(start);
-    end.setDate(start.getDate() + 6); 
+    end.setDate(start.getDate() + 7); 
     this.rangeWeek.controls["endWeek"].setValue(end);
     this.updateWeekChart(start, end);
   }
@@ -88,6 +79,7 @@ export class StatisticsComponent implements OnInit {
     let start = new Date(this.rangeMonth.controls["startMonth"].value);
     let end = new Date(start.getUTCFullYear(), start.getMonth()+1, 0)
     this.rangeMonth.controls["endMonth"].setValue(end);
+    this.updateMonthChart(start, end);
   }
 
   updateWeekChart(startOfWeek: Date, endOfWeek: Date) {
@@ -100,8 +92,8 @@ export class StatisticsComponent implements OnInit {
       for(let e of timespanData) {
         let baseUrl = e.url.split('/')[2];
         startTime.setTime(e.starttime);
-        let weekIndex = startTime.getDay();
-
+        let weekIndex = startTime.getDay() - 1;
+        if(weekIndex == -1) weekIndex = 6;
         if(!week[weekIndex]) {
           week[weekIndex] = [];
         }
@@ -113,7 +105,9 @@ export class StatisticsComponent implements OnInit {
         }
       }
       for(let i = 0; i<7; i++){
+        // Only check for days with input
         if(week[i]) {
+          // Sort entries for time
           week[i].sort((a: any, b: any)=>{
             return b.time-a.time;
           });
@@ -131,7 +125,8 @@ export class StatisticsComponent implements OnInit {
           for(let j = 0; j < week[i].length; j++) {
             let baseUrl = week[i][j].url;
             startTime.setTime(week[i][j].startTime);
-            let weekIndex = startTime.getDay();
+            let weekIndex = startTime.getDay() - 1;
+            if(weekIndex == -1) weekIndex = 6;
             if(!urls[baseUrl]){
               let r = Math.floor(Math.random() * 255);
               let g = Math.floor(Math.random() * 255);
@@ -151,55 +146,38 @@ export class StatisticsComponent implements OnInit {
             }
             weekTime[urls[baseUrl].num].data[weekIndex] += Math.floor(week[i][j].time/1000/6)/10;
           }
+          console.log("week", week)
           console.log(weekTime)
         }
-      }
+      }       
+      this.createWeekChart(weekTime);
+    });
+  }
 
-      // for(let i = 0; i<weekTime.length; i++){
-      //   weekTime[i] = Math.floor(((weekTime[i]/1000))/6)/100;
-      // }     
-      // [
-      //   { data: [65, 59, 80, 81, 56, 55, 40], label: 'Series A', stack: 'a' },
-      //   { data: [28, 48, 40, 19, 86, 27, 90], label: 'Series B', stack: 'a' },
-      //   { data: [28, 48, 40, 19, 86], label: 'Series B', stack: 'a' }
-      // ]
-      console.log("22",weekTime)
-      // this.weekChart = {
-      //   labels:  ['2006', '2007', '2008', '2009', '2010', '2011', '2012'],
-      //   type: "bar",
-      //   legend: true,
-      //   plugins: [],
-      //   options: {},
-      //   data: [
-      //     { data: [65, 59, 80, 81, 56, 55, 40], label: 'Series A', stack: 'a' },
-      //     { data: [28, 48, 40, 19, 86, 27, 90], label: 'Series B', stack: 'a' },
-      //     { data: [28, 48, 40, 19, 86], label: 'Series B', stack: 'a' }
-      //   ]
-      // }
-            
-      this.weekChart = {
-        options: {scaleShowVerticalLines: false,
-          responsive: true,
-          scales: {
-            x: {
-              stacked: true
-            },
-            y: {
-              stacked: true
-            },
-            yAxes: [{ticks: {beginAtZero: true}}]
-          }
-        },
-        labels: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
-        type: 'bar',
-        legend: false,
-        data: weekTime
+  updateMonthChart(startOfMonth: Date, endOfMonth: Date) {
+    this.apiService.getWebActivitiesInTimespan('0', startOfMonth.getTime().toString(), endOfMonth.getTime().toString()).subscribe((timespanData : any) => {
+      let labels: any = [];
+      let monthData: any[] = [];
+      for(let i = 0; i < endOfMonth.getDate(); i++){
+        monthData[i] = 0;
+        labels[i] = i+1;
       }
+      let startTime = new Date();
+      for(let e of timespanData) {
+        startTime.setTime(e.starttime);
+        let dayIndex = startTime.getDate();
+        monthData[dayIndex] += e.endtime - e.starttime;
+      }
+      for(let i = 0; i < endOfMonth.getDate(); i++){
+        monthData[i] = Math.floor(monthData[i] / 1000 / 6 / 6)/100;
+      }
+      this.createMonthChart(monthData, labels);
+      console.log("month", monthData)
     });
   }
 
   updateDayChart(day: Date){
-    this.times = [];
+    let times: number[] = [];
     this.siteNames = [];
     let millisecondsInDay = day.getHours()*60*60*1000 + day.getMinutes()*60*1000 + day.getSeconds()*1000;
     let startOfDay = day.getTime() - millisecondsInDay;
@@ -220,13 +198,62 @@ export class StatisticsComponent implements OnInit {
       }
       for(var[siteName, time] of sites.entries()){
         this.siteNames.push(siteName);
-        this.times.push(time);
+        times.push(time);
       }
-      this.createDoughnut();
+      this.createDayDoughnut(times);
     });
   }
-  createDoughnut(){
-    this.experienceChart = {
+  createMonthChart(monthData: any, labels: any){
+    this.monthChart = {
+      options: {scaleShowVerticalLines: false,
+        elements: {
+          line: {
+              tension: 0
+          }
+      },
+        responsive: true,
+        scales: {yAxes: [{ticks: {beginAtZero: true}, scaleLabel: {
+          display: true,
+          labelString: 'Stunden'
+        }}]}},
+      labels: labels,
+      type: 'line',
+      legend: false,
+      data: [
+        {data: monthData, label: 'Stunden'},
+      ],
+    }
+  }
+  createWeekChart(weekTime: any){
+    this.weekChart = {
+      options: {scaleShowVerticalLines: false,
+        responsive: true,
+        scales: {
+          x: {
+            stacked: true
+          },
+          y: {
+            stacked: true,
+          },
+          yAxes: [
+            {
+              ticks: {beginAtZero: true},
+              scaleLabel: {
+                display: true,
+                labelString: 'Minuten'
+              }
+            }
+          ]
+        }
+      },
+      labels: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
+      type: 'bar',
+      legend: false,
+      data: weekTime
+    }
+  }
+  createDayDoughnut(times: any){
+    this.dayChart = {
       options: {scaleShowVerticalLines: false,
         responsive: true,
         scales: {yAxes: [{ticks: {beginAtZero: true}}]}},
@@ -234,19 +261,19 @@ export class StatisticsComponent implements OnInit {
       type: 'doughnut',
       legend: true,
       data: [
-        {data: this.times, label: 'times'},
+        {data: times, label: 'times'},
       ],
     }
   }
 
-  nextDay() {
+  nextDay(isSecond?: boolean) {
     let dayPlusOne = new Date(this.rangeDay.controls["startDay"].value);
     dayPlusOne.setTime(dayPlusOne.getTime()+24*60*60*1000);
     this.rangeDay.controls["startDay"].setValue(dayPlusOne);
     this.updateDayChart(dayPlusOne);
   }
 
-  prevDay() {
+  prevDay(isSecond?: boolean) {
     let dayMinusOne = new Date(this.rangeDay.controls["startDay"].value);
     dayMinusOne.setTime(dayMinusOne.getTime()-24*60*60*1000);
     this.rangeDay.controls["startDay"].setValue(dayMinusOne);
@@ -279,7 +306,7 @@ export class StatisticsComponent implements OnInit {
     this.rangeMonth.controls["startMonth"].setValue(monthPlusOne);
     let endMonthPlusOne = new Date(monthPlusOne.getUTCFullYear(), monthPlusOne.getMonth()+1, 0)
     this.rangeMonth.controls["endMonth"].setValue(endMonthPlusOne);
-    this.updateWeekChart(monthPlusOne, endMonthPlusOne);
+    this.updateMonthChart(monthPlusOne, endMonthPlusOne);
   }
 
   prevMonth() {
@@ -288,6 +315,10 @@ export class StatisticsComponent implements OnInit {
     this.rangeMonth.controls["startMonth"].setValue(monthMinusOne);
     let endMonthMinusOne = new Date(monthMinusOne.getUTCFullYear(), monthMinusOne.getMonth()+1, 0)
     this.rangeMonth.controls["endMonth"].setValue(endMonthMinusOne);
-    this.updateWeekChart(monthMinusOne, endMonthMinusOne);
+    this.updateMonthChart(monthMinusOne, endMonthMinusOne);
+  }
+
+  addWeek(){
+    
   }
 }

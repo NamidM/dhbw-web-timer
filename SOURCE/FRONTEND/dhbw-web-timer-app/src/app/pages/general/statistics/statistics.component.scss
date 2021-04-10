@@ -2,17 +2,36 @@
     //width: 50%
 }
 .timeStatistics {
-    border: 1px solid gray;
+    border: 0px solid gray;
     border-radius: 3px;
+}
+.day-wrapper {
+    display: block;
 }
 .statisticsHeader {
     padding: 10px;
 }
 .day-form, .week-form, .month-form {
-    margin-top: 10px;
-    display: flex;
-    justify-content: center;
+    margin: 1em;
+    width: 90%;
 }
 .next-icon {
     margin-top: 5px;
+}
+
+.center {
+    text-align: center;
+    margin: 0 auto;
+}
+
+.center-btn {
+    width: 5%;
+    margin: auto;
+}
+
+.compare-box{
+    float: right;
+    margin-top: 1.5em;
+}
+.date-wrapper{
 }
