@@ -2,13 +2,8 @@ chrome.storage.sync.get(['token'], res=>{
   if(!res.token) {
     document.getElementById('login').innerHTML = `
     <h2> Einloggen</h2>
-    <form>
-          <label >Username</label>
-          <input type="text" id="username"/><br>
-          <label>Passwort</label>
-          <input type="password" id="password"/><br>
-    </form>
-    <button id="loginBtn">Einloggen</button>
+    <button id="loginBtn" style="width: 150px">Einloggen</button>
+    <button id="syncBtn">Sync</button>
     <p>Noch kein Konto?<br>Hier <a id="registerLink" href="#">registrieren</a></p>
     `;
     document.getElementById('registerLink').addEventListener("click", (()=>{
@@ -16,16 +11,12 @@ chrome.storage.sync.get(['token'], res=>{
     }));
 
     document.getElementById('loginBtn').addEventListener("click", (()=>{
-      postData('http://127.0.0.1:3000/login', {username: document.getElementById('username').value, password: document.getElementById('password').value})
-        .then(async response => {
-          if(response.status == 200) {
-            // SUCCESS
-            let res = await response.json();
-            chrome.storage.sync.set({"token": res.token});
-            location.reload();
-          } else {
-            // FAIL
-          }
+      chrome.runtime.sendMessage({message: 'login'}, response => {
+      });
+    }));
+
+    document.getElementById('syncBtn').addEventListener("click", (()=>{
+      chrome.runtime.sendMessage({message: 'sync'}, response => {
       });
     }));
   } else {
@@ -38,11 +29,9 @@ chrome.storage.sync.get(['token'], res=>{
     }));
 
     document.getElementById('logoutBtn').addEventListener("click", (()=>{
-      chrome.storage.sync.set({ token: undefined });
-      chrome.storage.sync.remove('token', (r)=>{
+      chrome.runtime.sendMessage({message: 'login'}, response => {
         location.reload();
       });
-      
     }));
   }
 });

@@ -19,6 +19,6 @@
           <a class="nav-link" [routerLink]="['/about']">About</a>
         </li>
       </ul>
-      <button mat-raised-button color="accent" class="my-2 my-sm-0" type="submit" [routerLink]="['/login']">Login</button>
+      <button mat-raised-button color="accent" class="my-2 my-sm-0" *ngIf="loggedIn" (click)="logout()">Logout</button>
     </div>
 </nav>
