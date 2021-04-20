@@ -1,116 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
+import * as Chart from 'chart.js';
 import { SnackBarService } from 'src/app/services/snack-bar/snack-bar.service';
 import {ApiService} from "../../../services/api/api.service";
-
-const getOrCreateTooltip = (chart: any) => {
-  let tooltipEl = chart.canvas.parentNode.querySelector('div');
-
-  if (!tooltipEl) {
-    tooltipEl = document.createElement('div');
-    tooltipEl.style.background = 'rgba(0, 0, 0, 0.7)';
-    tooltipEl.style.borderRadius = '3px';
-    tooltipEl.style.color = 'white';
-    tooltipEl.style.opacity = 1;
-    tooltipEl.style.pointerEvents = 'none';
-    tooltipEl.style.position = 'absolute';
-    tooltipEl.style.transform = 'translate(-50%, 0)';
-    tooltipEl.style.transition = 'all .1s ease';
-
-    const table = document.createElement('table');
-    table.style.margin = '0px';
-
-    tooltipEl.appendChild(table);
-    chart.canvas.parentNode.appendChild(tooltipEl);
-  }
-
-  return tooltipEl;
-};
-
-const externalTooltipHandler = (context: any) => {
-
-  console.log("Context inc:")
-  console.log(context);
-
-  // Tooltip Element
-  const {chart, tooltip} = context;
-  const tooltipEl = getOrCreateTooltip(chart);
-
-  // Hide if no tooltip
-  if (tooltip.opacity === 0) {
-    tooltipEl.style.opacity = 0;
-    return;
-  }
-
-  // Set Text
-  if (tooltip.body) {
-    const titleLines = tooltip.title || [];
-    const bodyLines = tooltip.body.map((b: any) => b.lines);
-
-    const tableHead = document.createElement('thead');
-
-    titleLines.forEach((title: any) => {
-      const tr = document.createElement('tr');
-      tr.style.borderWidth = '0';
-
-      const th = document.createElement('th');
-      th.style.borderWidth = '0';
-      const text = document.createTextNode(title);
-
-      th.appendChild(text);
-      tr.appendChild(th);
-      tableHead.appendChild(tr);
-    });
-
-    const tableBody = document.createElement('tbody');
-    bodyLines.forEach((body: any, i: any) => {
-      const colors = tooltip.labelColors[i];
-
-      const span = document.createElement('span');
-      span.style.background = colors.backgroundColor;
-      span.style.borderColor = colors.borderColor;
-      span.style.borderWidth = '2px';
-      span.style.marginRight = '10px';
-      span.style.height = '10px';
-      span.style.width = '10px';
-      span.style.display = 'inline-block';
-
-      const tr = document.createElement('tr');
-      tr.style.backgroundColor = 'inherit';
-      tr.style.borderWidth = '0';
-
-      const td = document.createElement('td');
-      td.style.borderWidth = '0';
-
-      const text = document.createTextNode(body);
-
-      td.appendChild(span);
-      td.appendChild(text);
-      tr.appendChild(td);
-      tableBody.appendChild(tr);
-    });
-
-    const tableRoot = tooltipEl.querySelector('table');
-
-    // Remove old children
-    while (tableRoot.firstChild) {
-      tableRoot.firstChild.remove();
-    }
-
-    // Add new children
-    tableRoot.appendChild(tableHead);
-    tableRoot.appendChild(tableBody);
-  }
-
-  const {offsetLeft: positionX, offsetTop: positionY} = chart.canvas;
-
-  // Display, position, and set styles for font
-  tooltipEl.style.opacity = 1;
-  tooltipEl.style.left = positionX + tooltip.caretX + 'px';
-  tooltipEl.style.top = positionY + tooltip.caretY + 'px';
-  tooltipEl.style.font = tooltip.options.bodyFont.string;
-  tooltipEl.style.padding = tooltip.padding + 'px ' + tooltip.padding + 'px';
-};
+import {Site} from "../../../interfaces";
+import {HttpClient} from "@angular/common/http";
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'app-home',
@@ -118,12 +13,29 @@ const externalTooltipHandler = (context: any) => {
   styleUrls: ['./home.component.scss']
 })
 
+// @ts-ignore: Object is possibly 'null'.
 export class HomeComponent implements OnInit {
-  constructor(private snackService: SnackBarService, private apiService: ApiService) { }
 
   public experienceChart: any;
   public siteNames: string[] = [];
   public times: number[] = [];
+  public sites: Site[] = [];
+
+  public imageToShow: any;
+  public isImageLoading: boolean = false;
+
+  // @ts-ignore
+  @ViewChild('title') detailsCardTitle: ElementRef<HTMLElement>;
+  // @ts-ignore
+  @ViewChild('detailsCardAbsoluteTime') detailsCardAbsoluteTime: ElementRef<HTMLElement>;
+  // @ts-ignore
+  @ViewChild('detailsCardPercent') detailsCardPercent: ElementRef<HTMLElement>;
+  // @ts-ignore
+  @ViewChild('favicon') favicon: ElementRef<HTMLElement>;
+  // @ts-ignore
+  @ViewChild('visits') visits: ElementRef<HTMLElement>;
+
+  constructor(private snackService: SnackBarService, private apiService: ApiService, private http: HttpClient) { }
 
   async ngOnInit(){
     this.grabWebActivityData();
@@ -139,6 +51,7 @@ export class HomeComponent implements OnInit {
     this.apiService.getWebActivitiesInTimespan('0', startOfDay.toString(), currentTime.toString()).subscribe((timespanData : any) => {
       let sites: any[] = []
 
+
       for(let entry of timespanData){
         let baseUrl:string = entry.url.split('/')[2];
         let timespan:number = entry.endtime - entry.starttime;
@@ -146,80 +59,96 @@ export class HomeComponent implements OnInit {
         let index = this.findIndexOfSiteWithURL(sites, baseUrl);
 
         if(index == -1){
-          sites.push({url: baseUrl, time: timespan});
+          sites.push({url: baseUrl, time: timespan, favicon: entry.faviconUrl, percentage: 0, visits: 0});
         }
         else{
           sites[index].time += timespan;
+          sites[index].visits++;
         }
-
       }
 
       sites.sort((a: any, b: any)=>{
         return b.time-a.time;
       });
 
-      console.log(sites.length);
-
       if(sites.length > 10) {
-        let others = {url: "Andere", time: 0, };
+        let others = {url: "Andere", time: 0, visits: 0 };
 
         for(let j = 9; j < sites.length; j++) {
           others.time += sites[j].time;
+          others.visits++;
         }
-
-        console.log(others);
 
         sites.splice(9, 0, others);
         sites.splice(10, sites.length-1);
       }
 
+      sites = this.setPercentage(sites);
+
 
       for(let i=0; i<sites.length; i++){
-        //console.log(sites[i]);
-
         this.siteNames.push(sites[i].url);
         this.times.push(sites[i].time);
       }
 
-      //console.log(this.siteNames);
-      //console.log(this.times);
+      this.sites = sites;
 
+      console.log(this.sites);
       this.createDoughnut();
     });
-
   }
-
-
 
   test(){
     this.snackService.openSnackBar("test", "Ok");
   }
 
+  public chartHovered({ event, active }: { event: MouseEvent, active: {}[] }): void {
+
+    const hovered : any = active[0];
+    let site = this.sites[hovered._index];
+    let timeString = this.convertMilliseconds(site.time);
+
+    this.detailsCardTitle.nativeElement.innerHTML = site.url;
+    this.detailsCardAbsoluteTime.nativeElement.innerHTML = timeString;
+    this.detailsCardPercent.nativeElement.innerHTML = site.percentage.toString() + "%";
+    this.favicon.nativeElement.setAttribute("src", site.favicon);
+    this.visits.nativeElement.innerHTML = "Visits: " + site.visits.toString();
+  }
+
   createDoughnut(){
-    // @ts-ignore
     this.experienceChart = {
-      options: {scaleShowVerticalLines: false,
-        responsive: true,
-        plugins: {
-          title: {
-            display: true,
-            text: 'Chart.js Line Chart - External Tooltips'
-          },
-          tooltip: {
-            enabled: false,
-            position: 'nearest',
-            external: externalTooltipHandler
-          }
-        }
-      },
+       options: {
+         plugins:{
+           tooltip: {
+             callbacks: {
+               // @ts-ignore
+               label: function(context){
+                 console.log(context);
+                 return "hallo";
+               }
+             }
+           }
+         }
+       },
       type: 'doughnut',
       legend: true,
       data: [
         {data: this.times, label: 'Time spent'},
       ],
+      labels: this.siteNames
     }
   }
 
+  convertMilliseconds(milliseconds: number){
+
+    let totalHours = Math.floor(milliseconds / 1000 / 60 / 60);
+    let remainingTime = milliseconds - (totalHours * 60 * 60 * 1000);
+    let totalMinutes = Math.floor(remainingTime / 1000 / 60);
+    remainingTime = remainingTime - (totalMinutes * 60 * 1000);
+    let totalSeconds = Math.floor(remainingTime / 1000);
+
+    return totalHours + "h " + totalMinutes + "m " + totalSeconds + "s";
+  }
 
   findIndexOfSiteWithURL(sites: any[], url: any){
     for(let i=0; i<sites.length; i++){
@@ -229,6 +158,23 @@ export class HomeComponent implements OnInit {
       }
     }
     return -1;
+  }
+
+  setPercentage(sites: any[]){
+    let completeTime: number = 0;
+
+    for(let i=0; i<sites.length; i++){
+      completeTime += sites[i].time;
+      console.log(sites[i].time);
+    }
+
+    for(let i=0; i<sites.length; i++){
+      let percent = (sites[i].time/completeTime) * 100;
+      let rounded =  Math.round(percent * 10) / 10;
+      sites[i].percentage = rounded;
+    }
+
+    return sites;
   }
 
 }

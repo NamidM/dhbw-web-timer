@@ -22,9 +22,11 @@ function pushNewTabEntry(id){
       }
       tabs.push({
         id: id,
+        userID: "0",
+        faviconUrl: getFavicon(x),
         url: x.url,
-        startTime: new Date().getTime(),
-        endTime: new Date().getTime(),
+        starttime: new Date().getTime(),
+        endtime: new Date().getTime(),
         active: true
       });
       addEventListenerToPage(id);
@@ -70,20 +72,20 @@ function updateTabEntry (id, isCloseEvent) {
   if(tabs.length != 0){
     let tab = tabs[tabs.length-1]
     let currentTime = new Date().getTime();
-    if((currentTime - tab.endTime) < TIMELIMIT) {
-      tabs[tabs.length-1].endTime = currentTime;
+    if((currentTime - tab.endtime) < TIMELIMIT) {
+      tabs[tabs.length-1].endtime = currentTime;
       //TODO das hier funktioniert manchmal nicht? Endtime wird nicht immer richtig gesetzt....
       if(isCloseEvent) {
         tabs[tabs.length-1].active = false;
       }
     } else {
       tabs[tabs.length-1].active = false;
-      tabs[tabs.length-1].endTime = tab.endTime + TIMELIMIT;
+      tabs[tabs.length-1].endtime = tab.endtime + TIMELIMIT;
       tabs.push({
         id: tab.id,
+        userID: "0",
+        faviconUrl: getFavicon(tab),
         url: tab.url,
-        startTime: currentTime,
-        endTime: currentTime,
         active: true
       });
     }
@@ -95,6 +97,15 @@ function startTimer() {
       sendTabs();
       startTimer();
   }, 600000);
+}
+
+function getFavicon(tab){
+  var favicon = tab.favIconUrl;
+  if (favicon === undefined) {
+    favicon = 'chrome://favicon/' + tab.url;
+  }
+  console.log(favicon);
+  return favicon;
 }
 
 function addEventListenerToPage(id){

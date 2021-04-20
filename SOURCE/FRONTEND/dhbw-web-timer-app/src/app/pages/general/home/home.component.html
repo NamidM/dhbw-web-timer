@@ -6,15 +6,38 @@
         Toast Test
     </button>
 
-  <div style="display: block" id="experienceChart" class="chart">
-    <label>Vorerfahrungen der Probanden im Vergleich</label>
-    <canvas baseChart *ngIf="experienceChart"
-            [datasets]="experienceChart.data"
-            [labels]="experienceChart.labels"
-            [options]="experienceChart.options"
-            [legend]="experienceChart.legend"
-            [chartType]="experienceChart.type">
-    </canvas>
+
+  <div class="wrapper">
+
+    <div style="display: block" id="experienceChart" class="chart">
+      <label>Webaktivität Heute</label>
+      <canvas baseChart *ngIf="experienceChart"
+              [datasets]="experienceChart.data"
+              [labels]="experienceChart.labels"
+              [options]="experienceChart.options"
+              [legend]="experienceChart.legend"
+              [chartType]="experienceChart.type"
+              (chartHover)="chartHovered($event)">
+      </canvas>
+    </div>
+
+    <mat-card class="example-card" #detailsCard>
+      <mat-card-header>
+        <div mat-card-avatar class="example-header-image">
+          <img #favicon class="favicon" src="https://old.reddit.com/favicon.ico"/>
+        </div>
+        <mat-card-title #title>Shiba Inu</mat-card-title>
+      </mat-card-header>
+      <br>
+        <p #detailsCardAbsoluteTime></p>
+        <p #detailsCardPercent></p>
+        <p #visits></p>
+      <mat-card-actions>
+        <button mat-button>LIKE</button>
+        <button mat-button>SHARE</button>
+      </mat-card-actions>
+    </mat-card>
+
   </div>
 
 </div>
