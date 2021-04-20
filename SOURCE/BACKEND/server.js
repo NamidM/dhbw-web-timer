@@ -69,9 +69,11 @@ server.get("/webActivities", (req,res)=>{
 });
 
 server.post("/tracking", async (req,res)=>{
+  console.log("Received tracking call");
   for(i in req.body){
     let obj = req.body[i];
-    WEBACTIVITY.addWebActivity(obj.url, obj.startTime, obj.endTime, "0");
+    console.log(obj);
+    WEBACTIVITY.addWebActivity(obj.url, obj.userID, obj.faviconUrl, obj.starttime, obj.endtime, ()=>{});
   }
   console.log(req.body[0])
 });
