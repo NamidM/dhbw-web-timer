@@ -7,16 +7,20 @@
 }
 .day-wrapper {
     display: block;
+    margin: auto;
+    width: 60%;
 }
 .statisticsHeader {
     padding: 10px;
 }
 .day-form, .week-form, .month-form {
-    margin: 1em;
-    width: 90%;
+    margin-top: 1em !important;
+    // width: 90%;
 }
-.next-icon {
-    margin-top: 5px;
+.next-icon, .delete-icon{
+    margin-top: 1em;
+    position: relative;
+    top: -0.5em;
 }
 
 .center {
@@ -34,4 +38,19 @@
     margin-top: 1.5em;
 }
 .date-wrapper{
+    padding: 0;
+    width: 50%;
+    margin: auto;
+    text-align: center;
+}
+.addweek-btn {
+    margin-top: 10px;
+}
+.week-wrapper, .month-wrapper {
+    max-width: 100%;
+    margin: 1%;
+}
+.delete-icon {
+    background-color: red;
+    width: 0;
 }
