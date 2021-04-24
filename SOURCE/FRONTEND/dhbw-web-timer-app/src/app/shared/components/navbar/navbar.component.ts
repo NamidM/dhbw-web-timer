@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { SnackBarService } from 'src/app/services/snack-bar/snack-bar.service';
 
 @Component({
   selector: 'app-navbar',
@@ -7,15 +9,15 @@ import { Router } from '@angular/router';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
-  public loggedIn: boolean;
 
-  constructor(public router: Router) {
-    this.loggedIn = true;
+  constructor(public router: Router, public authService: AuthService, private snackBarService: SnackBarService) {
   }
 
   ngOnInit(): void {
   }
   logout() {
-
+    this.authService.logout();
+    this.snackBarService.openSnackBar("Ausgeloggt!", "ok");
+    this.router.navigateByUrl("/");
   }
 }

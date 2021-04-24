@@ -21,12 +21,15 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatNativeDateModule, MAT_DATE_FORMATS } from '@angular/material/core';
 import {MatInputModule} from '@angular/material/input';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatIconModule} from '@angular/material/icon';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatCardModule} from '@angular/material/card';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { registerLocaleData } from '@angular/common';
 import localeDe from '@angular/common/locales/de';
+import { RegisterComponent } from './pages/general/register/register/register.component';
+import { CookieService } from 'ngx-cookie-service';
 registerLocaleData(localeDe);
 
 @NgModule({
@@ -39,7 +42,8 @@ registerLocaleData(localeDe);
     StatisticsComponent,
     CommunityComponent,
     GeneralComponent,
-    LoginComponent
+    LoginComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule,
@@ -56,11 +60,14 @@ registerLocaleData(localeDe);
     MatInputModule,
     ReactiveFormsModule,
     MatIconModule,
+    FormsModule,
     MatCheckboxModule,
-    MatCardModule
+    MatCardModule,
+    MatProgressSpinnerModule,
   ],
   bootstrap: [AppComponent],
   providers: [
+    CookieService,
     { provide: LOCALE_ID, useValue: 'de-DE' },
   ]
 })

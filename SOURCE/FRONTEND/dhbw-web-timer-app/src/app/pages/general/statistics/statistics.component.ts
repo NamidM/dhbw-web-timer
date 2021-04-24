@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ApiService } from 'src/app/services/api/api.service';
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-statistics',
@@ -29,10 +31,10 @@ export class StatisticsComponent implements OnInit {
     endMonth: new FormControl()
   });
 
-  constructor(private apiService: ApiService, private formBuilder: FormBuilder) {
+  constructor(private apiService: ApiService, private formBuilder: FormBuilder, private authService: AuthService, private router: Router) {
   }
 
-  async ngOnInit(){    
+  async ngOnInit(){
     let currentDate = new Date();
     let startOfWeek = new Date();
     let endOfWeek = new Date();
@@ -51,9 +53,13 @@ export class StatisticsComponent implements OnInit {
     this.rangeMonth.controls["startMonth"].setValue(startOfMonth);
     this.rangeMonth.controls["endMonth"].setValue(endOfMonth);
 
-    this.updateWeekChart(startOfWeek, endOfWeek);
-    this.updateDayChart(currentDate);
-    this.updateMonthChart(startOfMonth, endOfMonth);
+    if(!this.authService.loggedIn) {
+      this.router.navigateByUrl("/");
+    } else {
+      this.updateWeekChart(startOfWeek, endOfWeek);
+      this.updateDayChart(currentDate);
+      this.updateMonthChart(startOfMonth, endOfMonth);
+    }
   }
 
   dateSelectionDay(){

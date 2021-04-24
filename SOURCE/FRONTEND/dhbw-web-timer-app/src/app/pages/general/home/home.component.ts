@@ -6,6 +6,7 @@ import {ApiService} from "../../../services/api/api.service";
 import {Site} from "../../../interfaces";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
+import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -35,10 +36,15 @@ export class HomeComponent implements OnInit {
   // @ts-ignore
   @ViewChild('visits') visits: ElementRef<HTMLElement>;
 
-  constructor(private snackService: SnackBarService, private apiService: ApiService, private http: HttpClient) { }
+  constructor(private snackService: SnackBarService, private apiService: ApiService, public authService: AuthService) { }
 
   async ngOnInit(){
-    this.grabWebActivityData();
+    this.apiService.silentLogin().subscribe((response)=>{
+      if(response.message == "success") {
+        this.authService.loginUser();
+        this.grabWebActivityData();
+      }
+    });
   }
 
   grabWebActivityData(){
@@ -177,6 +183,23 @@ export class HomeComponent implements OnInit {
     return sites;
   }
 
+  register() {
+    this.authService.sendRegisterRequest();
+  }
+
+  login(){
+    this.authService.sendLoginRequest();
+  }
+
+  deleteUser() {
+    if(this.authService.loggedIn) {
+      this.apiService.deleteUser().subscribe((response)=>{
+        if(response.message == "success") {
+          this.authService.logout();
+        }
+      })
+    }
+  }
 }
 
 

@@ -6,7 +6,7 @@ const USER = module.exports = mongoose.model("User", mongoose.Schema({
         required: true,
         unique: true
     },
-    email: {
+    googleId: {
         type: String,
         required: true,
         unique: true
@@ -17,10 +17,14 @@ module.exports.getUsers = (callback, limit)=>{
     USER.find(callback).limit(limit);
 };
 
-module.exports.addUser = (name, email, callback)=>{
-    USER.create({name, email}, callback);
+module.exports.addUser = (name, googleId, callback)=>{
+    USER.create({name, googleId}, callback);
 };
 
-module.exports.getUser = (name, password, callback)=>{
-    USER.findOne(callback);
+module.exports.getUser = (googleId, callback)=>{
+    USER.findOne({ googleId }, callback);
+};
+
+module.exports.deleteUser = (googleId, callback)=>{
+    USER.deleteOne({ googleId }, callback);
 };

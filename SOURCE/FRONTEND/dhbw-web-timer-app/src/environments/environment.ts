@@ -4,9 +4,7 @@
 
 export const environment = {
   production: false,
-  baseUrl: "http://localhost:3000/",
-  redirect_uri: "http://localhost:4200",
-  client_id: "13816586294-mrtld51khmjj2lk85v2n12au2fnsak8c.apps.googleusercontent.com"
+  baseUrl: "http://localhost:3000/"
 };
 
 /*

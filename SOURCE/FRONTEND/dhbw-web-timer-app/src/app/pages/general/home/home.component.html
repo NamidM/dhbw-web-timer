@@ -1,5 +1,4 @@
-<div class="container">
-    <br>
+<div class="container main-page" *ngIf="authService.loggedIn">
     <h2>StartSeite</h2>
     <p>User Dashboard</p>
     <button mat-raised-button color="primary" (click)="test()" aria-label="Show an example snack-bar">
@@ -41,4 +40,11 @@
   </div>
 
 </div>
-
+<div *ngIf="!authService.loggedIn" class="container main-page">
+  <h1>Willkommen auf DHBW Web-Timer</h1>
+  <h3>Um diese Seite zu benutzen müssen sie eingeloggt sein!</h3><br>
+  <label >Noch kein Account?</label><br>
+  <button class="register-btn" mat-raised-button color="primary" (click)="register()">Registrieren mit Google</button><br><br>
+  <label>Bereits registriert?</label><br>
+  <button mat-raised-button color="primary" (click)="login()">Einloggen mit Google</button>
+</div>
