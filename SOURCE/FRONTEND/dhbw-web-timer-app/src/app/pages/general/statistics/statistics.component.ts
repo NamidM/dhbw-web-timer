@@ -53,13 +53,9 @@ export class StatisticsComponent implements OnInit {
     this.rangeMonth.controls["startMonth"].setValue(startOfMonth);
     this.rangeMonth.controls["endMonth"].setValue(endOfMonth);
 
-    if(!this.authService.loggedIn) {
-      this.router.navigateByUrl("/");
-    } else {
-      this.updateWeekChart(startOfWeek, endOfWeek);
-      this.updateDayChart(currentDate);
-      this.updateMonthChart(startOfMonth, endOfMonth);
-    }
+    this.updateWeekChart(startOfWeek, endOfWeek);
+    this.updateDayChart(currentDate);
+    this.updateMonthChart(startOfMonth, endOfMonth);
   }
 
   dateSelectionDay(){
@@ -138,7 +134,7 @@ export class StatisticsComponent implements OnInit {
     } else {
       let stack = weekForm != undefined ? weekForm : -1;
       this.weekTime = this.weekTime.filter(e => e.stack != stack.toString());
-      this.apiService.getWebActivitiesInTimespan('0', startOfWeek.getTime().toString(), endOfWeek.getTime().toString()).subscribe((timespanData : any) => {
+      this.apiService.getWebActivitiesInTimespan(startOfWeek.getTime().toString(), endOfWeek.getTime().toString()).subscribe((timespanData : any) => {
         let week: any[] = [];
         let urls = [];
         let startTime = new Date();
@@ -213,7 +209,7 @@ export class StatisticsComponent implements OnInit {
     } else {
       let stack = monthForm != undefined ? monthForm : -1;
       this.monthTime = this.monthTime.filter(e => e.stack != stack);
-      this.apiService.getWebActivitiesInTimespan('0', startOfMonth.getTime().toString(), endOfMonth.getTime().toString()).subscribe((timespanData : any) => {
+      this.apiService.getWebActivitiesInTimespan(startOfMonth.getTime().toString(), endOfMonth.getTime().toString()).subscribe((timespanData : any) => {
         let monthData: any = [];
         for(let i = 0; i < endOfMonth.getDate(); i++){
           monthData[i] = 0;
@@ -244,7 +240,7 @@ export class StatisticsComponent implements OnInit {
     let millisecondsInDay = day.getHours()*60*60*1000 + day.getMinutes()*60*1000 + day.getSeconds()*1000;
     let startOfDay = day.getTime() - millisecondsInDay;
     let endOfDay = startOfDay + 24*60*60*1000;
-    this.apiService.getWebActivitiesInTimespan('0', startOfDay.toString(), endOfDay.toString()).subscribe((timespanData : any) => {
+    this.apiService.getWebActivitiesInTimespan(startOfDay.toString(), endOfDay.toString()).subscribe((timespanData : any) => {
       let sites = new Map<string, number>();
       sites.clear();
       for(let entry of timespanData){

@@ -22,7 +22,7 @@ module.exports.addUser = (name, googleId, callback)=>{
 };
 
 module.exports.getUser = (googleId, callback)=>{
-    USER.findOne({ googleId }, callback);
+    USER.findOne({ googleId: googleId }, callback);
 };
 
 module.exports.deleteUser = (googleId, callback)=>{

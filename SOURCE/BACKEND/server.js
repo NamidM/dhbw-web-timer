@@ -49,16 +49,12 @@ if(production) {
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 
-server.get("/test", (req,res)=>{
-  req.session.page_views = req.session.page_views ? req.session.page_views+=1 : 1;
-  res.send("Page views: "+ req.session.page_views);
-});
-
 server.get("/webActivities", (req,res)=>{
   authUser(req, res, (userID)=> {
     let startTime = req.query.startTime;
     let endTime = req.query.endTime;
     WEBACTIVITY.getWebActivitiesInTimespan(startTime, endTime, userID, (error, webActivities) => {
+      console.log(webActivities.length);
       if(error){
         res.status(500).send("Backendfehler beim Laden von Web Activites");
       }else{
@@ -68,20 +64,24 @@ server.get("/webActivities", (req,res)=>{
   });
 });
 
-server.post("/tracking", async (req,res)=>{
+server.post("/webActivities", async (req,res)=>{
   console.log("Received tracking call");
-  for(i in req.body){
-    let obj = req.body[i];
-    WEBACTIVITY.addWebActivity(obj.url, obj.userID, obj.faviconUrl, obj.starttime, obj.endtime, ()=>{});
-  }
+  authUser(req, res, (userID)=>{
+    for(i in req.body){
+      let obj = req.body[i];
+      WEBACTIVITY.addWebActivity(obj.url, userID, obj.faviconUrl, obj.starttime, obj.endtime, ()=>{});
+    }
+  })
 });
 
 server.get("/getOAuthUrl", (req, res) => {
   let nonce = encodeURIComponent(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
   let state = encodeURIComponent(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
   const CLIENT_ID = encodeURIComponent(process.env.CLIENT_ID);
-  const REDIRECT_URI = encodeURIComponent(process.env.REDIRECT_URI + req.query.redirect);
-  console.log(REDIRECT_URI);
+  let REDIRECT_URI = encodeURIComponent(process.env.REDIRECT_URI + req.query.redirect);
+  if(!req.query.redirect) {
+    REDIRECT_URI = encodeURIComponent(process.env.REDIRECT_URI_EXTENSION);
+  }
   const RESPONSE_TYPE = encodeURIComponent('id_token code');
   const SCOPE = encodeURIComponent('openid');
   const PROMPT = encodeURIComponent('consent');
@@ -99,18 +99,20 @@ server.get("/getOAuthUrl", (req, res) => {
 
 server.get("/login", (req,res)=>{
   console.log("login")
+  let redirect = req.query.extension ? process.env.REDIRECT_URI_EXTENSION : process.env.REDIRECT_URI + "login";
   googleRequest({
     'code': req.query.authorization_code,
     'grant_type': 'authorization_code',
     'client_id': process.env.CLIENT_ID,
     'client_secret': process.env.CLIENT_SECRET,
-    'redirect_uri': process.env.REDIRECT_URI + "login"
+    'redirect_uri': redirect
   }, (data) => {
+    console.log(data);
     if(data.error) {
       res.send({message: "error"});
     } else {
       try {
-        jwt.decode(req.query.id_token);
+        let decodedIT = jwt.decode(req.query.id_token);
         res.cookie('refresh_token', data.refresh_token,  
           { maxAge: 7*24*60*60*1000,
             httpOnly: true,
@@ -121,7 +123,9 @@ server.get("/login", (req,res)=>{
             httpOnly: true,
             secure: production
           });
-        res.send({message: "success"});
+        getUserName(decodedIT.sub, (username)=>{
+          res.send({message: "success", username: username});
+        })
       } catch(e) {
         res.send({message: "error"});
       } 
@@ -133,9 +137,10 @@ server.get("/login", (req,res)=>{
 server.get("/silentLogin", (req,res)=>{
   console.log("silentLogin");
   authUser(req, res, (userID)=> {
-    res.send({message: "success"})
+    getUserName(userID, (username)=>{
+      res.send({message: "success", username: username})
+    });
   });
-
 });
 
 server.get("/logout", (req,res)=>{
@@ -199,7 +204,9 @@ server.get("/register", (req,res)=>{
                 httpOnly: true,
                 secure: production
               });
-            res.send({message: "success"});
+            getUserName(decoded.sub, (username)=>{
+              res.send({message: "success", username: username});
+            })
           }
         });
       } catch(e) {
@@ -211,8 +218,6 @@ server.get("/register", (req,res)=>{
 
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
-  WEBACTIVITY.getWebActivitiesInTimespan(0, 1617103561082,"0", (error, webActivities)=>{
-  });
 });
 
 function authUser(req, res, callback) {
@@ -225,26 +230,27 @@ function authUser(req, res, callback) {
       decodedIT.aud == process.env.CLIENT_ID) {
       callback(decodedIT.sub);
     } else {
-      googleRequest({
-        'grant_type': 'refresh_token',
-        'client_id': process.env.CLIENT_ID,
-        'client_secret': process.env.CLIENT_SECRET,
-        'refresh_token': req.cookies.refresh_token
-      }, (data)=>{
-        if(data.error || !data.id_token) {
-          res.status(401);
-        } else {
-          res.cookie('id_token', data.id_token,  
-          { maxAge: 60*60*1000,
-            httpOnly: true,
-            secure: production
-          });
-          callback(decodedIT.sub);
-        }
-      });
+      throw "e";
     }
   } catch(e) {
-    res.status(401);
+    googleRequest({
+      'grant_type': 'refresh_token',
+      'client_id': process.env.CLIENT_ID,
+      'client_secret': process.env.CLIENT_SECRET,
+      'refresh_token': req.cookies.refresh_token
+    }, (data)=>{
+      if(data.error || !data.id_token) {
+        res.send({message: "error"});
+      } else {
+        let decodedIT = jwt.decode(data.id_token);
+        res.cookie('id_token', data.id_token,  
+        { maxAge: 60*60*1000,
+          httpOnly: true,
+          secure: production
+        });
+        callback(decodedIT.sub);
+      }
+    });
   }
 }
 
@@ -274,4 +280,14 @@ function googleRequest(params, callback) {
   });
   request.write(postData);
   request.end();
+}
+
+function getUserName(userID, callback) {
+  USER.getUser(userID, (error, user)=>{
+    if(error || !user) {
+      callback(undefined);
+    } else {
+      callback(user.name);
+    }
+  })
 }

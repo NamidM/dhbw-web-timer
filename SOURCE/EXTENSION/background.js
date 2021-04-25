@@ -1,18 +1,72 @@
-let token;
 const TIMELIMIT = 30000;
 let tabs = [];
+let username, timeout;
+const base_url = 'http://127.0.0.1:3000/'
 
-/**
- * TODO:
- * -Login mit Oath/JWT
- * -IFrame mit Hauptstatistik in Popup.js
- */
+fetch(base_url + 'silentLogin')
+.then(response => response.json())
+.then(data => {
+  if(data.message == "success") {
+    username = data.username;
+    startTracking();
+  }
+});
 
-startTimer();
-// Function on tab change
-chrome.tabs.onActivated.addListener(async (e) => {
-  pushNewTabEntry(e.tabId);
-})
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if(request.message === 'login') {
+    if(username) {
+      console.log('Already signed in');
+    } else {
+      fetch(base_url + 'getOAuthUrl')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        chrome.identity.launchWebAuthFlow({
+          url: data.url,
+          interactive: true
+        }, function(redirect_url) {
+          console.log(redirect_url);
+          let id_token = redirect_url.substring(redirect_url.indexOf('id_token=') + 9)
+          id_token = id_token.substring(0, id_token.indexOf('&'));
+      
+          let authorization_code = redirect_url.substring(redirect_url.indexOf('code=') + 5);
+          authorization_code = authorization_code.substring(0, authorization_code.indexOf('&'));
+          fetch(`${base_url}login?authorization_code=${authorization_code}&id_token=${id_token}&extension=true`)
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+            if(data.message == "error") {
+              // TODO add message that login failed
+            } else {
+              username = data.username;
+              startTracking();
+              chrome.runtime.sendMessage({message: 'login', username: username});
+            }
+            return true;
+          });
+        });
+      });
+    }
+  } else if(request.message === 'logout') {
+    fetch(base_url + 'logout')
+      .then(response => response.json())
+      .then(data => {
+        if(data.message == "success") {
+          username = undefined;
+          stopTracking();
+          chrome.runtime.sendMessage({message: 'logout'});
+        }
+      });
+  } else if(request.message === 'isUserLoggedIn') {
+    sendResponse(username);
+  } else if(request.message === 'updateTabs') {
+    updateTabEntry(sender.tab.id, false);
+  } else if(request.message === 'sync') {
+    sendTabs();
+    sendResponse('success');
+  }
+});
+
 
 function pushNewTabEntry(id){
   chrome.tabs.get(id, (x)=>{
@@ -22,7 +76,6 @@ function pushNewTabEntry(id){
       }
       tabs.push({
         id: id,
-        userID: "0",
         faviconUrl: getFavicon(x),
         url: x.url,
         starttime: new Date().getTime(),
@@ -32,39 +85,6 @@ function pushNewTabEntry(id){
       addEventListenerToPage(id);
     }
   });
-}
-
-chrome.tabs.onRemoved.addListener(tabId => {
-    updateTabEntry(tabId, true);
-});
-
-chrome.windows.onRemoved.addListener(windowId => {
-  sendTabs();
-});
-
-chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  if(changeInfo.url) {
-      //let baseUrl = url.split('/')[2];
-      //let baseUrl = url.split('/')[2].split('.').slice(url.split('/')[2].split('.').length-2, url.split('/')[2].split('.').length).join('.');
-      if(tabs.length != 0 && (tabs[tabs.length-1].url.split('/')[2] == changeInfo.url.split('/')[2])) {
-        addEventListenerToPage(tabId);
-        tabs[tabs.length-1].endTime = new Date().getTime();
-        tabs[tabs.length-1].url = changeInfo.url;
-      } else {
-        pushNewTabEntry(tabId);
-      }
-  }
-});
-
-async function postData(url = '', data = {}) {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  });
-  return response;
 }
 
 // Update tab entry if no timeout or create new if timeout
@@ -83,7 +103,6 @@ function updateTabEntry (id, isCloseEvent) {
       tabs[tabs.length-1].endtime = tab.endtime + TIMELIMIT;
       tabs.push({
         id: tab.id,
-        userID: "0",
         faviconUrl: getFavicon(tab),
         url: tab.url,
         active: true
@@ -93,7 +112,7 @@ function updateTabEntry (id, isCloseEvent) {
 }
 
 function startTimer() {
-  setTimeout(() => {
+  timeout = setTimeout(() => {
       sendTabs();
       startTimer();
   }, 600000);
@@ -142,10 +161,9 @@ function sendTabs(){
       tabs[tabs.length-1].endTime = tabs[tabs.length-1].endTime + TIMELIMIT;
       tabs[tabs.length-1].active = false;
     }
-    // TODO -> send UserID
     console.log("Sending data");
     console.log(tabs);
-    postData('http://127.0.0.1:3000/tracking', tabs)
+    postData(base_url + 'webActivities', tabs)
     .then(async response => {
       if(response.status == 200) {
         let res = await response.json();
@@ -157,64 +175,60 @@ function sendTabs(){
     });
   }
 }
-let user_signed_in = false;
-const CLIENT_ID = encodeURIComponent('13816586294-t3d1k5mqu77um116qd9vn3dede42ppmn.apps.googleusercontent.com');
-const RESPONSE_TYPE = encodeURIComponent('id_token');
-const REDIRECT_URI = encodeURIComponent('https://peiiacnbhlnhkiklncejaoegaocccgom.chromiumapp.org');
-const STATE = encodeURIComponent('jfkls3n');
-const SCOPE = encodeURIComponent('openid');
-const PROMPT = encodeURIComponent('consent');
 
-function create_oauth2_url() {
-  let nonce = encodeURIComponent(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
+function startTracking() {
+  console.log("tracking started")
+  startTimer();
+  // Function on tab change
+  chrome.tabs.onActivated.addListener(tabActivatedListener);
 
-  let url = `
-  https://accounts.google.com/o/oauth2/v2/auth
-  ?client_id=${CLIENT_ID}
-  &response_type=${RESPONSE_TYPE}
-  &redirect_uri=${REDIRECT_URI}
-  &state=${STATE}
-  &scope=${SCOPE}
-  &prompt=${PROMPT}
-  &nonce=${nonce}`;
+  chrome.tabs.onRemoved.addListener(tabRemovedListener);
 
-  console.log(url)
+  chrome.windows.onRemoved.addListener(windowRemovedListener);
 
-  return url;
+  chrome.tabs.onUpdated.addListener(tabUpdatedListener);
 }
 
-function is_user_signed_in() {
-  return user_signed_in;
+function stopTracking() {
+  console.log("tracking stopped")
+  chrome.tabs.onUpdated.removeListener(tabUpdatedListener);
+  chrome.windows.onRemoved.removeListener(windowRemovedListener);
+  chrome.tabs.onRemoved.removeListener(tabRemovedListener);
+  chrome.tabs.onActivated.removeListener(tabActivatedListener);
+  clearTimeout(timeout);
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if(request.message === 'login') {
-    if(is_user_signed_in()) {
-      console.log('Already signed in');
-    } else {
-      chrome.identity.launchWebAuthFlow({
-        url: create_oauth2_url(),
-        interactive: true
-      }, function(redirect_url) {
-        console.log(redirect_url)
+async function postData(url = '', data = {}) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+  return response;
+}
 
-        // let id_token = redirect_url.substring(redirect_url.indexOf('id_token=') + 9)
-        // id_token = id_token.substring(0, id_token.indexOf('&'));
-        // const user_info = KJUR.jws.JWS.readSafeJSONString(b64utoutf8(id_token.split(".")[1]))
+async function tabActivatedListener(e) {
+  pushNewTabEntry(e.tabId);
+}
 
-        sendResponse('success');
-      });
+function tabRemovedListener(tabId) {
+  updateTabEntry(tabId, true);
+}
 
-      return true;
-    }
-  } else if(request.message === 'logout') {
+function windowRemovedListener(windowId) {
+  sendTabs();
+}
 
-  } else if(request.message === 'isUserSignedIn') {
-    
-  } else if(request.message === 'updateTabs') {
-    updateTabEntry(sender.tab.id, false);
-  } else if(request.message === 'sync') {
-    sendTabs();
-    sendResponse('success');
+function tabUpdatedListener(tabId, changeInfo) {
+  if(changeInfo.url) {
+      if(tabs.length != 0 && (tabs[tabs.length-1].url.split('/')[2] == changeInfo.url.split('/')[2])) {
+        addEventListenerToPage(tabId);
+        tabs[tabs.length-1].endTime = new Date().getTime();
+        tabs[tabs.length-1].url = changeInfo.url;
+      } else {
+        pushNewTabEntry(tabId);
+      }
   }
-});
+}

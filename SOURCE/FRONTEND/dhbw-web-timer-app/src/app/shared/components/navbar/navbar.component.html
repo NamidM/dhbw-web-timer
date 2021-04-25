@@ -9,16 +9,17 @@
         <li class="nav-item" [class.active]="router.isActive('/', true)" >
           <a class="nav-link" [routerLink]="['/']">Home</a>
         </li>
-        <li class="nav-item" *ngIf="authService.loggedIn" [class.active]="router.isActive('/statistics', true)" >
+        <li class="nav-item" *ngIf="authService.username" [class.active]="router.isActive('/statistics', true)" >
             <a class="nav-link" [routerLink]="['/statistics']">Statistiken</a>
         </li>
-        <li class="nav-item" *ngIf="authService.loggedIn" [class.active]="router.isActive('/community', true)" >
+        <li class="nav-item" *ngIf="authService.username" [class.active]="router.isActive('/community', true)" >
             <a class="nav-link" [routerLink]="['/community']">Community</a>
         </li>
         <li class="nav-item" [class.active]="router.isActive('/about', true)">
           <a class="nav-link" [routerLink]="['/about']">About</a>
         </li>
       </ul>
-      <button mat-raised-button color="accent" class="my-2 my-sm-0" *ngIf="authService.loggedIn" (click)="logout()">Logout</button>
+      <span class="username">Eingeloggt als: <b>{{authService.username}}</b></span>
+      <button mat-raised-button color="accent" class="my-2 my-sm-0" *ngIf="authService.username" (click)="logout()">Logout</button>
     </div>
 </nav>

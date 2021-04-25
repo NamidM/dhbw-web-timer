@@ -30,7 +30,7 @@ export class RegisterComponent implements OnInit {
     this.authorization_code = this.router.url.substring(this.router.url.indexOf('code=') + 5);
     this.authorization_code = this.authorization_code.substring(0, this.authorization_code.indexOf('&'));
     this.router.navigateByUrl("/register");
-    if(this.id_token == "" || this.authorization_code == "" || this.authService.loggedIn) {
+    if(this.id_token == "" || this.authorization_code == "" || this.authService.username) {
       this.router.navigateByUrl("/");
     } else {
       this.apiService.registerCheck(this.id_token).subscribe((response)=>{
@@ -45,7 +45,7 @@ export class RegisterComponent implements OnInit {
   register() {
     this.apiService.register(this.id_token, this.authorization_code, this.registerForm.controls['username'].value).subscribe((response)=>{
       if(response.message == "success") {
-        this.authService.loginUser();
+        this.authService.loginUser(response.username);
         this.snackBarService.openSnackBar("Registriert!", "Ok");
         this.router.navigateByUrl("/");
       }

@@ -12,9 +12,6 @@ export class CommunityComponent implements OnInit {
   constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
-    if(!this.authService.loggedIn) {
-      this.router.navigateByUrl("/");
-    }
   }
 
 }

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { ApiService } from '../api/api.service';
 
@@ -7,32 +8,47 @@ import { ApiService } from '../api/api.service';
   providedIn: 'root'
 })
 export class AuthService {
-  public loggedIn: boolean = false;
+  public loading: boolean = true;
+  public username?: string;
 
-  constructor(private cookieService: CookieService, private apiService: ApiService) {}
+  constructor(private cookieService: CookieService, private apiService: ApiService, private router: Router) {}
 
   sendRegisterRequest(){
     this.apiService.getOAuthUrl("register").subscribe((response)=>{
-      location.replace(response.url);
+      window.location.href = response.url;
     });
   }
 
   sendLoginRequest(){
     this.apiService.getOAuthUrl("login").subscribe((response)=>{
-      location.replace(response.url);
+      window.location.href = response.url;
     });
   }
 
   logout() {
     this.apiService.logout().subscribe((response)=> {
       if(response.message == "success") {
-        this.loggedIn = false;
+        delete(this.username);
       }
     });
   }
 
-  loginUser() {
-    this.loggedIn = true;
+  loginUser(username?: string) {
+    this.loading = false;
+    this.username = username;
+  }
+
+  silentLogin(callback: Function) {
+    this.apiService.silentLogin().subscribe((response)=>{
+      this.loading = false;
+      if(response.message == "success") {
+        this.username = response.username;
+        callback();
+      } else {
+        delete(this.username);
+        this.router.navigateByUrl("/");
+      }
+    });
   }
 
 }

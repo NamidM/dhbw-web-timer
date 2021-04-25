@@ -1,10 +1,6 @@
-<div class="container main-page" *ngIf="authService.loggedIn">
-    <h2>StartSeite</h2>
-    <p>User Dashboard</p>
-    <button mat-raised-button color="primary" (click)="test()" aria-label="Show an example snack-bar">
-        Toast Test
-    </button>
-
+<div class="container main-page" *ngIf="authService.username">
+    <h1>StartSeite</h1>
+    <h3>User Dashboard von: <b>{{authService.username}}</b></h3>
 
   <div class="wrapper">
 
@@ -40,7 +36,7 @@
   </div>
 
 </div>
-<div *ngIf="!authService.loggedIn" class="container main-page">
+<div *ngIf="!authService.username && !authService.loading" class="container main-page">
   <h1>Willkommen auf DHBW Web-Timer</h1>
   <h3>Um diese Seite zu benutzen müssen sie eingeloggt sein!</h3><br>
   <label >Noch kein Account?</label><br>

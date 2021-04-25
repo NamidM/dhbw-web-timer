@@ -4,8 +4,6 @@ import * as Chart from 'chart.js';
 import { SnackBarService } from 'src/app/services/snack-bar/snack-bar.service';
 import {ApiService} from "../../../services/api/api.service";
 import {Site} from "../../../interfaces";
-import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
 import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
@@ -39,12 +37,7 @@ export class HomeComponent implements OnInit {
   constructor(private snackService: SnackBarService, private apiService: ApiService, public authService: AuthService) { }
 
   async ngOnInit(){
-    this.apiService.silentLogin().subscribe((response)=>{
-      if(response.message == "success") {
-        this.authService.loginUser();
-        this.grabWebActivityData();
-      }
-    });
+    this.grabWebActivityData();
   }
 
   grabWebActivityData(){
@@ -54,7 +47,7 @@ export class HomeComponent implements OnInit {
 
     let startOfDay = currentTime - millisecondsInDay;
 
-    this.apiService.getWebActivitiesInTimespan('0', startOfDay.toString(), currentTime.toString()).subscribe((timespanData : any) => {
+    this.apiService.getWebActivitiesInTimespan(startOfDay.toString(), currentTime.toString()).subscribe((timespanData : any) => {
       let sites: any[] = []
 
 
@@ -102,10 +95,6 @@ export class HomeComponent implements OnInit {
       console.log(this.sites);
       this.createDoughnut();
     });
-  }
-
-  test(){
-    this.snackService.openSnackBar("test", "Ok");
   }
 
   public chartHovered({ event, active }: { event: MouseEvent, active: {}[] }): void {
@@ -192,7 +181,7 @@ export class HomeComponent implements OnInit {
   }
 
   deleteUser() {
-    if(this.authService.loggedIn) {
+    if(this.authService.username) {
       this.apiService.deleteUser().subscribe((response)=>{
         if(response.message == "success") {
           this.authService.logout();

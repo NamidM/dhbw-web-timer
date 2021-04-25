@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit {
     } else {
       this.apiService.login(id_token, authorization_code).subscribe((response)=>{
         if(response.message == "success") {
-          this.authService.loginUser();
+          this.authService.loginUser(response.username);
           this.snackBarService.openSnackBar("Eingeloggt!", "Ok");
           this.router.navigateByUrl("/");
         } else {
