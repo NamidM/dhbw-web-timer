@@ -1,6 +1,6 @@
 const TIMELIMIT = 30000;
 let tabs = [];
-let username, timeout;
+let username, timeout, tracking;
 const base_url = 'http://127.0.0.1:3000/'
 
 fetch(base_url + 'silentLogin')
@@ -58,10 +58,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
       });
   } else if(request.message === 'isUserLoggedIn') {
+    console.log("isuserlog")
     sendResponse(username);
   } else if(request.message === 'updateTabs') {
-    updateTabEntry(sender.tab.id, false);
+    if(tracking) {
+      updateTabEntry(sender.tab.id, false);
+    }
   } else if(request.message === 'sync') {
+    console.log("syncBtn pressed")
     sendTabs();
     sendResponse('success');
   }
@@ -72,6 +76,7 @@ function pushNewTabEntry(id){
   chrome.tabs.get(id, (x)=>{
     if(x.url !== "chrome://newtab/" && x.url !== "" && !x.url.startsWith("chrome://")) {
       if(tabs.length != 0){
+        tabs[tabs.length-1].endtime = new Date().getTime();
         tabs[tabs.length-1].active = false;
       }
       tabs.push({
@@ -94,7 +99,6 @@ function updateTabEntry (id, isCloseEvent) {
     let currentTime = new Date().getTime();
     if((currentTime - tab.endtime) < TIMELIMIT) {
       tabs[tabs.length-1].endtime = currentTime;
-      //TODO das hier funktioniert manchmal nicht? Endtime wird nicht immer richtig gesetzt....
       if(isCloseEvent) {
         tabs[tabs.length-1].active = false;
       }
@@ -136,38 +140,40 @@ function addEventListenerToPage(id){
         chrome.runtime.sendMessage({message: 'updateTabs'});
         lastSent = new Date().getTime()  
       }
-    }, false)
+    }, false);
     document.addEventListener('mousemove', (event) => {
       if(!lastSent || (new Date().getTime() - lastSent) > 1000) {
         chrome.runtime.sendMessage({message: 'updateTabs'});
         lastSent = new Date().getTime()
       }
-    }, false)
+    }, false);
   };
   chrome.scripting.executeScript({
     target: { tabId: id },
-    function: code,
+    function: code
   });
 }
 
 function sendTabs(){
+  console.log(tabs.length, tabs.length != 0)
   if(tabs.length != 0){
     let newTabs = [];
-    let activeTabExists = (tabs[tabs.length-1].endTime - new Date().getTime()) < TIMELIMIT;
+    let activeTabExists = (new Date().getTime() - tabs[tabs.length-1].endtime) < TIMELIMIT;
+    console.log(tabs[tabs.length-1].endtime, activeTabExists)
+
     if(activeTabExists) {
       newTabs.push(tabs[tabs.length-1]);
       tabs = tabs.splice(0, tabs.length-1);
     } else {
-      tabs[tabs.length-1].endTime = tabs[tabs.length-1].endTime + TIMELIMIT;
+      tabs[tabs.length-1].endtime = tabs[tabs.length-1].endtime + TIMELIMIT;
       tabs[tabs.length-1].active = false;
     }
-    console.log("Sending data");
-    console.log(tabs);
+    console.log("Sending data", tabs);
     postData(base_url + 'webActivities', tabs)
     .then(async response => {
       if(response.status == 200) {
         let res = await response.json();
-        console.log("Success: " +  res.data);
+        console.log("Success: ", res);
         tabs = newTabs;
       } else {
         console.log("Failed to reach backend")
@@ -179,14 +185,11 @@ function sendTabs(){
 function startTracking() {
   console.log("tracking started")
   startTimer();
-  // Function on tab change
   chrome.tabs.onActivated.addListener(tabActivatedListener);
-
   chrome.tabs.onRemoved.addListener(tabRemovedListener);
-
   chrome.windows.onRemoved.addListener(windowRemovedListener);
-
   chrome.tabs.onUpdated.addListener(tabUpdatedListener);
+  tracking = true;
 }
 
 function stopTracking() {
@@ -196,6 +199,8 @@ function stopTracking() {
   chrome.tabs.onRemoved.removeListener(tabRemovedListener);
   chrome.tabs.onActivated.removeListener(tabActivatedListener);
   clearTimeout(timeout);
+  tracking = false;
+  tabs = [];
 }
 
 async function postData(url = '', data = {}) {
@@ -225,7 +230,7 @@ function tabUpdatedListener(tabId, changeInfo) {
   if(changeInfo.url) {
       if(tabs.length != 0 && (tabs[tabs.length-1].url.split('/')[2] == changeInfo.url.split('/')[2])) {
         addEventListenerToPage(tabId);
-        tabs[tabs.length-1].endTime = new Date().getTime();
+        tabs[tabs.length-1].endtime = new Date().getTime();
         tabs[tabs.length-1].url = changeInfo.url;
       } else {
         pushNewTabEntry(tabId);

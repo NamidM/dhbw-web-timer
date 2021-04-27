@@ -77,7 +77,7 @@
               <button mat-icon-button class="next-icon" (click)="nextWeek(i)">
                 <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_next</mat-icon>
               </button>
-              <button mat-icon-button class="delete-icon" (click)="deleteWeek(i)">
+              <button mat-icon-button class="delete-icon" (click)="deleteWeek(addedWeek.controls.index.value)">
                 <mat-icon aria-hidden="false" aria-label="Example home icon">delete</mat-icon>
               </button>
             </form>
@@ -136,7 +136,7 @@
               <button mat-icon-button class="next-icon" (click)="nextMonth(i)">
                 <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_next</mat-icon>
               </button>
-              <button mat-icon-button class="delete-icon" (click)="deleteMonth(i)">
+              <button mat-icon-button class="delete-icon" (click)="deleteMonth(addedMonth.controls.index.value)">
                 <mat-icon aria-hidden="false" aria-label="Example home icon">delete</mat-icon>
               </button>
             </form>

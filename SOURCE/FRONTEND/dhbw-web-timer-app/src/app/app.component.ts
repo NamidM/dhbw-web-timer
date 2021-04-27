@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 
 // @ts-ignore
@@ -13,9 +13,6 @@ export class AppComponent {
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
-  constructor(http:HttpClient){
-    http.get("http://127.0.0.1:3000/test", this.httpOptions).subscribe((data: any)=>{
-      console.log(data);
-    });
+  constructor(){
   }
 }

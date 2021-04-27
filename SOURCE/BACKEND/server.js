@@ -54,7 +54,6 @@ server.get("/webActivities", (req,res)=>{
     let startTime = req.query.startTime;
     let endTime = req.query.endTime;
     WEBACTIVITY.getWebActivitiesInTimespan(startTime, endTime, userID, (error, webActivities) => {
-      console.log(webActivities.length);
       if(error){
         res.status(500).send("Backendfehler beim Laden von Web Activites");
       }else{
@@ -71,6 +70,7 @@ server.post("/webActivities", async (req,res)=>{
       let obj = req.body[i];
       WEBACTIVITY.addWebActivity(obj.url, userID, obj.faviconUrl, obj.starttime, obj.endtime, ()=>{});
     }
+    res.send({message: "success"})
   })
 });
 

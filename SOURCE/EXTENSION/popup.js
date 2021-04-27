@@ -8,12 +8,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       showLoginPage("error");
     }
   } else if(request.message === 'logout') {
-    delete(username);
+    username = undefined;
     showLoginPage();
   }
 });
+console.log("test")
 
 chrome.runtime.sendMessage({message: 'isUserLoggedIn'}, response => {
+  console.log("sent")
   if(!response) {
     showLoginPage();
   } else {
@@ -36,6 +38,7 @@ function showMainPage() {
   document.getElementById('login').innerHTML = "";
   document.getElementById('content').innerHTML = `
     <iframe src="http://localhost:4200/" style="max-width: 780px; max-height: 450px" width="900" height="500" name="homepage"></iframe>
+    <p>Willkommen: <b></b></p>
     <p>Statistiken <a id="statisticsLink" href="#">Hier</a> ansehen</p>
     <button id="logoutBtn">Ausloggen</button>
     <button id="syncBtn">Sync</button>

@@ -4,14 +4,14 @@
 
   <div class="wrapper">
 
-    <div style="display: block" id="experienceChart" class="chart">
+    <div style="display: block" id="dayChart" class="chart">
       <label>Webaktivität Heute</label>
-      <canvas baseChart *ngIf="experienceChart"
-              [datasets]="experienceChart.data"
-              [labels]="experienceChart.labels"
-              [options]="experienceChart.options"
-              [legend]="experienceChart.legend"
-              [chartType]="experienceChart.type"
+      <canvas baseChart *ngIf="dayChart"
+              [datasets]="dayChart.data"
+              [labels]="dayChart.labels"
+              [options]="dayChart.options"
+              [legend]="dayChart.legend"
+              [chartType]="dayChart.type"
               (chartHover)="chartHovered($event)">
       </canvas>
     </div>

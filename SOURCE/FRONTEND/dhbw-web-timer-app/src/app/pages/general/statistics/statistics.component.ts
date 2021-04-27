@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
-import { Router } from '@angular/router';
 import { ApiService } from 'src/app/services/api/api.service';
-import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-statistics',
@@ -16,9 +14,10 @@ export class StatisticsComponent implements OnInit {
   public siteNames: string[] = [];
   public addedWeeks: FormGroup[] = [];
   public addedMonths: FormGroup[] = [];
-  public comparingWeeks: boolean = false;
   private weekTime:any[] = [];
   private monthTime:any[] = [];
+  private startOfWeek?: Date;
+  private endOfWeek?: Date;
   rangeWeek = new FormGroup({
     startWeek: new FormControl(),
     endWeek: new FormControl()
@@ -31,29 +30,27 @@ export class StatisticsComponent implements OnInit {
     endMonth: new FormControl()
   });
 
-  constructor(private apiService: ApiService, private formBuilder: FormBuilder, private authService: AuthService, private router: Router) {
+  constructor(private apiService: ApiService, private formBuilder: FormBuilder) {
   }
 
   async ngOnInit(){
     let currentDate = new Date();
-    let startOfWeek = new Date();
-    let endOfWeek = new Date();
+    this.startOfWeek = new Date();
+    this.startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1);
+    this.startOfWeek.setHours(0);
+    this.startOfWeek.setMinutes(0);
+    this.startOfWeek.setSeconds(0);
+    this.endOfWeek = this.getEndWeek(this.startOfWeek);
     let startOfMonth = new Date();
-    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1);
-    startOfWeek.setHours(0);
-    startOfWeek.setMinutes(0);
-    endOfWeek.setDate(startOfWeek.getDate() + 7); 
-    endOfWeek.setHours(0);
-    endOfWeek.setMinutes(0);
     startOfMonth.setDate(1);
     let endOfMonth = new Date(startOfMonth.getFullYear(), startOfMonth.getMonth()+1, 0)
     this.rangeDay.controls["startDay"].setValue(new Date());
-    this.rangeWeek.controls["startWeek"].setValue(startOfWeek);
-    this.rangeWeek.controls["endWeek"].setValue(endOfWeek);
+    this.rangeWeek.controls["startWeek"].setValue(this.startOfWeek);
+    this.rangeWeek.controls["endWeek"].setValue(this.endOfWeek);
     this.rangeMonth.controls["startMonth"].setValue(startOfMonth);
     this.rangeMonth.controls["endMonth"].setValue(endOfMonth);
 
-    this.updateWeekChart(startOfWeek, endOfWeek);
+    this.updateWeekChart(this.startOfWeek, this.endOfWeek);
     this.updateDayChart(currentDate);
     this.updateMonthChart(startOfMonth, endOfMonth);
   }
@@ -63,18 +60,13 @@ export class StatisticsComponent implements OnInit {
   }
 
   startDateSelectionWeek(i?: any){
-    console.log(i);
     if(i != undefined) {
       let start = new Date(this.addedWeeks[i].controls["startWeek"].value);
       start.setDate(start.getDate() - start.getDay() + 1);
-      start.setHours(0);
-      start.setMinutes(0);
       this.addedWeeks[i].controls["startWeek"].setValue(start);
     } else {
       let start = new Date(this.rangeWeek.controls["startWeek"].value);
       start.setDate(start.getDate() - start.getDay() + 1);
-      start.setHours(0);
-      start.setMinutes(0);
       this.rangeWeek.controls["startWeek"].setValue(start);
     }
   }
@@ -82,18 +74,12 @@ export class StatisticsComponent implements OnInit {
   endDateSelectionWeek(i?: any){
     if(i != undefined) {
       let start = new Date(this.addedWeeks[i].controls["startWeek"].value);
-      let end = new Date(start);
-      end.setHours(0);
-      end.setMinutes(0);
-      end.setDate(start.getDate() + 7); 
+      let end = this.getEndWeek(start);
       this.addedWeeks[i].controls["endWeek"].setValue(end);
       this.updateWeekChart(start, end);
     } else {
       let start = new Date(this.rangeWeek.controls["startWeek"].value);
-      let end = new Date(start);
-      end.setHours(0);
-      end.setMinutes(0);
-      end.setDate(start.getDate() + 7); 
+      let end = this.getEndWeek(start);
       this.rangeWeek.controls["endWeek"].setValue(end);
       this.updateWeekChart(start, end);
       console.log(start, end)
@@ -203,12 +189,14 @@ export class StatisticsComponent implements OnInit {
   }
 
   updateMonthChart(startOfMonth?: Date, endOfMonth?: Date, monthForm?: any) {
+    console.log(monthForm)
     if(startOfMonth == undefined || endOfMonth == undefined) {
+      console.log(this.monthTime, monthForm);
       this.monthTime = this.monthTime.filter(e => e.stack != monthForm);
+      console.log(this.monthTime);
+
       this.createMonthChart();
     } else {
-      let stack = monthForm != undefined ? monthForm : -1;
-      this.monthTime = this.monthTime.filter(e => e.stack != stack);
       this.apiService.getWebActivitiesInTimespan(startOfMonth.getTime().toString(), endOfMonth.getTime().toString()).subscribe((timespanData : any) => {
         let monthData: any = [];
         for(let i = 0; i < endOfMonth.getDate(); i++){
@@ -221,14 +209,26 @@ export class StatisticsComponent implements OnInit {
           monthData[dayIndex] += e.endtime - e.starttime;
         }
         for(let i = 0; i < endOfMonth.getDate(); i++){
-          monthData[i] = Math.floor(monthData[i] / 1000 / 6 / 6)/100;
+          monthData[i] = Math.floor(((monthData[i] / 10) / 60) / 60)/100;
         }
+        const monthNames = ["Januar", "Februar", "März", "April", "Mai", "Juni",
+        "Juli", "August", "September", "Oktober", "November", "Dezember"
+        ];
         let stack = monthForm != undefined ? monthForm : -1;
-        this.monthTime.push({
-          data: monthData, 
-          label: "Stunden",
-          stack: stack
-        });
+        let indexFromStack = this.monthTime.findIndex(e => e.stack == stack);
+        if(this.monthTime[indexFromStack]) {
+          this.monthTime[indexFromStack] = {
+            data: monthData, 
+            label: monthNames[startOfMonth.getMonth()],
+            stack: stack
+          };
+        } else {
+          this.monthTime.push({
+            data: monthData, 
+            label: monthNames[startOfMonth.getMonth()],
+            stack: stack
+          });
+        }
         this.createMonthChart();
       });
     }
@@ -256,7 +256,7 @@ export class StatisticsComponent implements OnInit {
       }
       for(var[siteName, time] of sites.entries()){
         this.siteNames.push(siteName);
-        times.push(time);
+        times.push(Math.round(time/1000/6)/10);
       }
       this.createDayDoughnut(times);
     });
@@ -269,18 +269,17 @@ export class StatisticsComponent implements OnInit {
     this.monthChart = {
       options: {scaleShowVerticalLines: false,
         elements: {
-          line: {
-              tension: 0
-          }
+          line: {tension: 0}
       },
         responsive: true,
         scales: {yAxes: [{ticks: {beginAtZero: true}, scaleLabel: {
           display: true,
           labelString: 'Stunden'
-        }}]}},
+        }}]}
+      },
       labels: labels,
       type: 'line',
-      legend: false,
+      legend: true,
       data: this.monthTime
     }
   }
@@ -290,12 +289,9 @@ export class StatisticsComponent implements OnInit {
       options: {scaleShowVerticalLines: false,
         responsive: true,
         scales: {
-          x: {
-            stacked: true
-          },
-          y: {
-            stacked: true,
-          },
+          x: {stacked: true},
+          y: {stacked: true},
+          
           yAxes: [
             {
               ticks: {beginAtZero: true},
@@ -317,7 +313,11 @@ export class StatisticsComponent implements OnInit {
     this.dayChart = {
       options: {scaleShowVerticalLines: false,
         responsive: true,
-        scales: {yAxes: [{ticks: {beginAtZero: true}}]}},
+        scales: {yAxes: [{ticks: {beginAtZero: true}, scaleLabel: {
+          display: true,
+          labelString: 'Minuten'
+        }}]}
+      },
       labels: this.siteNames,
       type: 'doughnut',
       legend: true,
@@ -346,20 +346,14 @@ export class StatisticsComponent implements OnInit {
       let weekPlusOne = new Date(this.addedWeeks[i].controls["startWeek"].value);
       weekPlusOne.setTime(weekPlusOne.getTime()+24*60*60*1000*7);
       this.addedWeeks[i].controls["startWeek"].setValue(weekPlusOne);
-      let endWeekPlusOne = new Date(weekPlusOne);
-      endWeekPlusOne.setDate(weekPlusOne.getDate() + 7); 
-      endWeekPlusOne.setHours(0);
-      endWeekPlusOne.setMinutes(0);
+      let endWeekPlusOne = this.getEndWeek(weekPlusOne);
       this.addedWeeks[i].controls["endWeek"].setValue(endWeekPlusOne);
       this.updateWeekChart(weekPlusOne, endWeekPlusOne, i);
     } else {
       let weekPlusOne = new Date(this.rangeWeek.controls["startWeek"].value);
       weekPlusOne.setTime(weekPlusOne.getTime()+24*60*60*1000*7);
       this.rangeWeek.controls["startWeek"].setValue(weekPlusOne);
-      let endWeekPlusOne = new Date(weekPlusOne);
-      endWeekPlusOne.setDate(weekPlusOne.getDate() + 7); 
-      endWeekPlusOne.setHours(0);
-      endWeekPlusOne.setMinutes(0);
+      let endWeekPlusOne = this.getEndWeek(weekPlusOne);
       this.rangeWeek.controls["endWeek"].setValue(endWeekPlusOne);
       this.updateWeekChart(weekPlusOne, endWeekPlusOne);
     }
@@ -370,20 +364,14 @@ export class StatisticsComponent implements OnInit {
       let weekMinusOne = new Date(this.addedWeeks[i].controls["startWeek"].value);
       weekMinusOne.setTime(weekMinusOne.getTime()-24*60*60*1000*7);
       this.addedWeeks[i].controls["startWeek"].setValue(weekMinusOne);
-      let endWeekMinusOne = new Date(weekMinusOne)
-      endWeekMinusOne.setDate(weekMinusOne.getDate() + 7); 
-      endWeekMinusOne.setHours(0);
-      endWeekMinusOne.setMinutes(0);
+      let endWeekMinusOne = this.getEndWeek(weekMinusOne);
       this.addedWeeks[i].controls["endWeek"].setValue(endWeekMinusOne);
       this.updateWeekChart(weekMinusOne, endWeekMinusOne, i);
     } else {
       let weekMinusOne = new Date(this.rangeWeek.controls["startWeek"].value);
       weekMinusOne.setTime(weekMinusOne.getTime()-24*60*60*1000*7);
       this.rangeWeek.controls["startWeek"].setValue(weekMinusOne);
-      let endWeekMinusOne = new Date(weekMinusOne)
-      endWeekMinusOne.setDate(weekMinusOne.getDate() + 7); 
-      endWeekMinusOne.setHours(0);
-      endWeekMinusOne.setMinutes(0);
+      let endWeekMinusOne = this.getEndWeek(weekMinusOne);
       this.rangeWeek.controls["endWeek"].setValue(endWeekMinusOne);
       this.updateWeekChart(weekMinusOne, endWeekMinusOne);
     }
@@ -427,32 +415,22 @@ export class StatisticsComponent implements OnInit {
 
   addWeek(){
     if(this.addedWeeks.length <= 4) {
-      this.comparingWeeks = true;
       this.addedWeeks.push(this.formBuilder.group({
         startWeek: new FormControl(),
-        endWeek: new FormControl()
+        endWeek: new FormControl(),
+        index: new FormControl()
       }));
-      let currentDate = new Date();
-      let startOfWeek = new Date();
-      let endOfWeek = new Date();
-      startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
-      endOfWeek.setDate(startOfWeek.getDate() + 6); 
-      endOfWeek.setHours(0);
-      endOfWeek.setMinutes(0);
-      endOfWeek.setDate(endOfWeek.getDate());
-      this.addedWeeks[this.addedWeeks.length - 1].controls["startWeek"].setValue(startOfWeek);
-      this.addedWeeks[this.addedWeeks.length - 1].controls["endWeek"].setValue(endOfWeek);
-      this.updateWeekChart(startOfWeek, endOfWeek, this.addedWeeks.length - 1);
+      this.addedWeeks[this.addedWeeks.length - 1].controls["startWeek"].setValue(this.startOfWeek);
+      this.addedWeeks[this.addedWeeks.length - 1].controls["endWeek"].setValue(this.endOfWeek);
+      this.addedWeeks[this.addedWeeks.length - 1].controls["index"].setValue(this.addedWeeks.length - 1);
+      this.updateWeekChart(this.startOfWeek, this.endOfWeek, this.addedWeeks.length - 1);
     }
   }
 
   deleteWeek(i: any) {
     if(this.addedWeeks.length > 0) {
-      this.addedWeeks.splice(i, 1);
+      this.addedWeeks = this.addedWeeks.filter(e => e.controls.index.value != i);
       this.updateWeekChart(undefined, undefined, i);
-      if(this.addedWeeks.length == 0) {
-        this.comparingWeeks = false;
-      }
     }
   }
 
@@ -460,21 +438,32 @@ export class StatisticsComponent implements OnInit {
     if(this.addedMonths.length <= 4) {
       this.addedMonths.push(this.formBuilder.group({
         startMonth: new FormControl(),
-        endMonth: new FormControl()
+        endMonth: new FormControl(),
+        index: new FormControl()
       }));
       let startOfMonth = new Date();
       startOfMonth.setDate(1);
       let endOfMonth = new Date(startOfMonth.getFullYear(), startOfMonth.getMonth()+1, 0)
       this.addedMonths[this.addedMonths.length - 1].controls["startMonth"].setValue(startOfMonth);
       this.addedMonths[this.addedMonths.length - 1].controls["endMonth"].setValue(endOfMonth);
+      this.addedMonths[this.addedMonths.length - 1].controls["index"].setValue(this.addedMonths.length - 1);
       this.updateMonthChart(startOfMonth, endOfMonth, this.addedMonths.length - 1);
     }
   }
 
   deleteMonth(i: any) {
     if(this.addedMonths.length > 0) {
-      this.addedMonths.splice(i, 1);
+      this.addedMonths = this.addedMonths.filter(e => e.controls.index.value != i);
       this.updateMonthChart(undefined, undefined, i);
     }
+  }
+
+  getEndWeek(start: Date) {
+    let end = new Date(start);
+    end.setDate(start.getDate() + 7); 
+    end.setHours(0);
+    end.setMinutes(0);
+    end.setSeconds(-1);
+    return end;
   }
 }

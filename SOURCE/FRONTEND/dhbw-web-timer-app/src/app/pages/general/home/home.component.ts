@@ -15,7 +15,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 // @ts-ignore: Object is possibly 'null'.
 export class HomeComponent implements OnInit {
 
-  public experienceChart: any;
+  public dayChart: any;
   public siteNames: string[] = [];
   public times: number[] = [];
   public sites: Site[] = [];
@@ -54,13 +54,11 @@ export class HomeComponent implements OnInit {
       for(let entry of timespanData){
         let baseUrl:string = entry.url.split('/')[2];
         let timespan:number = entry.endtime - entry.starttime;
-
         let index = this.findIndexOfSiteWithURL(sites, baseUrl);
 
         if(index == -1){
           sites.push({url: baseUrl, time: timespan, favicon: entry.faviconUrl, percentage: 0, visits: 0});
-        }
-        else{
+        } else{
           sites[index].time += timespan;
           sites[index].visits++;
         }
@@ -69,36 +67,27 @@ export class HomeComponent implements OnInit {
       sites.sort((a: any, b: any)=>{
         return b.time-a.time;
       });
-
       if(sites.length > 10) {
         let others = {url: "Andere", time: 0, visits: 0 };
-
         for(let j = 9; j < sites.length; j++) {
           others.time += sites[j].time;
           others.visits++;
         }
-
         sites.splice(9, 0, others);
         sites.splice(10, sites.length-1);
       }
-
       sites = this.setPercentage(sites);
-
-
       for(let i=0; i<sites.length; i++){
         this.siteNames.push(sites[i].url);
-        this.times.push(sites[i].time);
+        this.times.push(Math.round(sites[i].time/1000/6)/10);
       }
 
       this.sites = sites;
-
-      console.log(this.sites);
       this.createDoughnut();
     });
   }
 
   public chartHovered({ event, active }: { event: MouseEvent, active: {}[] }): void {
-
     const hovered : any = active[0];
     let site = this.sites[hovered._index];
     let timeString = this.convertMilliseconds(site.time);
@@ -111,19 +100,24 @@ export class HomeComponent implements OnInit {
   }
 
   createDoughnut(){
-    this.experienceChart = {
+    this.dayChart = {
        options: {
-         plugins:{
-           tooltip: {
-             callbacks: {
-               // @ts-ignore
-               label: function(context){
-                 console.log(context);
-                 return "hallo";
-               }
-             }
-           }
-         }
+        scales: {yAxes: [{ticks: {beginAtZero: true}, scaleLabel: {
+          display: true,
+          labelString: 'Minuten'
+        }}]},
+        responsive: true,
+        plugins:{
+          tooltip: {
+            callbacks: {
+              // @ts-ignore
+              label: function(context){
+                console.log(context);
+                return "hallo";
+              }
+            }
+          }
+        }
        },
       type: 'doughnut',
       legend: true,
