@@ -49,29 +49,61 @@ if(production) {
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 
-server.get("/webActivities", (req,res)=>{
-  authUser(req, res, (userID)=> {
-    let startTime = req.query.startTime;
-    let endTime = req.query.endTime;
-    WEBACTIVITY.getWebActivitiesInTimespan(startTime, endTime, userID, (error, webActivities) => {
-      if(error){
-        res.status(500).send("Backendfehler beim Laden von Web Activites");
-      }else{
-        res.status(200).json(webActivities);
+authUser = (req, res, next) => {
+  try {
+    let decodedIT = jwt.decode(req.cookies.id_token);
+    let currentTime = new Date().getTime();
+    if(decodedIT.nonce == req.session.nonce ||
+      decodedIT.iat*1000 < currentTime ||
+      decodedIT.exp > currentTime ||
+      decodedIT.aud == process.env.CLIENT_ID) {
+      req.userID = decodedIT.sub;
+      next();
+    } else {
+      throw "e";
+    }
+  } catch(e) {
+    googleRequest({
+      'grant_type': 'refresh_token',
+      'client_id': process.env.CLIENT_ID,
+      'client_secret': process.env.CLIENT_SECRET,
+      'refresh_token': req.cookies.refresh_token
+    }, (data)=>{
+      if(data.error || !data.id_token) {
+        res.send({message: "error"});
+      } else {
+        let decodedIT = jwt.decode(data.id_token);
+        res.cookie('id_token', data.id_token,  
+        { maxAge: 60*60*1000,
+          httpOnly: true,
+          secure: production
+        });
+        req.userID = decodedIT.sub;
+        next();
       }
     });
+  }
+}
+
+server.get("/webActivities", authUser, (req,res)=>{
+  let startTime = req.query.startTime;
+  let endTime = req.query.endTime;
+  WEBACTIVITY.getWebActivitiesInTimespan(startTime, endTime, req.userID, (error, webActivities) => {
+    if(error){
+      res.status(500).send("Backendfehler beim Laden von Web Activites");
+    }else{
+      res.status(200).json(webActivities);
+    }
   });
 });
 
-server.post("/webActivities", async (req,res)=>{
+server.post("/webActivities", authUser, async (req,res)=>{
   console.log("Received tracking call");
-  authUser(req, res, (userID)=>{
-    for(i in req.body){
-      let obj = req.body[i];
-      WEBACTIVITY.addWebActivity(obj.url, userID, obj.faviconUrl, obj.starttime, obj.endtime, ()=>{});
-    }
-    res.send({message: "success"})
-  })
+  for(i in req.body){
+    let obj = req.body[i];
+    WEBACTIVITY.addWebActivity(obj.url, req.userID, obj.faviconUrl, obj.starttime, obj.endtime, ()=>{});
+  }
+  res.send({message: "success"});
 });
 
 server.get("/getOAuthUrl", (req, res) => {
@@ -133,13 +165,10 @@ server.get("/login", (req,res)=>{
   });
 });
 
-
-server.get("/silentLogin", (req,res)=>{
+server.get("/silentLogin", authUser, (req,res)=>{
   console.log("silentLogin");
-  authUser(req, res, (userID)=> {
-    getUserName(userID, (username)=>{
-      res.send({message: "success", username: username})
-    });
+  getUserName(req.userID, (username)=>{
+    res.send({message: "success", username: username})
   });
 });
 
@@ -150,31 +179,32 @@ server.get("/logout", (req,res)=>{
   res.send({message: "success"});
 });
 
-server.put("/user", (req, res) => {
-  console.log(req.body);
-
-  authUser(req, res, ()=> {
-    console.log(req.body);
-    USER.updateUser(req.body.userID, req.body.username, (error, user)=>{
-      if(error || !user) {
-        res.send({message: "error"});
-      } else {
-        res.send({message: "success"});
-      }
-    });
-  })
+server.put("/user", authUser, (req, res) => {
+  console.log("update user");
+  USER.updateUser(req.userID, req.body.username, (error, user)=>{
+    if(error || !user) {
+      res.send({message: "error"});
+    } else {
+      res.send({message: "success"});
+    }
+  });
 })
 
-server.delete("/user", (req, res) => {
-  authUser(req, res, ()=> {
-    USER.deleteUser(req.body.userID, (error, user)=>{
-      if(error || !user) {
-        res.send({message: "error"});
-      } else {
-        res.send({message: "success"});
-      }
-    });
-  })
+server.delete("/user", authUser, (req, res) => {
+  console.log("delete user");
+  USER.deleteUser(req.userID, (error, user)=>{
+    if(error || !user) {
+      res.send({message: "error"});
+    } else {
+      WEBACTIVITY.deleteAllFromUser(req.userID, (error, webActivities) => {
+        if(error || !webActivities) {
+          res.send({message: "error"});
+        } else {
+          res.send({message: "success"});
+        }
+      });
+    }
+  });
 })
 
 server.get("/registerCheck", (req,res)=>{
@@ -236,40 +266,6 @@ server.get("/register", (req,res)=>{
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
-
-function authUser(req, res, callback) {
-  try {
-    let decodedIT = jwt.decode(req.cookies.id_token);
-    let currentTime = new Date().getTime();
-    if(decodedIT.nonce == req.session.nonce ||
-      decodedIT.iat*1000 < currentTime ||
-      decodedIT.exp > currentTime ||
-      decodedIT.aud == process.env.CLIENT_ID) {
-      callback(decodedIT.sub);
-    } else {
-      throw "e";
-    }
-  } catch(e) {
-    googleRequest({
-      'grant_type': 'refresh_token',
-      'client_id': process.env.CLIENT_ID,
-      'client_secret': process.env.CLIENT_SECRET,
-      'refresh_token': req.cookies.refresh_token
-    }, (data)=>{
-      if(data.error || !data.id_token) {
-        res.send({message: "error"});
-      } else {
-        let decodedIT = jwt.decode(data.id_token);
-        res.cookie('id_token', data.id_token,  
-        { maxAge: 60*60*1000,
-          httpOnly: true,
-          secure: production
-        });
-        callback(decodedIT.sub);
-      }
-    });
-  }
-}
 
 function googleRequest(params, callback) {
   const postData = querystring.stringify(params);

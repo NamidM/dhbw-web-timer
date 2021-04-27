@@ -17,20 +17,13 @@
     </div>
 
     <mat-card class="example-card" #detailsCard>
-      <mat-card-header>
-        <div mat-card-avatar class="example-header-image">
-          <img #favicon class="favicon" src="https://old.reddit.com/favicon.ico"/>
-        </div>
-        <mat-card-title #title>Shiba Inu</mat-card-title>
-      </mat-card-header>
-      <br>
+      <div class="center">
+        <img #favicon class="favicon" src="https://old.reddit.com/favicon.ico"/>
+        <b><p #title class="title">Shiba Inu</p></b>
         <p #detailsCardAbsoluteTime></p>
         <p #detailsCardPercent></p>
         <p #visits></p>
-      <mat-card-actions>
-        <button mat-button>LIKE</button>
-        <button mat-button>SHARE</button>
-      </mat-card-actions>
+      </div>
     </mat-card>
 
   </div>

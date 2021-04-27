@@ -65,7 +65,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       updateTabEntry(sender.tab.id, false);
     }
   } else if(request.message === 'sync') {
-    console.log("syncBtn pressed")
     sendTabs();
     sendResponse('success');
   }

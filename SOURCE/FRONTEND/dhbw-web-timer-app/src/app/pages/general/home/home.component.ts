@@ -102,6 +102,9 @@ export class HomeComponent implements OnInit {
   createDoughnut(){
     this.dayChart = {
        options: {
+        tooltips: {
+          enabled: false
+        },
         scales: {yAxes: [{ticks: {beginAtZero: true}, scaleLabel: {
           display: true,
           labelString: 'Minuten'

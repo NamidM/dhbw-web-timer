@@ -142,34 +142,19 @@
             </form>
           </ng-container>
         </div>
-
-        
-        <!-- <div class="date-wrapper">
-          <form class="month-form" onsubmit="return false;">
-            <button mat-icon-button class="next-icon" (click)="prevMonth()">
-              <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_before</mat-icon>
-            </button>
-            <mat-form-field appearance="fill">
-              <mat-label>Monat auswählen</mat-label>
-              <mat-date-range-input [formGroup]="rangeMonth" [rangePicker]="picker3">
-                <input matStartDate formControlName="startMonth" (dateChange)="startDateSelectionMonth()">
-                <input matEndDate formControlName="endMonth" (dateChange)="endDateSelectionMonth()">
-              </mat-date-range-input>
-              <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
-              <mat-date-range-picker #picker3></mat-date-range-picker>
-              <mat-error *ngIf="rangeMonth.controls.startMonth.hasError('matStartDateInvalid')">Invalid start date
-              </mat-error>
-              <mat-error *ngIf="rangeMonth.controls.endMonth.hasError('matEndDateInvalid')">Invalid end date</mat-error>
-            </mat-form-field>
-            <button mat-icon-button class="next-icon" (click)="nextMonth()">
-              <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_next</mat-icon>
-            </button>
-          </form>
-        </div> -->
         <div style="display: block" id="monthChart" class="col-8">
           <canvas baseChart *ngIf="monthChart" [datasets]="monthChart.data" [labels]="monthChart.labels"
             [options]="monthChart.options" [plugins]="monthChart.plugins" [legend]="monthChart.legend"
             [chartType]="monthChart.type">
+          </canvas>
+        </div>
+      </div>
+    </mat-tab>
+    <mat-tab label="Gesamt">
+      <div class="total-wrapper">
+        <div id="totalChart" class="chart">
+          <canvas baseChart *ngIf="totalChart" [datasets]="totalChart.data" [labels]="totalChart.labels"
+            [options]="totalChart.options" [legend]="totalChart.legend" [chartType]="totalChart.type">
           </canvas>
         </div>
       </div>

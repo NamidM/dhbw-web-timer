@@ -19,7 +19,7 @@ export class RegisterComponent implements OnInit {
 
   constructor(private formBuilder: FormBuilder, private authService: AuthService, private router: Router, private apiService: ApiService, private snackBarService: SnackBarService) {
     this.registerForm = this.formBuilder.group({
-      username: [null, [Validators.required, Validators.pattern("[a-z0-9_-]{3,16}$")]]
+      username: [null, [Validators.required, Validators.pattern("[a-zA-Z0-9_-]{3,16}$")]]
     });
   }
 

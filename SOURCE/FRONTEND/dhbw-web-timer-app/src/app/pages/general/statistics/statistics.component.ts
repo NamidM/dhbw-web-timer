@@ -9,9 +9,11 @@ import { ApiService } from 'src/app/services/api/api.service';
 })
 export class StatisticsComponent implements OnInit {
   public dayChart: any;
+  public totalChart: any;
   public weekChart: any;
   public monthChart: any;
   public siteNames: string[] = [];
+  public siteNamesTotal: string[] = [];
   public addedWeeks: FormGroup[] = [];
   public addedMonths: FormGroup[] = [];
   private weekTime:any[] = [];
@@ -53,6 +55,7 @@ export class StatisticsComponent implements OnInit {
     this.updateWeekChart(this.startOfWeek, this.endOfWeek);
     this.updateDayChart(currentDate);
     this.updateMonthChart(startOfMonth, endOfMonth);
+    this.updateTotalChart();
   }
 
   dateSelectionDay(){
@@ -261,6 +264,31 @@ export class StatisticsComponent implements OnInit {
       this.createDayDoughnut(times);
     });
   }
+  updateTotalChart(){
+    let times: number[] = [];
+    this.siteNamesTotal = [];
+    // TODO add "andere" und fun facts and tabelle
+    this.apiService.getWebActivitiesInTimespan("0", new Date().getTime().toString()).subscribe((timespanData : any) => {
+      let sites = new Map<string, number>();
+      sites.clear();
+      for(let entry of timespanData){
+        let baseUrl = entry.url.split('/')[2];
+        let timespan = entry.endtime - entry.starttime;
+        if(sites.get(baseUrl) != null){
+          let oldTime = sites.get(baseUrl);
+          // @ts-ignore
+          sites.set(baseUrl, oldTime + timespan);
+        } else {
+          sites.set(baseUrl, timespan);
+        }
+      }
+      for(var[siteName, time] of sites.entries()){
+        this.siteNamesTotal.push(siteName);
+        times.push(Math.round(time/1000/6/6)/100);
+      }
+      this.createTotalDoughnut(times);
+    });
+  }
   createMonthChart(){
     let labels = [];
     for(let i = 0; i < 31; i++){
@@ -309,6 +337,25 @@ export class StatisticsComponent implements OnInit {
       data: this.weekTime
     }
   }
+
+  createTotalDoughnut(times: any) {
+    this.totalChart = {
+      options: {scaleShowVerticalLines: false,
+        responsive: true,
+        scales: {yAxes: [{ticks: {beginAtZero: true}, scaleLabel: {
+          display: true,
+          labelString: 'Stunden'
+        }}]}
+      },
+      labels: this.siteNamesTotal,
+      type: 'doughnut',
+      legend: true,
+      data: [
+        {data: times, label: 'times'},
+      ],
+    }
+  }
+
   createDayDoughnut(times: any){
     this.dayChart = {
       options: {scaleShowVerticalLines: false,
