@@ -28,3 +28,7 @@ module.exports.getUser = (googleId, callback)=>{
 module.exports.deleteUser = (googleId, callback)=>{
     USER.deleteOne({ googleId }, callback);
 };
+
+module.exports.updateUser = (googleId, name, callback)=>{
+    USER.findOneAndUpdate({ googleId }, { name }, callback);
+};

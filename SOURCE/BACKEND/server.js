@@ -150,14 +150,31 @@ server.get("/logout", (req,res)=>{
   res.send({message: "success"});
 });
 
-server.delete("/user", (res, req) => {
-  USER.deleteUser(req.query.userID, (error, user)=>{
-    if(error || !user) {
-      res.send({message: "error"});
-    } else {
-      res.send({message: "success"});
-    }
-  });
+server.put("/user", (req, res) => {
+  console.log(req.body);
+
+  authUser(req, res, ()=> {
+    console.log(req.body);
+    USER.updateUser(req.body.userID, req.body.username, (error, user)=>{
+      if(error || !user) {
+        res.send({message: "error"});
+      } else {
+        res.send({message: "success"});
+      }
+    });
+  })
+})
+
+server.delete("/user", (req, res) => {
+  authUser(req, res, ()=> {
+    USER.deleteUser(req.body.userID, (error, user)=>{
+      if(error || !user) {
+        res.send({message: "error"});
+      } else {
+        res.send({message: "success"});
+      }
+    });
+  })
 })
 
 server.get("/registerCheck", (req,res)=>{
