@@ -4,4 +4,5 @@ export interface Site {
   favicon: string;
   percentage: number;
   visits: number;
+  prettyTime: string;
 }

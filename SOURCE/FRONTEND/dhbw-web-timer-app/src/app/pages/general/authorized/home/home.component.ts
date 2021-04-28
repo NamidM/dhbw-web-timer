@@ -19,6 +19,8 @@ export class HomeComponent implements OnInit {
   public siteNames: string[] = [];
   public times: number[] = [];
   public sites: Site[] = [];
+  public displayedColumns: string[] = ['favicon', 'url', 'visits', 'percentage', 'time'];
+
 
   public imageToShow: any;
   public isImageLoading: boolean = false;
@@ -50,17 +52,22 @@ export class HomeComponent implements OnInit {
     this.apiService.getWebActivitiesInTimespan(startOfDay.toString(), currentTime.toString()).subscribe((timespanData : any) => {
       let sites: any[] = []
 
-
       for(let entry of timespanData){
         let baseUrl:string = entry.url.split('/')[2];
         let timespan:number = entry.endtime - entry.starttime;
         let index = this.findIndexOfSiteWithURL(sites, baseUrl);
 
         if(index == -1){
-          sites.push({url: baseUrl, time: timespan, favicon: entry.faviconUrl, percentage: 0, visits: 0});
+          sites.push({url: baseUrl, time: timespan, favicon: entry.faviconUrl, percentage: 0, visits: 0, prettyTime: ""});
         } else{
           sites[index].time += timespan;
           sites[index].visits++;
+
+          if(sites[index].favicon.startsWith("chrome://") && !entry.faviconUrl.startsWith("chrome://")){
+            sites[index].favicon = entry.faviconUrl;
+          }
+
+
         }
       }
 
@@ -76,13 +83,19 @@ export class HomeComponent implements OnInit {
         sites.splice(9, 0, others);
         sites.splice(10, sites.length-1);
       }
+
       sites = this.setPercentage(sites);
+      sites = this.setPrettyTime(sites);
+
       for(let i=0; i<sites.length; i++){
         this.siteNames.push(sites[i].url);
         this.times.push(Math.round(sites[i].time/1000/6)/10);
       }
 
       this.sites = sites;
+      console.log(sites);
+
+
       this.createDoughnut();
     });
   }
@@ -90,10 +103,9 @@ export class HomeComponent implements OnInit {
   public chartHovered({ event, active }: { event: MouseEvent, active: {}[] }): void {
     const hovered : any = active[0];
     let site = this.sites[hovered._index];
-    let timeString = this.convertMilliseconds(site.time);
 
     this.detailsCardTitle.nativeElement.innerHTML = site.url;
-    this.detailsCardAbsoluteTime.nativeElement.innerHTML = timeString;
+    this.detailsCardAbsoluteTime.nativeElement.innerHTML = site.prettyTime;
     this.detailsCardPercent.nativeElement.innerHTML = site.percentage.toString() + "%";
     this.favicon.nativeElement.setAttribute("src", site.favicon);
     this.visits.nativeElement.innerHTML = "Visits: " + site.visits.toString();
@@ -145,7 +157,8 @@ export class HomeComponent implements OnInit {
   findIndexOfSiteWithURL(sites: any[], url: any){
     for(let i=0; i<sites.length; i++){
       let site = sites[i];
-      if(site.url.localeCompare(url) == 0){
+
+      if(typeof site.url !== "undefined" && site.url.localeCompare(url) == 0){
         return i;
       }
     }
@@ -157,13 +170,20 @@ export class HomeComponent implements OnInit {
 
     for(let i=0; i<sites.length; i++){
       completeTime += sites[i].time;
-      console.log(sites[i].time);
     }
 
     for(let i=0; i<sites.length; i++){
       let percent = (sites[i].time/completeTime) * 100;
       let rounded =  Math.round(percent * 10) / 10;
       sites[i].percentage = rounded;
+    }
+
+    return sites;
+  }
+
+  setPrettyTime(sites: any[]){
+    for(let i=0; i<sites.length; i++){
+      sites[i].prettyTime = this.convertMilliseconds(sites[i].time);
     }
 
     return sites;
