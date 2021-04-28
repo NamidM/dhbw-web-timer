@@ -2,7 +2,10 @@
     <h1>StartSeite</h1>
     <h3>User Dashboard von: <b>{{authService.username}}</b></h3>
 
-  <div class="wrapper">
+    <div *ngIf="!dayChart">
+      <h3>Noch keine Einträge für heute!</h3>
+    </div>
+  <div class="wrapper" *ngIf="dayChart">
 
     <div style="display: block" id="dayChart" class="chart">
       <label>Webaktivität Heute</label>

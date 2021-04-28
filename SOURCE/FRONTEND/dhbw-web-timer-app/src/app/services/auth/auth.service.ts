@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { ApiService } from '../api/api.service';
+import { SnackBarService } from '../snack-bar/snack-bar.service';
 
 
 @Injectable({
@@ -11,7 +12,7 @@ export class AuthService {
   public loading: boolean = true;
   public username?: string;
 
-  constructor(private cookieService: CookieService, private apiService: ApiService, private router: Router) {}
+  constructor(private apiService: ApiService, private router: Router, private snackBarService: SnackBarService) {}
 
   sendRegisterRequest(){
     this.apiService.getOAuthUrl("register").subscribe((response)=>{
@@ -46,7 +47,24 @@ export class AuthService {
         callback();
       } else {
         delete(this.username);
-        this.router.navigateByUrl("/");
+      }
+    });
+  }
+
+  deleteUser() {
+    this.apiService.deleteUser().subscribe((response)=>{
+      if(response.message == "success") {
+        this.logout();
+      }
+    });
+  }
+
+  updateUser(username: any) {
+    this.apiService.updateUser(username).subscribe((response)=>{
+      if(response.message == "success") {
+        this.username = response.username;
+        console.log(response);
+        this.snackBarService.openSnackBar("Benutzername wurde geändert" + this.username, "Ok");
       }
     });
   }

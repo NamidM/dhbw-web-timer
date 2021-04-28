@@ -1,3 +1,14 @@
 .username{
     margin-right: 0.5vw;
+    opacity: 100% !important;
+    color: black !important;
+    position: relative;
+    top: -6px;
+}
+.settings {
+    position: relative;
+    top: 7px;
+}
+.settings:hover {
+    cursor: pointer;
 }

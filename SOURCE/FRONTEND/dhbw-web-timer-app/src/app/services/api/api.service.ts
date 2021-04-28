@@ -1,4 +1,4 @@
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 
@@ -8,6 +8,10 @@ import { environment } from 'src/environments/environment';
 export class ApiService {
   baseUrl = environment.baseUrl;
   constructor(public http: HttpClient) { }
+
+  private readonly defaultOptions: any = {
+    headers: new HttpHeaders().set('Content-Type', 'application/json')
+  }
 
   silentLogin() {
     return this.http.get<{ message: 'success' | 'error', username?: string}>(`${this.baseUrl}silentLogin`, { withCredentials: true });
@@ -40,6 +44,12 @@ export class ApiService {
 
   deleteUser() {
     return this.http.delete<{ message: 'success' | 'error' }>(`${this.baseUrl}user`, {withCredentials: true});
+  }
+
+  updateUser(username: string) {
+
+    return this.http.put<{ message: 'success' | 'error', username: string }>(`${this.baseUrl}user`,{username: username}, 
+    { withCredentials: true, headers: new HttpHeaders().set('Content-Type', 'application/json')});
   }
 
   getOAuthUrl(redirect: 'login' | 'register') {

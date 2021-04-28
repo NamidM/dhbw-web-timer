@@ -4,15 +4,15 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
-import { HomeComponent } from './pages/general/home/home.component';
+import { HomeComponent } from './pages/general/authorized/home/home.component';
 import { AboutComponent } from './pages/general/about/about.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
-import { StatisticsComponent } from './pages/general/statistics/statistics.component';
-import { CommunityComponent } from './pages/general/community/community.component';
+import { StatisticsComponent } from './pages/general/authorized/statistics/statistics.component';
+import { CommunityComponent } from './pages/general/authorized/community/community.component';
 import { GeneralComponent } from './pages/general/general.component';
 import { ChartsModule } from 'ng2-charts';
 import { LoginComponent } from './pages/general/login/login.component';
@@ -28,8 +28,13 @@ import {MatCardModule} from '@angular/material/card';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { registerLocaleData } from '@angular/common';
 import localeDe from '@angular/common/locales/de';
-import { RegisterComponent } from './pages/general/register/register/register.component';
+import { RegisterComponent } from './pages/general/register/register.component';
 import { CookieService } from 'ngx-cookie-service';
+import { SettingsComponent } from './pages/general/authorized/settings/settings.component';
+import { AuthorizedComponent } from './pages/general/authorized/authorized.component';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { DeleteDialogComponent } from './shared/dialogs/delete-dialog/delete-dialog.component';
+import { UpdateDialogComponent } from './shared/dialogs/update-dialog/update-dialog.component';
 registerLocaleData(localeDe);
 
 @NgModule({
@@ -43,7 +48,11 @@ registerLocaleData(localeDe);
     CommunityComponent,
     GeneralComponent,
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    SettingsComponent,
+    AuthorizedComponent,
+    DeleteDialogComponent,
+    UpdateDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -64,6 +73,7 @@ registerLocaleData(localeDe);
     MatCheckboxModule,
     MatCardModule,
     MatProgressSpinnerModule,
+    MatDialogModule
   ],
   bootstrap: [AppComponent],
   providers: [

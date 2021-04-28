@@ -1,0 +1,13 @@
+<div mat-dialog-content>
+    <p>Benutzername ändern</p>
+</div>
+<form [formGroup]="updateForm">
+    <mat-form-field>
+        <mat-label>Benutzername</mat-label>
+        <input formControlName="username" matInput placeholder="Username" />
+    </mat-form-field>
+</form>
+<div mat-dialog-actions>
+    <button mat-raised-button color="basic" (click)="onNoClick()">Abbrechen</button>
+    <button mat-raised-button color="accent" (click)="onYesClick()">Ändern</button>
+</div>

@@ -1,12 +1,14 @@
 import { NgModule } from '@angular/core';
 import { ChildActivationEnd, RouterModule, Routes } from '@angular/router';
 import { AboutComponent } from './pages/general/about/about.component';
-import { CommunityComponent } from './pages/general/community/community.component';
+import { CommunityComponent } from './pages/general/authorized/community/community.component';
 import { GeneralComponent } from './pages/general/general.component';
-import { HomeComponent } from './pages/general/home/home.component';
-import { StatisticsComponent } from './pages/general/statistics/statistics.component';
+import { HomeComponent } from './pages/general/authorized/home/home.component';
+import { StatisticsComponent } from './pages/general/authorized/statistics/statistics.component';
 import {LoginComponent} from "./pages/general/login/login.component";
-import { RegisterComponent } from './pages/general/register/register/register.component';
+import { RegisterComponent } from './pages/general/register/register.component';
+import { SettingsComponent } from './pages/general/authorized/settings/settings.component';
+import { AuthorizedComponent } from './pages/general/authorized/authorized.component';
 
 const routes: Routes = [
   {
@@ -14,20 +16,8 @@ const routes: Routes = [
     component: GeneralComponent,
     children: [
       {
-        path: '',
-        component: HomeComponent
-      },
-      {
         path: 'about',
         component: AboutComponent
-      },
-      {
-        path: 'statistics',
-        component: StatisticsComponent
-      },
-      {
-        path: 'community',
-        component: CommunityComponent
       },
       {
         path: 'login',
@@ -36,6 +26,28 @@ const routes: Routes = [
       {
         path: 'register',
         component: RegisterComponent
+      },
+      {
+        path: '',
+        component: AuthorizedComponent,
+        children: [
+          {
+            path: 'statistics',
+            component: StatisticsComponent
+          },
+          {
+            path: 'settings',
+            component: SettingsComponent
+          },
+          {
+            path: 'community',
+            component: CommunityComponent
+          },
+          {
+            path: '',
+            component: HomeComponent
+          },
+        ]
       }
     ]
   },

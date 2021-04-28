@@ -30,5 +30,5 @@ module.exports.deleteUser = (googleId, callback)=>{
 };
 
 module.exports.updateUser = (googleId, name, callback)=>{
-    USER.findOneAndUpdate({ googleId }, { name }, callback);
+    USER.findOneAndUpdate({ googleId }, { name }, {new: true} , callback);
 };

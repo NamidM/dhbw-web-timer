@@ -2,8 +2,8 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import * as Chart from 'chart.js';
 import { SnackBarService } from 'src/app/services/snack-bar/snack-bar.service';
-import {ApiService} from "../../../services/api/api.service";
-import {Site} from "../../../interfaces";
+import {ApiService} from "../../../../services/api/api.service";
+import {Site} from "../../../../interfaces";
 import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
@@ -175,16 +175,6 @@ export class HomeComponent implements OnInit {
 
   login(){
     this.authService.sendLoginRequest();
-  }
-
-  deleteUser() {
-    if(this.authService.username) {
-      this.apiService.deleteUser().subscribe((response)=>{
-        if(response.message == "success") {
-          this.authService.logout();
-        }
-      })
-    }
   }
 }
 

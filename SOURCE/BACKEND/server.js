@@ -15,7 +15,6 @@ const port = process.env.APP_PORT;
 const server = express();
 const USER = require('./models/user');
 const WEBACTIVITY = require('./models/webActivity');
-server.use(cors());
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
@@ -25,18 +24,21 @@ mongoose.set('useUnifiedTopology', true);
 server.use((req, res, next) => {
   const origin = req.headers.origin;
   res.header('Access-Control-Allow-Origin', origin);
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Headers', 'Origin, Accept, Content-Type, X-Requested-With');
   res.header('Content-Type', 'application/json');
-  res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
+  res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Credentials', true);
   next();
 });
+
 server.use(session({
 	secret: 'secret',
 	resave: true,
 	saveUninitialized: true
 }));
-server.use(bodyParser.urlencoded({ extended: false }));
+
+server.use(bodyParser.json({ limit: '50mb', extended: true }));
+server.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 server.use(bodyParser.json());
 server.use(cookieParser());
 
@@ -139,7 +141,6 @@ server.get("/login", (req,res)=>{
     'client_secret': process.env.CLIENT_SECRET,
     'redirect_uri': redirect
   }, (data) => {
-    console.log(data);
     if(data.error) {
       res.send({message: "error"});
     } else {
@@ -180,12 +181,11 @@ server.get("/logout", (req,res)=>{
 });
 
 server.put("/user", authUser, (req, res) => {
-  console.log("update user");
   USER.updateUser(req.userID, req.body.username, (error, user)=>{
     if(error || !user) {
       res.send({message: "error"});
     } else {
-      res.send({message: "success"});
+      res.send({message: "success", username: user.name});
     }
   });
 })
