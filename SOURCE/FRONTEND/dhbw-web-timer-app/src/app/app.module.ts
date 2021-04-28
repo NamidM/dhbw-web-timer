@@ -26,6 +26,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatCardModule} from '@angular/material/card';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatTableModule} from "@angular/material/table";
 import { registerLocaleData } from '@angular/common';
 import localeDe from '@angular/common/locales/de';
 import { RegisterComponent } from './pages/general/register/register/register.component';
@@ -64,6 +65,7 @@ registerLocaleData(localeDe);
     MatCheckboxModule,
     MatCardModule,
     MatProgressSpinnerModule,
+    MatTableModule
   ],
   bootstrap: [AppComponent],
   providers: [

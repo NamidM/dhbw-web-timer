@@ -124,7 +124,7 @@ function startTimer() {
 function getFavicon(tab){
   var favicon = tab.favIconUrl;
   if (favicon === undefined) {
-    favicon = 'chrome://favicon/' + tab.url;
+    favicon = 'chrome://favicon/'; //+ tab.url;
   }
   console.log(favicon);
   return favicon;

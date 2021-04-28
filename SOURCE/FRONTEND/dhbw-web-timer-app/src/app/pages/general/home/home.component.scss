@@ -42,3 +42,21 @@
 .title {
   font-size: 1em;
 }
+
+td,th {
+  width: 25%;
+  font-size: 15px;
+}
+
+.smallColumn{
+  width: 15%;
+}
+
+.faviconInTable{
+  height: 20px;
+  width: 20px;
+}
+
+table{
+  min-width: 500px;
+}

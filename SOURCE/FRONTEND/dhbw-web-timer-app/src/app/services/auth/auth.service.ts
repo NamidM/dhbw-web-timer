@@ -46,7 +46,6 @@ export class AuthService {
         callback();
       } else {
         delete(this.username);
-        this.router.navigateByUrl("/");
       }
     });
   }
