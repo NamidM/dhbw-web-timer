@@ -12,9 +12,6 @@ export class AuthorizedComponent implements OnInit {
   constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
-    if(!this.authService.username) {
-      this.router.navigateByUrl("/");
-    }
   }
 
 }

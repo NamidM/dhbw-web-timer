@@ -20,6 +20,7 @@ export class StatisticsComponent implements OnInit {
   private monthTime:any[] = [];
   private startOfWeek?: Date;
   private endOfWeek?: Date;
+  public allData: any = {};
   rangeWeek = new FormGroup({
     startWeek: new FormControl(),
     endWeek: new FormControl()
@@ -270,9 +271,11 @@ export class StatisticsComponent implements OnInit {
     // TODO add "andere" und fun facts and tabelle
     this.apiService.getWebActivitiesInTimespan("0", new Date().getTime().toString()).subscribe((timespanData : any) => {
       let sites = new Map<string, number>();
+      let first = Infinity;
       sites.clear();
       for(let entry of timespanData){
         let baseUrl = entry.url.split('/')[2];
+        first = Math.min(first, entry.starttime);
         let timespan = entry.endtime - entry.starttime;
         if(sites.get(baseUrl) != null){
           let oldTime = sites.get(baseUrl);
@@ -282,13 +285,40 @@ export class StatisticsComponent implements OnInit {
           sites.set(baseUrl, timespan);
         }
       }
+      let sum = 0;
+      let temp = [];
       for(var[siteName, time] of sites.entries()){
-        this.siteNamesTotal.push(siteName);
-        times.push(Math.round(time/1000/6/6)/100);
+        temp.push({time: time, label: siteName});
+        //this.siteNamesTotal.push(siteName);
+        sum += time;
+        //times.push(Math.round(time/1000/6/6)/100);
       }
+
+      temp.sort((a: any, b: any)=>{
+        return b.time-a.time;
+      });
+      if(temp.length > 10) {
+        let others = {time: 0, label: "Andere"};
+
+        for(let j = 9; j < temp.length; j++) {
+          others.time += temp[j].time;
+        }
+        temp.splice(9, 0, others);
+        temp.splice(10, temp.length-1);
+      }
+      for(let t of temp){
+        times.push(Math.round(t.time/1000/6/6)/100);
+        this.siteNamesTotal.push(t.label);
+      }
+
+      this.allData.bestSite = this.siteNamesTotal[times.indexOf(Math.max(...times))];
+      this.allData.firstTime = this.getPrettyDate(first);
+      this.allData.allTime = this.getPrettyTime(sum);
+      this.allData.avgTime = this.getPrettyTime(sum/times.length);
       this.createTotalDoughnut(times);
     });
   }
+
   createMonthChart(){
     let labels = [];
     for(let i = 0; i < 31; i++){
@@ -512,5 +542,21 @@ export class StatisticsComponent implements OnInit {
     end.setMinutes(0);
     end.setSeconds(-1);
     return end;
+  }
+
+  getPrettyTime(milliseconds: number){
+    let totalHours = Math.floor(milliseconds / 1000 / 60 / 60);
+    let remainingTime = milliseconds - (totalHours * 60 * 60 * 1000);
+    let totalMinutes = Math.floor(remainingTime / 1000 / 60);
+    remainingTime = remainingTime - (totalMinutes * 60 * 1000);
+    let totalSeconds = Math.floor(remainingTime / 1000);
+    return totalHours + "h " + totalMinutes + "m " + totalSeconds + "s";
+  }
+
+  getPrettyDate(milliseconds: number) {
+    let date = new Date(milliseconds);
+    let d = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+    let m = date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth();
+    return d + "." + m + "." + date.getFullYear();
   }
 }

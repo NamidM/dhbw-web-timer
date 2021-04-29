@@ -46,6 +46,11 @@ export class AuthService {
         this.username = response.username;
         callback();
       } else {
+        console.log(this.router.url);
+        let authorizedSites = ["/comunity", "/home", "/settings", "/statistics"];
+        if(authorizedSites.includes(this.router.url)) {
+          this.router.navigateByUrl("/");
+        }
         delete(this.username);
       }
     });

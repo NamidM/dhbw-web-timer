@@ -19,7 +19,7 @@
           <a class="nav-link" [routerLink]="['/about']">About</a>
         </li>
       </ul>
-      <ul class="navbar-nav my-2 my-sm-0">
+      <ul class="navbar-nav my-2 my-sm-0" *ngIf="authService.username">
         <li class="nav-item" [class.active]="router.isActive('/about', true)">
           <span class="username nav-link">
             Eingeloggt als: <b>{{authService.username}}</b>
@@ -27,7 +27,7 @@
           </span>
         </li>
         <li class="nav-item" [class.active]="router.isActive('/about', true)">
-          <button mat-raised-button color="accent" class="" *ngIf="authService.username" (click)="logout()">Logout</button>
+          <button mat-raised-button color="accent" (click)="logout()">Logout</button>
         </li>
       </ul>
     </div>

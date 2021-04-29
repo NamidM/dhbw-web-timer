@@ -152,6 +152,10 @@
     </mat-tab>
     <mat-tab label="Gesamt">
       <div class="total-wrapper">
+        <h3 class="allTime"><b>Gesamtzeit:</b><br>{{allData.allTime}}</h3>
+        <h3 class="firstTime"><b>Erste Benutzung:</b><br>{{allData.firstTime}}</h3>
+        <h3 class="avgTime"><b>Durchschnittliche Benutzung:</b><br>{{allData.avgTime}}</h3>
+        <h3 class="bestSite"><b>Beliebteste Seite:</b><br>{{allData.bestSite}}</h3>
         <div id="totalChart" class="chart">
           <canvas baseChart *ngIf="totalChart" [datasets]="totalChart.data" [labels]="totalChart.labels"
             [options]="totalChart.options" [legend]="totalChart.legend" [chartType]="totalChart.type">

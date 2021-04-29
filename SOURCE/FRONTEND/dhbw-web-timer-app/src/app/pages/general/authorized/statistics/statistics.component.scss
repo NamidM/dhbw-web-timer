@@ -54,3 +54,18 @@
     background-color: red;
     width: 0;
 }
+.firstTime {
+    float: right;
+} 
+.allTime {
+    float: left;
+}
+.avgTime, .bestSite, .allTime,.firstTime  {
+    text-align: center;
+}
+.total-wrapper {
+    margin-top: 2vh;
+}
+.bestSite {
+    margin-right: 2vw;
+}

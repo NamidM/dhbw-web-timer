@@ -39,7 +39,9 @@ export class HomeComponent implements OnInit {
   constructor(private snackService: SnackBarService, private apiService: ApiService, public authService: AuthService) { }
 
   async ngOnInit(){
-    this.grabWebActivityData();
+    if(this.authService.username) {
+      this.grabWebActivityData();
+    }
   }
 
   grabWebActivityData(){
@@ -95,8 +97,9 @@ export class HomeComponent implements OnInit {
       this.sites = sites;
       console.log(sites);
 
-
-      this.createDoughnut();
+      if(sites.length > 0) {
+        this.createDoughnut();
+      }
     });
   }
 
@@ -117,10 +120,6 @@ export class HomeComponent implements OnInit {
         tooltips: {
           enabled: false
         },
-        scales: {yAxes: [{ticks: {beginAtZero: true}, scaleLabel: {
-          display: true,
-          labelString: 'Minuten'
-        }}]},
         responsive: true,
         plugins:{
           tooltip: {
@@ -144,13 +143,11 @@ export class HomeComponent implements OnInit {
   }
 
   convertMilliseconds(milliseconds: number){
-
     let totalHours = Math.floor(milliseconds / 1000 / 60 / 60);
     let remainingTime = milliseconds - (totalHours * 60 * 60 * 1000);
     let totalMinutes = Math.floor(remainingTime / 1000 / 60);
     remainingTime = remainingTime - (totalMinutes * 60 * 1000);
     let totalSeconds = Math.floor(remainingTime / 1000);
-
     return totalHours + "h " + totalMinutes + "m " + totalSeconds + "s";
   }
 

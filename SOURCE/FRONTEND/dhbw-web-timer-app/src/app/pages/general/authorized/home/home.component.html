@@ -1,12 +1,19 @@
-<div class="container main-page" *ngIf="authService.username">
-    <h1>StartSeite</h1>
-    <h3>User Dashboard von: <b>{{authService.username}}</b></h3>
+<div *ngIf="!authService.username && !authService.loading" class="container main-page">
+  <h1>Willkommen auf DHBW Web-Timer</h1>
+  <h3>Um diese Seite zu benutzen müssen sie eingeloggt sein!</h3><br>
+  <label >Noch kein Account?</label><br>
+  <button class="register-btn" mat-raised-button color="primary" (click)="register()">Registrieren mit Google</button><br><br>
+  <label>Bereits registriert?</label><br>
+  <button mat-raised-button color="primary" (click)="login()">Einloggen mit Google</button>
+</div>
 
-    <div *ngIf="!dayChart">
-      <h3>Noch keine Einträge für heute!</h3>
-    </div>
+<div *ngIf="authService.username" class="container main-page">
+  <h1>StartSeite</h1>
+  <h3>User Dashboard von: <b>{{authService.username}}</b></h3>
+  <div *ngIf="!dayChart">
+    <h3>Noch keine Einträge für heute!</h3>
+  </div>
   <div class="wrapper" *ngIf="dayChart">
-
     <div style="display: block" id="dayChart" class="chart">
       <label>Webaktivität Heute</label>
       <canvas baseChart *ngIf="dayChart"
@@ -67,15 +74,5 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
       </table>
-
   </div>
-
-</div>
-<div *ngIf="!authService.username && !authService.loading" class="container main-page">
-  <h1>Willkommen auf DHBW Web-Timer</h1>
-  <h3>Um diese Seite zu benutzen müssen sie eingeloggt sein!</h3><br>
-  <label >Noch kein Account?</label><br>
-  <button class="register-btn" mat-raised-button color="primary" (click)="register()">Registrieren mit Google</button><br><br>
-  <label>Bereits registriert?</label><br>
-  <button mat-raised-button color="primary" (click)="login()">Einloggen mit Google</button>
 </div>
