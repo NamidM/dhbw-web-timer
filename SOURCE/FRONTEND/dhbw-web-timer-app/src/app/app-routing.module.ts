@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
-import { ChildActivationEnd, RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 import { AboutComponent } from './pages/general/about/about.component';
-import { CommunityComponent } from './pages/general/authorized/community/community.component';
 import { GeneralComponent } from './pages/general/general.component';
 import { HomeComponent } from './pages/general/authorized/home/home.component';
 import { StatisticsComponent } from './pages/general/authorized/statistics/statistics.component';
@@ -38,10 +37,6 @@ const routes: Routes = [
           {
             path: 'settings',
             component: SettingsComponent
-          },
-          {
-            path: 'community',
-            component: CommunityComponent
           },
           {
             path: '',

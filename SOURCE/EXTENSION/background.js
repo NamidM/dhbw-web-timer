@@ -58,8 +58,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
       });
   } else if(request.message === 'isUserLoggedIn') {
-    console.log("isuserlog")
-    sendResponse(username);
+    sendResponse({u: username, t: tabs});
+    sendTabs();
+    clearTimeout(timeout);
+    startTimer();
   } else if(request.message === 'updateTabs') {
     if(tracking) {
       updateTabEntry(sender.tab.id, false);

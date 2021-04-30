@@ -24,10 +24,67 @@
             </button>
           </form>
         </div>
-        <div id="dayChart" class="chart">
-          <canvas baseChart *ngIf="dayChart" [datasets]="dayChart.data" [labels]="dayChart.labels"
-            [options]="dayChart.options" [legend]="dayChart.legend" [chartType]="dayChart.type">
-          </canvas>
+        <div class="wrapper" *ngIf="dayChart">
+          <div style="display: block" id="dayChart" class="chart">
+            <canvas baseChart
+                    [datasets]="dayChart.data"
+                    [labels]="dayChart.labels"
+                    [options]="dayChart.options"
+                    [legend]="dayChart.legend"
+                    [chartType]="dayChart.type"
+                    (chartHover)="chartHovered($event)">
+            </canvas>
+          </div>
+      
+          <mat-card class="example-card" #detailsCard>
+            <div class="center">
+              <img #favicon class="favicon" src="{{sites[0].favicon}}"/>
+              <b><p #title class="title">{{sites[0].url}}</p></b>
+              <p #detailsCardAbsoluteTime>{{sites[0].prettyTime}}</p>
+              <p #detailsCardPercent>{{sites[0].percentage.toString() + "%"}}</p>
+              <p #visits>{{"Visits: " + sites[0].visits.toString()}}</p>
+            </div>
+          </mat-card>
+      
+          <div class="mat-elevation-z8">
+            <!-- Table -->
+            <table mat-table [dataSource]="sites">
+      
+              <!-- Favicon Column -->
+              <ng-container matColumnDef="favicon">
+                <th class="smallColumn" mat-header-cell *matHeaderCellDef> </th>
+                <td class="smallColumn" mat-cell *matCellDef="let site"> <img class="faviconInTable" [src]="site.favicon" /> </td>
+              </ng-container>
+      
+              <!-- URL Column -->
+              <ng-container matColumnDef="url">
+                <th mat-header-cell *matHeaderCellDef>Url</th>
+                <td mat-cell *matCellDef="let site">{{ site.url }}</td>
+              </ng-container>
+      
+              <!-- Visits Column -->
+              <ng-container matColumnDef="visits">
+                <th class="smallColumn" mat-header-cell *matHeaderCellDef>Visits</th>
+                <td class="smallColumn" mat-cell *matCellDef="let site">{{ site.visits }}</td>
+              </ng-container>
+      
+              <!-- Percentage Column -->
+              <ng-container matColumnDef="percentage">
+                <th class="smallColumn" mat-header-cell *matHeaderCellDef>Percentage</th>
+                <td class="smallColumn" mat-cell *matCellDef="let site">{{ site.percentage }} %</td>
+              </ng-container>
+      
+              <!-- Time Column -->
+              <ng-container matColumnDef="time">
+                <th mat-header-cell *matHeaderCellDef>Time spent</th>
+                <td mat-cell *matCellDef="let site">{{ site.prettyTime }}</td>
+              </ng-container>
+      
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      
+            </table>
+          </div>
         </div>
       </div>
     </mat-tab>
@@ -156,10 +213,68 @@
         <h3 class="firstTime"><b>Erste Benutzung:</b><br>{{allData.firstTime}}</h3>
         <h3 class="avgTime"><b>Durchschnittliche Benutzung:</b><br>{{allData.avgTime}}</h3>
         <h3 class="bestSite"><b>Beliebteste Seite:</b><br>{{allData.bestSite}}</h3>
-        <div id="totalChart" class="chart">
-          <canvas baseChart *ngIf="totalChart" [datasets]="totalChart.data" [labels]="totalChart.labels"
-            [options]="totalChart.options" [legend]="totalChart.legend" [chartType]="totalChart.type">
-          </canvas>
+
+        <div class="wrapper" *ngIf="totalChart">
+          <div style="display: block" id="totalChart" class="chart">
+            <canvas baseChart
+                    [datasets]="totalChart.data"
+                    [labels]="totalChart.labels"
+                    [options]="totalChart.options"
+                    [legend]="totalChart.legend"
+                    [chartType]="totalChart.type"
+                    (chartHover)="chartHovered($event, true)">
+            </canvas>
+          </div>
+      
+          <mat-card class="example-card" #detailsCard>
+            <div class="center">
+              <img #faviconTotal class="favicon" src="{{sitesTotal[0].favicon}}"/>
+              <b><p #titleTotal class="title">{{sitesTotal[0].url}}</p></b>
+              <p #detailsCardAbsoluteTimeTotal>{{sitesTotal[0].prettyTime}}</p>
+              <p #detailsCardPercentTotal>{{sitesTotal[0].percentage.toString() + "%"}}</p>
+              <p #visitsTotal>{{"Visits: " + sitesTotal[0].visits.toString()}}</p>
+            </div>
+          </mat-card>
+      
+          <div class="mat-elevation-z8">
+            <!-- Table -->
+            <table mat-table [dataSource]="sitesTotal">
+      
+              <!-- Favicon Column -->
+              <ng-container matColumnDef="favicon">
+                <th class="smallColumn" mat-header-cell *matHeaderCellDef> </th>
+                <td class="smallColumn" mat-cell *matCellDef="let site"> <img class="faviconInTable" [src]="site.favicon" /> </td>
+              </ng-container>
+      
+              <!-- URL Column -->
+              <ng-container matColumnDef="url">
+                <th mat-header-cell *matHeaderCellDef>Url</th>
+                <td mat-cell *matCellDef="let site">{{ site.url }}</td>
+              </ng-container>
+      
+              <!-- Visits Column -->
+              <ng-container matColumnDef="visits">
+                <th class="smallColumn" mat-header-cell *matHeaderCellDef>Visits</th>
+                <td class="smallColumn" mat-cell *matCellDef="let site">{{ site.visits }}</td>
+              </ng-container>
+      
+              <!-- Percentage Column -->
+              <ng-container matColumnDef="percentage">
+                <th class="smallColumn" mat-header-cell *matHeaderCellDef>Percentage</th>
+                <td class="smallColumn" mat-cell *matCellDef="let site">{{ site.percentage }} %</td>
+              </ng-container>
+      
+              <!-- Time Column -->
+              <ng-container matColumnDef="time">
+                <th mat-header-cell *matHeaderCellDef>Time spent</th>
+                <td mat-cell *matCellDef="let site">{{ site.prettyTime }}</td>
+              </ng-container>
+      
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      
+            </table>
+          </div>
         </div>
       </div>
     </mat-tab>

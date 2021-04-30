@@ -13,7 +13,7 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 })
 
 // @ts-ignore: Object is possibly 'null'.
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
 
   public dayChart: any;
   public siteNames: string[] = [];
@@ -39,9 +39,7 @@ export class HomeComponent implements OnInit {
   constructor(private snackService: SnackBarService, private apiService: ApiService, public authService: AuthService) { }
 
   async ngOnInit(){
-    if(this.authService.username) {
-      this.grabWebActivityData();
-    }
+    this.grabWebActivityData();
   }
 
   grabWebActivityData(){
@@ -60,7 +58,7 @@ export class HomeComponent implements OnInit {
         let index = this.findIndexOfSiteWithURL(sites, baseUrl);
 
         if(index == -1){
-          sites.push({url: baseUrl, time: timespan, favicon: entry.faviconUrl, percentage: 0, visits: 0, prettyTime: ""});
+          sites.push({url: baseUrl, time: timespan, favicon: entry.faviconUrl, percentage: 0, visits: 1, prettyTime: ""});
         } else{
           sites[index].time += timespan;
           sites[index].visits++;
@@ -68,8 +66,6 @@ export class HomeComponent implements OnInit {
           if(sites[index].favicon.startsWith("chrome://") && !entry.faviconUrl.startsWith("chrome://")){
             sites[index].favicon = entry.faviconUrl;
           }
-
-
         }
       }
 
@@ -93,10 +89,7 @@ export class HomeComponent implements OnInit {
         this.siteNames.push(sites[i].url);
         this.times.push(Math.round(sites[i].time/1000/6)/10);
       }
-
       this.sites = sites;
-      console.log(sites);
-
       if(sites.length > 0) {
         this.createDoughnut();
       }
@@ -120,18 +113,7 @@ export class HomeComponent implements OnInit {
         tooltips: {
           enabled: false
         },
-        responsive: true,
-        plugins:{
-          tooltip: {
-            callbacks: {
-              // @ts-ignore
-              label: function(context){
-                console.log(context);
-                return "hallo";
-              }
-            }
-          }
-        }
+        responsive: true
        },
       type: 'doughnut',
       legend: true,
@@ -139,7 +121,7 @@ export class HomeComponent implements OnInit {
         {data: this.times, label: 'Time spent'},
       ],
       labels: this.siteNames
-    }
+    }      
   }
 
   convertMilliseconds(milliseconds: number){
@@ -182,7 +164,6 @@ export class HomeComponent implements OnInit {
     for(let i=0; i<sites.length; i++){
       sites[i].prettyTime = this.convertMilliseconds(sites[i].time);
     }
-
     return sites;
   }
 
@@ -194,6 +175,3 @@ export class HomeComponent implements OnInit {
     this.authService.sendLoginRequest();
   }
 }
-
-
-

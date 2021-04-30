@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { Site } from 'src/app/interfaces';
 import { ApiService } from 'src/app/services/api/api.service';
 
 @Component({
@@ -20,6 +21,14 @@ export class StatisticsComponent implements OnInit {
   private monthTime:any[] = [];
   private startOfWeek?: Date;
   private endOfWeek?: Date;
+
+  public times: number[] = [];
+  public timesTotal: number[] = [];
+  public sites: Site[] = [];
+  public sitesTotal: Site[] = [];
+
+  public displayedColumns: string[] = ['favicon', 'url', 'visits', 'percentage', 'time'];
+
   public allData: any = {};
   rangeWeek = new FormGroup({
     startWeek: new FormControl(),
@@ -32,6 +41,31 @@ export class StatisticsComponent implements OnInit {
     startMonth: new FormControl(),
     endMonth: new FormControl()
   });
+
+  public imageToShow: any;
+  public isImageLoading: boolean = false;
+
+  // @ts-ignore
+  @ViewChild('title') detailsCardTitle: ElementRef<HTMLElement>;
+  // @ts-ignore
+  @ViewChild('detailsCardAbsoluteTime') detailsCardAbsoluteTime: ElementRef<HTMLElement>;
+  // @ts-ignore
+  @ViewChild('detailsCardPercent') detailsCardPercent: ElementRef<HTMLElement>;
+  // @ts-ignore
+  @ViewChild('favicon') favicon: ElementRef<HTMLElement>;
+  // @ts-ignore
+  @ViewChild('visits') visits: ElementRef<HTMLElement>;
+
+  // @ts-ignore
+  @ViewChild('titleTotal') detailsCardTitleTotal: ElementRef<HTMLElement>;
+  // @ts-ignore
+  @ViewChild('detailsCardAbsoluteTimeTotal') detailsCardAbsoluteTimeTotal: ElementRef<HTMLElement>;
+  // @ts-ignore
+  @ViewChild('detailsCardPercentTotal') detailsCardPercentTotal: ElementRef<HTMLElement>;
+  // @ts-ignore
+  @ViewChild('faviconTotal') faviconTotal: ElementRef<HTMLElement>;
+  // @ts-ignore
+  @ViewChild('visitsTotal') visitsTotal: ElementRef<HTMLElement>;
 
   constructor(private apiService: ApiService, private formBuilder: FormBuilder) {
   }
@@ -86,7 +120,6 @@ export class StatisticsComponent implements OnInit {
       let end = this.getEndWeek(start);
       this.rangeWeek.controls["endWeek"].setValue(end);
       this.updateWeekChart(start, end);
-      console.log(start, end)
     }
   }
 
@@ -106,7 +139,6 @@ export class StatisticsComponent implements OnInit {
     if(i != undefined) {
       let start = new Date(this.addedMonths[i].controls["startMonth"].value);
       let end = new Date(start.getFullYear(), start.getMonth()+1, 0);
-      console.log(start, end)
       this.addedMonths[i].controls["endMonth"].setValue(end);
       this.updateMonthChart(start, end);
     } else {
@@ -193,12 +225,8 @@ export class StatisticsComponent implements OnInit {
   }
 
   updateMonthChart(startOfMonth?: Date, endOfMonth?: Date, monthForm?: any) {
-    console.log(monthForm)
     if(startOfMonth == undefined || endOfMonth == undefined) {
-      console.log(this.monthTime, monthForm);
       this.monthTime = this.monthTime.filter(e => e.stack != monthForm);
-      console.log(this.monthTime);
-
       this.createMonthChart();
     } else {
       this.apiService.getWebActivitiesInTimespan(startOfMonth.getTime().toString(), endOfMonth.getTime().toString()).subscribe((timespanData : any) => {
@@ -239,83 +267,114 @@ export class StatisticsComponent implements OnInit {
   }
 
   updateDayChart(day: Date){
-    let times: number[] = [];
-    this.siteNames = [];
     let millisecondsInDay = day.getHours()*60*60*1000 + day.getMinutes()*60*1000 + day.getSeconds()*1000;
     let startOfDay = day.getTime() - millisecondsInDay;
     let endOfDay = startOfDay + 24*60*60*1000;
+    this.siteNames = [];
+    this.times = [];
     this.apiService.getWebActivitiesInTimespan(startOfDay.toString(), endOfDay.toString()).subscribe((timespanData : any) => {
-      let sites = new Map<string, number>();
-      sites.clear();
+      let sites: any[] = []
+
       for(let entry of timespanData){
-        let baseUrl = entry.url.split('/')[2];
-        let timespan = entry.endtime - entry.starttime;
-        if(sites.get(baseUrl) != null){
-          let oldTime = sites.get(baseUrl);
-          // @ts-ignore
-          sites.set(baseUrl, oldTime + timespan);
-        } else {
-          sites.set(baseUrl, timespan);
+        let baseUrl:string = entry.url.split('/')[2];
+        let timespan:number = entry.endtime - entry.starttime;
+        let index = this.findIndexOfSiteWithURL(sites, baseUrl);
+
+        if(index == -1){
+          sites.push({url: baseUrl, time: timespan, favicon: entry.faviconUrl, percentage: 0, visits: 1, prettyTime: ""});
+        } else{
+          sites[index].time += timespan;
+          sites[index].visits++;
+          if(sites[index].favicon.startsWith("chrome://") && !entry.faviconUrl.startsWith("chrome://")){
+            sites[index].favicon = entry.faviconUrl;
+          }
         }
       }
-      for(var[siteName, time] of sites.entries()){
-        this.siteNames.push(siteName);
-        times.push(Math.round(time/1000/6)/10);
+
+      sites.sort((a: any, b: any)=>{
+        return b.time-a.time;
+      });
+      if(sites.length > 10) {
+        let others = {url: "Andere", time: 0, visits: 0 };
+        for(let j = 9; j < sites.length; j++) {
+          others.time += sites[j].time;
+          others.visits++;
+        }
+        sites.splice(9, 0, others);
+        sites.splice(10, sites.length-1);
       }
-      this.createDayDoughnut(times);
+
+      sites = this.setPercentage(sites);
+      sites = this.setPrettyTime(sites);
+
+      for(let i=0; i<sites.length; i++){
+        this.siteNames.push(sites[i].url);
+        this.times.push(Math.round(sites[i].time/1000/6)/10);
+      }
+      this.sites = sites;
+      if(sites.length > 0) {
+        this.createDayDoughnut();
+      } else {
+        this.dayChart = null;
+      }
     });
   }
   updateTotalChart(){
-    let times: number[] = [];
     this.siteNamesTotal = [];
-    // TODO add "andere" und fun facts and tabelle
+    this.timesTotal = [];
     this.apiService.getWebActivitiesInTimespan("0", new Date().getTime().toString()).subscribe((timespanData : any) => {
-      let sites = new Map<string, number>();
+      let sites: any[] = []
       let first = Infinity;
-      sites.clear();
+      
       for(let entry of timespanData){
-        let baseUrl = entry.url.split('/')[2];
+        let baseUrl:string = entry.url.split('/')[2];
+        let timespan:number = entry.endtime - entry.starttime;
+        let index = this.findIndexOfSiteWithURL(sites, baseUrl);
         first = Math.min(first, entry.starttime);
-        let timespan = entry.endtime - entry.starttime;
-        if(sites.get(baseUrl) != null){
-          let oldTime = sites.get(baseUrl);
-          // @ts-ignore
-          sites.set(baseUrl, oldTime + timespan);
-        } else {
-          sites.set(baseUrl, timespan);
+        if(index == -1){
+          sites.push({url: baseUrl, time: timespan, favicon: entry.faviconUrl, percentage: 0, visits: 1, prettyTime: ""});
+        } else{
+          sites[index].time += timespan;
+          sites[index].visits++;
+          if(sites[index].favicon.startsWith("chrome://") && !entry.faviconUrl.startsWith("chrome://")){
+            sites[index].favicon = entry.faviconUrl;
+          }
         }
       }
-      let sum = 0;
-      let temp = [];
-      for(var[siteName, time] of sites.entries()){
-        temp.push({time: time, label: siteName});
-        //this.siteNamesTotal.push(siteName);
-        sum += time;
-        //times.push(Math.round(time/1000/6/6)/100);
-      }
 
-      temp.sort((a: any, b: any)=>{
+      sites.sort((a: any, b: any)=>{
         return b.time-a.time;
       });
-      if(temp.length > 10) {
-        let others = {time: 0, label: "Andere"};
-
-        for(let j = 9; j < temp.length; j++) {
-          others.time += temp[j].time;
+      if(sites.length > 10) {
+        let others = {url: "Andere", time: 0, visits: 0 };
+        for(let j = 9; j < sites.length; j++) {
+          others.time += sites[j].time;
+          others.visits++;
         }
-        temp.splice(9, 0, others);
-        temp.splice(10, temp.length-1);
-      }
-      for(let t of temp){
-        times.push(Math.round(t.time/1000/6/6)/100);
-        this.siteNamesTotal.push(t.label);
+        sites.splice(9, 0, others);
+        sites.splice(10, sites.length-1);
       }
 
-      this.allData.bestSite = this.siteNamesTotal[times.indexOf(Math.max(...times))];
+      sites = this.setPercentage(sites);
+      sites = this.setPrettyTime(sites);
+      let sum = 0;
+      for(let i=0; i<sites.length; i++){
+        this.siteNamesTotal.push(sites[i].url);
+        sum += sites[i].time;
+        this.timesTotal.push(Math.round(sites[i].time/1000/6)/10);
+      }
+      this.sitesTotal = sites;
+      if(sites.length > 0) {
+        this.createDayDoughnut();
+      } else {
+        this.dayChart = null;
+      }
+
+      this.allData.bestSite = this.siteNamesTotal[this.timesTotal.indexOf(Math.max(...this.timesTotal))];
       this.allData.firstTime = this.getPrettyDate(first);
       this.allData.allTime = this.getPrettyTime(sum);
-      this.allData.avgTime = this.getPrettyTime(sum/times.length);
-      this.createTotalDoughnut(times);
+      this.allData.avgTime = this.getPrettyTime(sum/this.timesTotal.length);
+      this.createTotalDoughnut();
     });
   }
 
@@ -342,7 +401,6 @@ export class StatisticsComponent implements OnInit {
     }
   }
   createWeekChart(){
-    console.log(this.weekChart);
     this.weekChart = {
       options: {scaleShowVerticalLines: false,
         responsive: true,
@@ -368,40 +426,35 @@ export class StatisticsComponent implements OnInit {
     }
   }
 
-  createTotalDoughnut(times: any) {
+  createTotalDoughnut() {
     this.totalChart = {
       options: {scaleShowVerticalLines: false,
         responsive: true,
-        scales: {yAxes: [{ticks: {beginAtZero: true}, scaleLabel: {
-          display: true,
-          labelString: 'Stunden'
-        }}]}
       },
       labels: this.siteNamesTotal,
       type: 'doughnut',
       legend: true,
       data: [
-        {data: times, label: 'times'},
+        {data: this.timesTotal, label: 'times'},
       ],
     }
   }
 
-  createDayDoughnut(times: any){
+  createDayDoughnut(){
     this.dayChart = {
-      options: {scaleShowVerticalLines: false,
-        responsive: true,
-        scales: {yAxes: [{ticks: {beginAtZero: true}, scaleLabel: {
-          display: true,
-          labelString: 'Minuten'
-        }}]}
+      options: {
+       tooltips: {
+         enabled: false
+       },
+       responsive: true
       },
-      labels: this.siteNames,
-      type: 'doughnut',
-      legend: true,
-      data: [
-        {data: times, label: 'times'},
-      ],
-    }
+     type: 'doughnut',
+     legend: true,
+     data: [
+       {data: this.times, label: 'Time spent'},
+     ],
+     labels: this.siteNames
+   }
   }
 
   nextDay() {
@@ -558,5 +611,58 @@ export class StatisticsComponent implements OnInit {
     let d = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
     let m = date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth();
     return d + "." + m + "." + date.getFullYear();
+  }
+
+  findIndexOfSiteWithURL(sites: any[], url: any){
+    for(let i=0; i<sites.length; i++){
+      let site = sites[i];
+
+      if(typeof site.url !== "undefined" && site.url.localeCompare(url) == 0){
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  setPercentage(sites: any[]){
+    let completeTime: number = 0;
+
+    for(let i=0; i<sites.length; i++){
+      completeTime += sites[i].time;
+    }
+
+    for(let i=0; i<sites.length; i++){
+      let percent = (sites[i].time/completeTime) * 100;
+      let rounded =  Math.round(percent * 10) / 10;
+      sites[i].percentage = rounded;
+    }
+
+    return sites;
+  }
+
+  setPrettyTime(sites: any[]){
+    for(let i=0; i<sites.length; i++){
+      sites[i].prettyTime = this.getPrettyTime(sites[i].time);
+    }
+    return sites;
+  }
+
+  public chartHovered({ event, active }: { event: MouseEvent, active: {}[] }, total?: boolean): void {
+    const hovered : any = active[0];
+    if(total) {
+      let site = this.sitesTotal[hovered._index];
+      this.detailsCardTitleTotal.nativeElement.innerHTML = site.url;
+      this.detailsCardAbsoluteTimeTotal.nativeElement.innerHTML = site.prettyTime;
+      this.detailsCardPercentTotal.nativeElement.innerHTML = site.percentage.toString() + "%";
+      this.faviconTotal.nativeElement.setAttribute("src", site.favicon);
+      this.visitsTotal.nativeElement.innerHTML = "Visits: " + site.visits.toString();
+    } else {
+      let site = this.sites[hovered._index];
+      this.detailsCardTitle.nativeElement.innerHTML = site.url;
+      this.detailsCardAbsoluteTime.nativeElement.innerHTML = site.prettyTime;
+      this.detailsCardPercent.nativeElement.innerHTML = site.percentage.toString() + "%";
+      this.favicon.nativeElement.setAttribute("src", site.favicon);
+      this.visits.nativeElement.innerHTML = "Visits: " + site.visits.toString();
+    }
   }
 }

@@ -17,22 +17,20 @@
 }
 
 .chart{
-  width: 700px;
+  width: 70%;
   float: left;
   margin: 0;
 }
 
 .main-page {
   margin-top: 2vh;
+  padding-bottom: 35px;
 }
 
 .example-card {
-  border-radius: 100%;
-  height: 20vh;
-  width: 20vh;
-  position: relative;
-  left: -33.2vw;
-  top: 13.2vh;
+  width: 27%;
+  margin-top: 9.5%;
+  margin-right: 3%;
 }
 
 .center {
@@ -49,7 +47,7 @@ td,th {
 }
 
 .smallColumn{
-  width: 15%;
+  width: 5%;
 }
 
 .faviconInTable{
@@ -58,5 +56,7 @@ td,th {
 }
 
 table{
+  margin: auto;
   min-width: 500px;
+  width: 100%;
 }

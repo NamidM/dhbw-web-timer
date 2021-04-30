@@ -12,7 +12,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { StatisticsComponent } from './pages/general/authorized/statistics/statistics.component';
-import { CommunityComponent } from './pages/general/authorized/community/community.component';
 import { GeneralComponent } from './pages/general/general.component';
 import { ChartsModule } from 'ng2-charts';
 import { LoginComponent } from './pages/general/login/login.component';
@@ -46,7 +45,6 @@ registerLocaleData(localeDe);
     FooterComponent,
     NavbarComponent,
     StatisticsComponent,
-    CommunityComponent,
     GeneralComponent,
     LoginComponent,
     RegisterComponent,

@@ -6,16 +6,13 @@
   <label>Bereits registriert?</label><br>
   <button mat-raised-button color="primary" (click)="login()">Einloggen mit Google</button>
 </div>
-
 <div *ngIf="authService.username" class="container main-page">
-  <h1>StartSeite</h1>
-  <h3>User Dashboard von: <b>{{authService.username}}</b></h3>
+  <h1 class="center">Statistik für: Heute</h1>
   <div *ngIf="!dayChart">
     <h3>Noch keine Einträge für heute!</h3>
   </div>
   <div class="wrapper" *ngIf="dayChart">
     <div style="display: block" id="dayChart" class="chart">
-      <label>Webaktivität Heute</label>
       <canvas baseChart *ngIf="dayChart"
               [datasets]="dayChart.data"
               [labels]="dayChart.labels"
@@ -28,11 +25,11 @@
 
     <mat-card class="example-card" #detailsCard>
       <div class="center">
-        <img #favicon class="favicon" src="https://old.reddit.com/favicon.ico"/>
-        <b><p #title class="title">Shiba Inu</p></b>
-        <p #detailsCardAbsoluteTime></p>
-        <p #detailsCardPercent></p>
-        <p #visits></p>
+        <img #favicon class="favicon" src="{{sites[0].favicon}}"/>
+        <b><p #title class="title">{{sites[0].url}}</p></b>
+        <p #detailsCardAbsoluteTime>{{sites[0].prettyTime}}</p>
+        <p #detailsCardPercent>{{sites[0].percentage.toString() + "%"}}</p>
+        <p #visits>{{"Visits: " + sites[0].visits.toString()}}</p>
       </div>
     </mat-card>
 
@@ -42,7 +39,7 @@
 
         <!-- Favicon Column -->
         <ng-container matColumnDef="favicon">
-          <th class="smallColumn" mat-header-cell *matHeaderCellDef> Favicon </th>
+          <th class="smallColumn" mat-header-cell *matHeaderCellDef> </th>
           <td class="smallColumn" mat-cell *matCellDef="let site"> <img class="faviconInTable" [src]="site.favicon" /> </td>
         </ng-container>
 

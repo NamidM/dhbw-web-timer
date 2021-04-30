@@ -1,0 +1,23 @@
+#err {
+    color: red;
+}
+.bottom {
+    margin: 10px 20px 20px 20px;
+}
+#login {
+    margin: 10px;
+    width: 200px;
+    text-align: center;
+}
+#loginBtn {
+    margin: 10px;
+}
+.welcome-txt {
+    text-align: center;
+}
+#logoutBtn {
+    float: right;
+}
+.statistics-txt {
+    color: gray !important;
+}
