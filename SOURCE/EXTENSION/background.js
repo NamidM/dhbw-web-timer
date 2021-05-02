@@ -1,6 +1,5 @@
 const TIMELIMIT = 30000;
-let tabs = [];
-let username, timeout, tracking;
+let username, tracking;
 const base_url = 'http://127.0.0.1:3000/'
 
 fetch(base_url + 'silentLogin')
@@ -66,9 +65,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendResponse(username);
       }
     });
-    sendTabs();
-    clearTimeout(timeout);
-    startTimer();
+    getActiveTab(activeTab => {
+      sendTab(activeTab, true);
+    });
     return true;
   } else if(request.message === 'updateTabs') {
     if(tracking) {
@@ -81,52 +80,64 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 function pushNewTabEntry(id){
   chrome.tabs.get(id, (x)=>{
     if(x.url !== "chrome://newtab/" && x.url !== "" && !x.url.startsWith("chrome://")) {
-      if(tabs.length != 0){
-        tabs[tabs.length-1].endtime = new Date().getTime();
-        tabs[tabs.length-1].active = false;
-      }
-      tabs.push({
-        id: id,
-        faviconUrl: getFavicon(x),
-        url: x.url,
-        starttime: new Date().getTime(),
-        endtime: new Date().getTime(),
-        active: true
-      });
-      addEventListenerToPage(id);
+      getActiveTab(activeTab=>{
+        if(activeTab){
+          let currentTime = new Date().getTime();
+          if((currentTime - activeTab.endtime) < TIMELIMIT) {
+            activeTab.endtime = new Date().getTime();
+          } else {
+            activeTab.endtime += TIMELIMIT;
+          }
+
+          activeTab.active = false;
+          sendTab(activeTab);
+        }
+        setActiveTab({
+          id: id,
+          faviconUrl: getFavicon(x),
+          url: x.url,
+          starttime: new Date().getTime(),
+          endtime: new Date().getTime(),
+          active: true
+        });
+        addEventListenerToPage(id);
+      })
     }
   });
 }
 
 // Update tab entry if no timeout or create new if timeout
 function updateTabEntry (id, isCloseEvent) {
-  if(tabs.length != 0){
-    let tab = tabs[tabs.length-1]
-    let currentTime = new Date().getTime();
-    if((currentTime - tab.endtime) < TIMELIMIT) {
-      tabs[tabs.length-1].endtime = currentTime;
-      if(isCloseEvent) {
-        tabs[tabs.length-1].active = false;
+  getActiveTab(activeTab => {
+    if(activeTab && id == activeTab.id){
+      let currentTime = new Date().getTime();
+      if((currentTime - activeTab.endtime) < TIMELIMIT) {
+        // Active Tab was active in the last 30 seconds
+        // Set endtime to now
+        activeTab.endtime = currentTime;
+        if(isCloseEvent) {
+          // If Tab was closed -> Send tab and set activeTab to null
+          activeTab.active = false;
+          sendTab(activeTab);
+          setActiveTab(null);
+        } else {
+          setActiveTab(activeTab);
+        }
+      } else {
+        // Active Tab was inactive for at least 30 seconds
+        activeTab.active = false;
+        activeTab.endtime = activeTab.endtime + TIMELIMIT;
+        // Send tab entry and create new one
+        sendTab(activeTab);
+        setActiveTab({
+          id: activeTab.id,
+          faviconUrl: getFavicon(activeTab),
+          url: activeTab.url,
+          active: true
+        });
       }
-    } else {
-      tabs[tabs.length-1].active = false;
-      tabs[tabs.length-1].endtime = tab.endtime + TIMELIMIT;
-      tabs.push({
-        id: tab.id,
-        faviconUrl: getFavicon(tab),
-        url: tab.url,
-        active: true
-      });
     }
-    console.log(tabs[tabs.length-1]);
-  }
-}
-
-function startTimer() {
-  timeout = setTimeout(() => {
-      sendTabs();
-      startTimer();
-  }, 300000);
+  })
 }
 
 function getFavicon(tab){
@@ -161,37 +172,34 @@ function addEventListenerToPage(id){
   });
 }
 
-function sendTabs(){
-  if(tabs.length != 0){
-    let newTabs = [];
-    let activeTabExists = tabs[tabs.length-1].active && (new Date().getTime() - tabs[tabs.length-1].endtime) < TIMELIMIT;
+function sendTab(tabToSend, sync){
+  if(tabToSend){
+    let activeTabExists = tabToSend.active && (new Date().getTime() - tabToSend.endtime) < TIMELIMIT;
 
-    if(activeTabExists) {
-      newTabs.push(tabs[tabs.length-1]);
-      tabs = tabs.splice(0, tabs.length-1);
-    } else {
-      if(tabs[tabs.length-1].active) {
-        tabs[tabs.length-1].endtime = tabs[tabs.length-1].endtime + TIMELIMIT;
-        tabs[tabs.length-1].active = false;
+    if(!activeTabExists) {
+      if(tabToSend.active) {
+        tabToSend.endtime = tabToSend.endtime + TIMELIMIT;
+        tabToSend.active = false;
+        if(sync) {
+          setActiveTab(null);
+        }
       }
+      console.log("Sending data", tabToSend);
+      postData(base_url + 'webActivity', tabToSend)
+      .then(async response => {
+        if(response.status == 200) {
+          let res = await response.json();
+          console.log("Success: ", res);
+        } else {
+          console.log("Failed to reach backend")
+        }
+      });
     }
-    console.log("Sending data", tabs);
-    postData(base_url + 'webActivities', tabs)
-    .then(async response => {
-      if(response.status == 200) {
-        let res = await response.json();
-        console.log("Success: ", res);
-        tabs = newTabs;
-      } else {
-        console.log("Failed to reach backend")
-      }
-    });
   }
 }
 
 function startTracking() {
   console.log("tracking started")
-  startTimer();
   chrome.tabs.onActivated.addListener(tabActivatedListener);
   chrome.tabs.onRemoved.addListener(tabRemovedListener);
   chrome.tabs.onUpdated.addListener(tabUpdatedListener);
@@ -203,9 +211,8 @@ function stopTracking() {
   chrome.tabs.onUpdated.removeListener(tabUpdatedListener);
   chrome.tabs.onRemoved.removeListener(tabRemovedListener);
   chrome.tabs.onActivated.removeListener(tabActivatedListener);
-  clearTimeout(timeout);
   tracking = false;
-  tabs = [];
+  setActiveTab(null);
 }
 
 async function postData(url = '', data = {}) {
@@ -229,12 +236,24 @@ function tabRemovedListener(tabId) {
 
 function tabUpdatedListener(tabId, changeInfo) {
   if(changeInfo.url) {
-      if(tabs.length != 0 && (tabs[tabs.length-1].url.split('/')[2] == changeInfo.url.split('/')[2])) {
+    getActiveTab(activeTab => {
+      if(activeTab && (activeTab.url.split('/')[2] == changeInfo.url.split('/')[2])) {
         addEventListenerToPage(tabId);
-        tabs[tabs.length-1].endtime = new Date().getTime();
-        tabs[tabs.length-1].url = changeInfo.url;
+        activeTab.endtime = new Date().getTime();
+        activeTab.url = changeInfo.url;
       } else {
         pushNewTabEntry(tabId);
       }
+    })
   }
+}
+
+function getActiveTab(callback) {
+  chrome.storage.local.get(['activeTab'], function(result) {
+    callback(result.activeTab);
+  });
+}
+
+function setActiveTab(activeTab) {
+  chrome.storage.local.set({activeTab: activeTab});
 }

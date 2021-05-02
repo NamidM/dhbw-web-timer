@@ -5,6 +5,8 @@
   <button class="register-btn" mat-raised-button color="primary" (click)="register()">Registrieren mit Google</button><br><br>
   <label>Bereits registriert?</label><br>
   <button mat-raised-button color="primary" (click)="login()">Einloggen mit Google</button>
+  <br><br>
+  <button mat-raised-button color="accent"><a href="assets/downloads/EXTENSION.crx" class="download-btn" download="dhbw-web-timer.crx">Extension herunterladen</a></button>
 </div>
 <div *ngIf="authService.username" class="container main-page">
   <h1 class="center">Statistik für: Heute</h1>
