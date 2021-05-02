@@ -106,7 +106,7 @@ server.get("/webActivities", authUser, (req,res)=>{
 });
 
 server.post("/webActivities", authUser, async (req,res)=>{
-  console.log("Received tracking call");
+  console.log("Received tracking call", req.body);
   for(i in req.body){
     let obj = req.body[i];
     WEBACTIVITY.addWebActivity(obj.url, req.userID, obj.faviconUrl, obj.starttime, obj.endtime, ()=>{});

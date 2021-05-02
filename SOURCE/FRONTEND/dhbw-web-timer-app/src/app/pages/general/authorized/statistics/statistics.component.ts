@@ -312,7 +312,7 @@ export class StatisticsComponent implements OnInit {
 
       for(let i=0; i<sites.length; i++){
         this.siteNames.push(sites[i].url);
-        this.times.push(Math.round(sites[i].time/1000/6)/10);
+        this.times.push(sites[i].time);
       }
       this.sites = sites;
       if(sites.length > 0) {
@@ -364,7 +364,7 @@ export class StatisticsComponent implements OnInit {
       for(let i=0; i<sites.length; i++){
         this.siteNamesTotal.push(sites[i].url);
         sum += sites[i].time;
-        this.timesTotal.push(Math.round(sites[i].time/1000/6)/10);
+        this.timesTotal.push(sites[i].time);
       }
       this.sitesTotal = sites;
       if(sites.length > 0) {

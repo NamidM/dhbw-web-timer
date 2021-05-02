@@ -71,21 +71,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     startTimer();
     return true;
   } else if(request.message === 'updateTabs') {
-    console.log("iuashdfgiuhsdfaiuhsdfaiuhfsdaeihusfadiuh")
     if(tracking) {
       updateTabEntry(sender.tab.id, false);
     }
-  } else if(request.message === 'sync') {
-    sendTabs();
-    sendResponse('success');
   }
 });
 
 
 function pushNewTabEntry(id){
-  console.log(id);
   chrome.tabs.get(id, (x)=>{
-    console.log(id, x.url);
     if(x.url !== "chrome://newtab/" && x.url !== "" && !x.url.startsWith("chrome://")) {
       if(tabs.length != 0){
         tabs[tabs.length-1].endtime = new Date().getTime();
@@ -170,14 +164,16 @@ function addEventListenerToPage(id){
 function sendTabs(){
   if(tabs.length != 0){
     let newTabs = [];
-    let activeTabExists = tabs[tabs.length-1].active || (tabs[tabs.length-1].active && (new Date().getTime() - tabs[tabs.length-1].endtime) < TIMELIMIT);
+    let activeTabExists = tabs[tabs.length-1].active && (new Date().getTime() - tabs[tabs.length-1].endtime) < TIMELIMIT;
 
     if(activeTabExists) {
       newTabs.push(tabs[tabs.length-1]);
       tabs = tabs.splice(0, tabs.length-1);
     } else {
-      tabs[tabs.length-1].endtime = tabs[tabs.length-1].endtime + TIMELIMIT;
-      tabs[tabs.length-1].active = false;
+      if(tabs[tabs.length-1].active) {
+        tabs[tabs.length-1].endtime = tabs[tabs.length-1].endtime + TIMELIMIT;
+        tabs[tabs.length-1].active = false;
+      }
     }
     console.log("Sending data", tabs);
     postData(base_url + 'webActivities', tabs)
@@ -198,7 +194,6 @@ function startTracking() {
   startTimer();
   chrome.tabs.onActivated.addListener(tabActivatedListener);
   chrome.tabs.onRemoved.addListener(tabRemovedListener);
-  chrome.windows.onRemoved.addListener(windowRemovedListener);
   chrome.tabs.onUpdated.addListener(tabUpdatedListener);
   tracking = true;
 }
@@ -206,7 +201,6 @@ function startTracking() {
 function stopTracking() {
   console.log("tracking stopped")
   chrome.tabs.onUpdated.removeListener(tabUpdatedListener);
-  chrome.windows.onRemoved.removeListener(windowRemovedListener);
   chrome.tabs.onRemoved.removeListener(tabRemovedListener);
   chrome.tabs.onActivated.removeListener(tabActivatedListener);
   clearTimeout(timeout);
@@ -231,10 +225,6 @@ async function tabActivatedListener(e) {
 
 function tabRemovedListener(tabId) {
   updateTabEntry(tabId, true);
-}
-
-function windowRemovedListener(windowId) {
-  sendTabs();
 }
 
 function tabUpdatedListener(tabId, changeInfo) {

@@ -87,7 +87,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
       for(let i=0; i<sites.length; i++){
         this.siteNames.push(sites[i].url);
-        this.times.push(Math.round(sites[i].time/1000/6)/10);
+        this.times.push(sites[i].time);
       }
       this.sites = sites;
       if(sites.length > 0) {
@@ -121,7 +121,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         {data: this.times, label: 'Time spent'},
       ],
       labels: this.siteNames
-    }      
+    }    
   }
 
   convertMilliseconds(milliseconds: number){
