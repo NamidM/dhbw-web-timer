@@ -8,9 +8,15 @@ const jwt = require('jsonwebtoken');
 const https = require('https');
 const querystring = require('querystring');
 const cookieParser = require('cookie-parser')
+const fs = require('fs');
 dotenv.config();
 const production = process.env.PRODUCTION == "true";
-const hostname = process.env.APP_HOSTNAME;
+let hostname = process.env.APP_HOSTNAME;
+let redirect_uri = process.env.REDIRECT_URI;
+if(production) {
+  hostname = process.env.APP_HOSTNAME_PROD;
+  redirect_uri = process.env.REDIRECT_URI_PROD;
+}
 const port = process.env.APP_PORT;
 const server = express();
 const USER = require('./models/user');
@@ -112,7 +118,7 @@ server.get("/getOAuthUrl", (req, res) => {
   let nonce = encodeURIComponent(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
   let state = encodeURIComponent(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
   const CLIENT_ID = encodeURIComponent(process.env.CLIENT_ID);
-  let REDIRECT_URI = encodeURIComponent(process.env.REDIRECT_URI + req.query.redirect);
+  let REDIRECT_URI = encodeURIComponent(redirect_uri + req.query.redirect);
   if(!req.query.redirect) {
     REDIRECT_URI = encodeURIComponent(process.env.REDIRECT_URI_EXTENSION);
   }
@@ -133,7 +139,7 @@ server.get("/getOAuthUrl", (req, res) => {
 
 server.get("/login", (req,res)=>{
   console.log("login")
-  let redirect = req.query.extension ? process.env.REDIRECT_URI_EXTENSION : process.env.REDIRECT_URI + "login";
+  let redirect = req.query.extension ? process.env.REDIRECT_URI_EXTENSION : redirect_uri + "login";
   googleRequest({
     'code': req.query.authorization_code,
     'grant_type': 'authorization_code',
@@ -230,7 +236,7 @@ server.get("/register", (req,res)=>{
     'grant_type': 'authorization_code',
     'client_id': process.env.CLIENT_ID,
     'client_secret': process.env.CLIENT_SECRET,
-    'redirect_uri': process.env.REDIRECT_URI + "register"
+    'redirect_uri': redirect_uri + "register"
   }, (data) => {
     if(data.error) {
       res.send({message: "error"});
@@ -263,9 +269,20 @@ server.get("/register", (req,res)=>{
   });
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
-});
+if(production) {
+  https.createServer({
+    key: fs.readFileSync('/etc/letsencrypt/live/gruppe10.testsites.info/privkey.pem', 'utf8'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/gruppe10.testsites.info/cert.pem', 'utf8')
+  }, server)
+  .listen(port, hostname, function () {
+    console.log(`Server running at https://${hostname}:${port}/`);
+  })
+} else {
+  server.listen(port, hostname, () => {
+    console.log(`Server running at http://${hostname}:${port}/`);
+  });
+}
+
 
 function googleRequest(params, callback) {
   const postData = querystring.stringify(params);

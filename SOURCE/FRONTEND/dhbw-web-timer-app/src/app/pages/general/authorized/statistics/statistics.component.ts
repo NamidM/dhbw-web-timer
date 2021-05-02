@@ -72,8 +72,9 @@ export class StatisticsComponent implements OnInit {
 
   async ngOnInit(){
     let currentDate = new Date();
+    let day = currentDate.getDay() == 0 ? 7 : currentDate.getDay();
     this.startOfWeek = new Date();
-    this.startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1);
+    this.startOfWeek.setDate(currentDate.getDate() - day + 1);
     this.startOfWeek.setHours(0);
     this.startOfWeek.setMinutes(0);
     this.startOfWeek.setSeconds(0);
@@ -100,11 +101,13 @@ export class StatisticsComponent implements OnInit {
   startDateSelectionWeek(i?: any){
     if(i != undefined) {
       let start = new Date(this.addedWeeks[i].controls["startWeek"].value);
-      start.setDate(start.getDate() - start.getDay() + 1);
+      let day = start.getDay() == 0 ? 7 : start.getDay();
+      start.setDate(start.getDate() - day + 1);
       this.addedWeeks[i].controls["startWeek"].setValue(start);
     } else {
       let start = new Date(this.rangeWeek.controls["startWeek"].value);
-      start.setDate(start.getDate() - start.getDay() + 1);
+      let day = start.getDay() == 0 ? 7 : start.getDay();
+      start.setDate(start.getDate() - day + 1);
       this.rangeWeek.controls["startWeek"].setValue(start);
     }
   }

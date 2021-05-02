@@ -58,11 +58,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
       });
   } else if(request.message === 'isUserLoggedIn') {
-    sendResponse({u: username, t: tabs});
+    fetch(base_url + 'silentLogin')
+    .then(response => response.json())
+    .then(data => {
+      if(data.message == "success") {
+        username = data.username;
+        sendResponse(username);
+      }
+    });
     sendTabs();
     clearTimeout(timeout);
     startTimer();
+    return true;
   } else if(request.message === 'updateTabs') {
+    console.log("iuashdfgiuhsdfaiuhsdfaiuhfsdaeihusfadiuh")
     if(tracking) {
       updateTabEntry(sender.tab.id, false);
     }
@@ -74,7 +83,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 
 function pushNewTabEntry(id){
+  console.log(id);
   chrome.tabs.get(id, (x)=>{
+    console.log(id, x.url);
     if(x.url !== "chrome://newtab/" && x.url !== "" && !x.url.startsWith("chrome://")) {
       if(tabs.length != 0){
         tabs[tabs.length-1].endtime = new Date().getTime();
@@ -113,6 +124,7 @@ function updateTabEntry (id, isCloseEvent) {
         active: true
       });
     }
+    console.log(tabs[tabs.length-1]);
   }
 }
 
@@ -120,7 +132,7 @@ function startTimer() {
   timeout = setTimeout(() => {
       sendTabs();
       startTimer();
-  }, 600000);
+  }, 300000);
 }
 
 function getFavicon(tab){
@@ -156,11 +168,9 @@ function addEventListenerToPage(id){
 }
 
 function sendTabs(){
-  console.log(tabs.length, tabs.length != 0)
   if(tabs.length != 0){
     let newTabs = [];
-    let activeTabExists = (new Date().getTime() - tabs[tabs.length-1].endtime) < TIMELIMIT;
-    console.log(tabs[tabs.length-1].endtime, activeTabExists)
+    let activeTabExists = tabs[tabs.length-1].active || (tabs[tabs.length-1].active && (new Date().getTime() - tabs[tabs.length-1].endtime) < TIMELIMIT);
 
     if(activeTabExists) {
       newTabs.push(tabs[tabs.length-1]);

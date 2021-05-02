@@ -12,13 +12,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     showLoginPage();
   }
 });
+console.log("test")
 
 chrome.runtime.sendMessage({message: 'isUserLoggedIn'}, response => {
   console.log(response)
   if(!response) {
     showLoginPage();
   } else {
-    username = response.u;
+    username = response;
     showMainPage();
   }
 });
