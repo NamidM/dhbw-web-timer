@@ -1,10 +1,10 @@
 <div *ngIf="!authService.username && !authService.loading" class="container main-page">
   <h1>Willkommen auf DHBW Web-Timer</h1>
   <h3>Um diese Seite zu benutzen müssen sie eingeloggt sein!</h3><br>
-  <label >Noch kein Account?</label><br>
-  <button class="register-btn" mat-raised-button color="primary" (click)="register()">Registrieren mit Google</button><br><br>
+  <label>Noch kein Account?</label><br>
+  <button class="register-btn" mat-raised-button color="primary" (click)="authService.sendRegisterRequest()">Registrieren mit Google</button><br><br>
   <label>Bereits registriert?</label><br>
-  <button mat-raised-button color="primary" (click)="login()">Einloggen mit Google</button>
+  <button mat-raised-button color="primary" (click)="authService.sendLoginRequest()">Einloggen mit Google</button>
   <br><br>
   <button mat-raised-button color="accent"><a href="assets/downloads/EXTENSION.crx" class="download-btn" download="dhbw-web-timer.crx">Extension herunterladen</a></button>
 </div>
@@ -27,13 +27,11 @@
 
     <mat-card class="example-card" #detailsCard>
       <div class="center">
-          <img onerror="this.src = '/assets/defaultFavicon.png';" #favicon class="favicon" src="{{sites[0].favicon}}" alt="favicon"/>
-        <!-- <img #favicon class="favicon" src="/assets/defaultFavicon.png" alt="favicon"/> -->
-
-        <b><p #title class="title">{{sites[0].url}}</p></b>
-        <p #detailsCardAbsoluteTime>{{sites[0].prettyTime}}</p>
-        <p #detailsCardPercent>{{sites[0].percentage.toString() + "%"}}</p>
-        <p #visits>{{"Visits: " + sites[0].visits.toString()}}</p>
+        <img onerror="this.src = '/assets/images/defaultFavicon.png';" #favicon class="favicon" src="{{sites[0].favicon}}" alt="favicon"/>
+        <b><p class="title">{{site.url}}</p></b>
+        <p>{{site.prettyTime}}</p>
+        <p>{{site.percentage.toString() + "%"}}</p>
+        <p>{{"Visits: " + site.visits.toString()}}</p>
       </div>
     </mat-card>
 
@@ -44,7 +42,9 @@
         <!-- Favicon Column -->
         <ng-container matColumnDef="favicon">
           <th class="smallColumn" mat-header-cell *matHeaderCellDef> </th>
-          <td class="smallColumn" mat-cell *matCellDef="let site"> <img class="faviconInTable" [src]="site.favicon "  onerror="this.src = '/assets/defaultFavicon.png';"/> </td>
+          <td class="smallColumn" mat-cell *matCellDef="let site">
+            <img class="faviconInTable" [src]="site.favicon" onerror="this.src = '/assets/images/defaultFavicon.png';"/>
+          </td>
         </ng-container>
 
         <!-- URL Column -->

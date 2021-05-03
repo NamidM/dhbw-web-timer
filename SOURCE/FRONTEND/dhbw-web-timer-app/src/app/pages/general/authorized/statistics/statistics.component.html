@@ -3,7 +3,6 @@
 </div>
 
 <div class="timeStatistics">
-
   <mat-tab-group mat-stretch-tabs>
     <mat-tab label="Tag">
       <div class="day-wrapper">
@@ -38,11 +37,11 @@
 
           <mat-card class="example-card" #detailsCard>
             <div class="center">
-              <img #favicon class="favicon" src="{{sites[0].favicon}}"/>
-              <b><p #title class="title">{{sites[0].url}}</p></b>
-              <p #detailsCardAbsoluteTime>{{sites[0].prettyTime}}</p>
-              <p #detailsCardPercent>{{sites[0].percentage.toString() + "%"}}</p>
-              <p #visits>{{"Visits: " + sites[0].visits.toString()}}</p>
+              <img onerror="this.src = 'assets/images/defaultFavicon.png';" #favicon class="favicon" src="{{site.favicon}}" alt="favicon"/>
+              <b><p class="title">{{site.url}}</p></b>
+              <p>{{site.prettyTime}}</p>
+              <p>{{site.percentage.toString() + "%"}}</p>
+              <p>{{"Visits: " + site.visits.toString()}}</p>
             </div>
           </mat-card>
 
@@ -53,7 +52,9 @@
               <!-- Favicon Column -->
               <ng-container matColumnDef="favicon">
                 <th class="smallColumn" mat-header-cell *matHeaderCellDef> </th>
-                <td class="smallColumn" mat-cell *matCellDef="let site"> <img class="faviconInTable" [src]="site.favicon" /> </td>
+                <td class="smallColumn" mat-cell *matCellDef="let site">
+                  <img class="faviconInTable" [src]="site.favicon" onerror="this.src = '/assets/images/defaultFavicon.png';"/>
+                </td>
               </ng-container>
 
               <!-- URL Column -->
@@ -64,19 +65,19 @@
 
               <!-- Visits Column -->
               <ng-container matColumnDef="visits">
-                <th class="smallColumn" mat-header-cell *matHeaderCellDef>Visits</th>
+                <th class="smallColumn" mat-header-cell *matHeaderCellDef>Besuche</th>
                 <td class="smallColumn" mat-cell *matCellDef="let site">{{ site.visits }}</td>
               </ng-container>
 
               <!-- Percentage Column -->
               <ng-container matColumnDef="percentage">
-                <th class="smallColumn" mat-header-cell *matHeaderCellDef>Percentage</th>
+                <th class="smallColumn" mat-header-cell *matHeaderCellDef>Prozent</th>
                 <td class="smallColumn" mat-cell *matCellDef="let site">{{ site.percentage }} %</td>
               </ng-container>
 
               <!-- Time Column -->
               <ng-container matColumnDef="time">
-                <th mat-header-cell *matHeaderCellDef>Time spent</th>
+                <th mat-header-cell *matHeaderCellDef>Gesamtzeit</th>
                 <td mat-cell *matCellDef="let site">{{ site.prettyTime }}</td>
               </ng-container>
 
@@ -94,33 +95,13 @@
           <div class="center">
             <button mat-raised-button color="primary" class="addweek-btn" (click)="addWeek()">Woche hinzufügen</button>
           </div>
-          <form class="week-form center" onsubmit="return false;">
-            <button mat-icon-button class="next-icon" (click)="prevWeek()">
-              <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_before</mat-icon>
-            </button>
-            <mat-form-field appearance="fill">
-              <mat-label>Woche auswählen</mat-label>
-              <mat-date-range-input [formGroup]="rangeWeek" [rangePicker]="picker2">
-                <input matStartDate formControlName="startWeek" (dateChange)="startDateSelectionWeek()">
-                <input matEndDate formControlName="endWeek" (dateChange)="endDateSelectionWeek()">
-              </mat-date-range-input>
-              <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-              <mat-date-range-picker #picker2></mat-date-range-picker>
-              <mat-error *ngIf="rangeWeek.controls.startWeek.hasError('matStartDateInvalid')">Invalid start date
-              </mat-error>
-              <mat-error *ngIf="rangeWeek.controls.endWeek.hasError('matEndDateInvalid')">Invalid end date</mat-error>
-            </mat-form-field>
-            <button mat-icon-button class="next-icon" (click)="nextWeek()">
-              <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_next</mat-icon>
-            </button>
-          </form>
           <ng-container *ngFor="let addedWeek of addedWeeks; index as i">
             <form class="week-form center" onsubmit="return false;">
               <button mat-icon-button class="next-icon" (click)="prevWeek(i)">
                 <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_before</mat-icon>
               </button>
               <mat-form-field appearance="fill">
-                <mat-label>{{i+2}}. Woche auswählen</mat-label>
+                <mat-label>{{i+1}}. Woche auswählen</mat-label>
                 <mat-date-range-input [formGroup]="addedWeek" [rangePicker]="picker2">
                   <input matStartDate formControlName="startWeek" (dateChange)="startDateSelectionWeek(i)">
                   <input matEndDate formControlName="endWeek" (dateChange)="endDateSelectionWeek(i)">
@@ -135,7 +116,7 @@
                 <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_next</mat-icon>
               </button>
               <button mat-icon-button class="delete-icon" (click)="deleteWeek(addedWeek.controls.index.value)">
-                <mat-icon aria-hidden="false" aria-label="Example home icon">delete</mat-icon>
+                <mat-icon aria-hidden="false" *ngIf="i != 0">delete</mat-icon>
               </button>
             </form>
           </ng-container>
@@ -154,32 +135,13 @@
           <div class="center">
             <button mat-raised-button color="primary" class="addmonth-btn" (click)="addMonth()">Monat hinzufügen</button>
           </div>
-          <form class="month-form center" onsubmit="return false;">
-            <button mat-icon-button class="next-icon" (click)="prevMonth()">
-              <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_before</mat-icon>
-            </button>
-            <mat-form-field appearance="fill">
-              <mat-label>Monat auswählen</mat-label>
-              <mat-date-range-input [formGroup]="rangeMonth" [rangePicker]="picker3">
-                <input matStartDate formControlName="startMonth" (dateChange)="startDateSelectionMonth()">
-                <input matEndDate formControlName="endMonth" (dateChange)="endDateSelectionMonth()">
-              </mat-date-range-input>
-              <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
-              <mat-date-range-picker #picker3></mat-date-range-picker>
-              <mat-error *ngIf="rangeMonth.controls.startMonth.hasError('matStartDateInvalid')">Invalid start date</mat-error>
-              <mat-error *ngIf="rangeMonth.controls.endMonth.hasError('matEndDateInvalid')">Invalid end date</mat-error>
-            </mat-form-field>
-            <button mat-icon-button class="next-icon" (click)="nextMonth()">
-              <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_next</mat-icon>
-            </button>
-          </form>
           <ng-container *ngFor="let addedMonth of addedMonths; index as i">
             <form class="month-form center" onsubmit="return false;">
               <button mat-icon-button class="next-icon" (click)="prevMonth(i)">
                 <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_before</mat-icon>
               </button>
               <mat-form-field appearance="fill">
-                <mat-label>{{i+2}}. Monat auswählen</mat-label>
+                <mat-label>{{i+1}}. Monat auswählen</mat-label>
                 <mat-date-range-input [formGroup]="addedMonth" [rangePicker]="picker3">
                   <input matStartDate formControlName="startMonth" (dateChange)="startDateSelectionMonth(i)">
                   <input matEndDate formControlName="endMonth" (dateChange)="endDateSelectionMonth(i)">
@@ -191,10 +153,10 @@
                 <mat-error *ngIf="addedMonth.controls.endMonth.hasError('matEndDateInvalid')">Invalid end date</mat-error>
               </mat-form-field>
               <button mat-icon-button class="next-icon" (click)="nextMonth(i)">
-                <mat-icon aria-hidden="false" aria-label="Example home icon">navigate_next</mat-icon>
+                <mat-icon aria-hidden="false">navigate_next</mat-icon>
               </button>
               <button mat-icon-button class="delete-icon" (click)="deleteMonth(addedMonth.controls.index.value)">
-                <mat-icon aria-hidden="false" aria-label="Example home icon">delete</mat-icon>
+                <mat-icon aria-hidden="false" *ngIf="i != 0">delete</mat-icon>
               </button>
             </form>
           </ng-container>
@@ -239,11 +201,11 @@
 
           <mat-card class="example-card" #detailsCard>
             <div class="center">
-              <img #faviconTotal class="favicon" src="{{sitesTotal[0].favicon}}"/>
-              <b><p #titleTotal class="title">{{sitesTotal[0].url}}</p></b>
-              <p #detailsCardAbsoluteTimeTotal>{{sitesTotal[0].prettyTime}}</p>
-              <p #detailsCardPercentTotal>{{sitesTotal[0].percentage.toString() + "%"}}</p>
-              <p #visitsTotal>{{"Visits: " + sitesTotal[0].visits.toString()}}</p>
+              <img onerror="this.src = '/assets/images/defaultFavicon.png';" #faviconTotal class="favicon" src="{{siteTotal.favicon}}" alt="favicon"/>
+              <b><p class="title">{{siteTotal.url}}</p></b>
+              <p>{{siteTotal.prettyTime}}</p>
+              <p>{{siteTotal.percentage.toString() + "%"}}</p>
+              <p>{{"Visits: " + siteTotal.visits.toString()}}</p>
             </div>
           </mat-card>
 
@@ -254,7 +216,9 @@
               <!-- Favicon Column -->
               <ng-container matColumnDef="favicon">
                 <th class="smallColumn" mat-header-cell *matHeaderCellDef> </th>
-                <td class="smallColumn" mat-cell *matCellDef="let site"> <img class="faviconInTable" [src]="site.favicon" /> </td>
+                <td class="smallColumn" mat-cell *matCellDef="let site">
+                  <img class="faviconInTable" [src]="site.favicon" onerror="this.src = '/assets/images/defaultFavicon.png';"/>
+                </td>
               </ng-container>
 
               <!-- URL Column -->
@@ -265,19 +229,19 @@
 
               <!-- Visits Column -->
               <ng-container matColumnDef="visits">
-                <th class="smallColumn" mat-header-cell *matHeaderCellDef>Visits</th>
+                <th class="smallColumn" mat-header-cell *matHeaderCellDef>Besuche</th>
                 <td class="smallColumn" mat-cell *matCellDef="let site">{{ site.visits }}</td>
               </ng-container>
 
               <!-- Percentage Column -->
               <ng-container matColumnDef="percentage">
-                <th class="smallColumn" mat-header-cell *matHeaderCellDef>Percentage</th>
+                <th class="smallColumn" mat-header-cell *matHeaderCellDef>Prozent</th>
                 <td class="smallColumn" mat-cell *matCellDef="let site">{{ site.percentage }} %</td>
               </ng-container>
 
               <!-- Time Column -->
               <ng-container matColumnDef="time">
-                <th mat-header-cell *matHeaderCellDef>Time spent</th>
+                <th mat-header-cell *matHeaderCellDef>Gesamtzeit</th>
                 <td mat-cell *matCellDef="let site">{{ site.prettyTime }}</td>
               </ng-container>
 
