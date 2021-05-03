@@ -311,7 +311,7 @@ export class StatisticsComponent implements OnInit {
 
   getEndWeek(start: Date) {
     let end = new Date(start);
-    end.setDate(start.getDate() + 7); 
+    end.setDate(start.getDate() + 7);
     end.setHours(0);
     end.setMinutes(0);
     end.setSeconds(-1);

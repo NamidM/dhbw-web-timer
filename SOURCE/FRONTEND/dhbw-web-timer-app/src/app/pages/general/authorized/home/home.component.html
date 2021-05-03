@@ -27,7 +27,9 @@
 
     <mat-card class="example-card" #detailsCard>
       <div class="center">
-        <img #favicon class="favicon" src="{{sites[0].favicon}}"/>
+          <img onerror="this.src = '/assets/defaultFavicon.png';" #favicon class="favicon" src="{{sites[0].favicon}}" alt="favicon"/>
+        <!-- <img #favicon class="favicon" src="/assets/defaultFavicon.png" alt="favicon"/> -->
+
         <b><p #title class="title">{{sites[0].url}}</p></b>
         <p #detailsCardAbsoluteTime>{{sites[0].prettyTime}}</p>
         <p #detailsCardPercent>{{sites[0].percentage.toString() + "%"}}</p>
@@ -42,7 +44,7 @@
         <!-- Favicon Column -->
         <ng-container matColumnDef="favicon">
           <th class="smallColumn" mat-header-cell *matHeaderCellDef> </th>
-          <td class="smallColumn" mat-cell *matCellDef="let site"> <img class="faviconInTable" [src]="site.favicon" /> </td>
+          <td class="smallColumn" mat-cell *matCellDef="let site"> <img class="faviconInTable" [src]="site.favicon "  onerror="this.src = '/assets/defaultFavicon.png';"/> </td>
         </ng-container>
 
         <!-- URL Column -->
