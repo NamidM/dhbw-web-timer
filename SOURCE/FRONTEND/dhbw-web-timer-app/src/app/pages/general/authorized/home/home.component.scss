@@ -4,8 +4,6 @@
 }
 
 .example-header-image {
-  //background-image: url('https://material.angular.io/assets/img/examples/shiba1.jpg');
-  //background-size: cover;
   width: 40px;
   height: 40px;
 }
@@ -14,6 +12,8 @@
   width: 40px;
   height: 40px;
   object-fit: contain;
+  //-webkit-filter: drop-shadow(0px 0px 3px #000000	);
+  //filter: drop-shadow(0px 0px 3px #000000	);
 }
 
 .chart{
@@ -51,8 +51,11 @@ td,th {
 }
 
 .faviconInTable{
-  height: 20px;
-  width: 20px;
+  height: 26px;
+  width: 26px;
+
+  //-webkit-filter: drop-shadow(0px 0px 3px #000000);
+  //filter: drop-shadow(0px 0px 3px #000000	);
 }
 
 table{

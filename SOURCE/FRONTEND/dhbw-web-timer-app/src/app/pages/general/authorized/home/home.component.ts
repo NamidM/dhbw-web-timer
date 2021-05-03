@@ -73,7 +73,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         return b.time-a.time;
       });
       if(sites.length > 10) {
-        let others = {url: "Andere", time: 0, visits: 0 };
+        let others = {url: "Andere", time: 0, visits: 0, favicon: "/assets/defaultFavicon.png" };
         for(let j = 9; j < sites.length; j++) {
           others.time += sites[j].time;
           others.visits++;
@@ -121,7 +121,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         {data: this.times, label: 'Time spent'},
       ],
       labels: this.siteNames
-    }      
+    }
   }
 
   convertMilliseconds(milliseconds: number){

@@ -188,7 +188,7 @@ export class StatisticsComponent implements OnInit {
             });
             if(week[i].length > 10) {
               let others = {time: 0, url: "Andere", startTime: 0};
-  
+
               for(let j = 9; j < week[i].length; j++) {
                 others.startTime = week[i][j].startTime;
                 others.time += week[i][j].time;
@@ -196,7 +196,7 @@ export class StatisticsComponent implements OnInit {
               week[i].splice(9, 0, others);
               week[i].splice(10, week[i].length-1);
             }
-  
+
             for(let j = 0; j < week[i].length; j++) {
               let baseUrl = week[i][j].url;
               startTime.setTime(week[i][j].startTime);
@@ -211,17 +211,17 @@ export class StatisticsComponent implements OnInit {
               }
               if(!this.weekTime[urls[baseUrl].num]){
                 this.weekTime[urls[baseUrl].num] = {
-                  data: [0,0,0,0,0,0,0], 
-                  label: baseUrl, 
+                  data: [0,0,0,0,0,0,0],
+                  label: baseUrl,
                   stack: stack.toString(),
-                  // backgroundColor: urls[baseUrl].color, 
+                  // backgroundColor: urls[baseUrl].color,
                   // hoverBackgroundColor: urls[baseUrl].color
                 };
               }
               this.weekTime[urls[baseUrl].num].data[weekIndex] += Math.floor(week[i][j].time/1000/6)/10;
             }
           }
-        }       
+        }
         this.createWeekChart();
       });
     }
@@ -253,13 +253,13 @@ export class StatisticsComponent implements OnInit {
         let indexFromStack = this.monthTime.findIndex(e => e.stack == stack);
         if(this.monthTime[indexFromStack]) {
           this.monthTime[indexFromStack] = {
-            data: monthData, 
+            data: monthData,
             label: monthNames[startOfMonth.getMonth()],
             stack: stack
           };
         } else {
           this.monthTime.push({
-            data: monthData, 
+            data: monthData,
             label: monthNames[startOfMonth.getMonth()],
             stack: stack
           });
@@ -322,13 +322,14 @@ export class StatisticsComponent implements OnInit {
       }
     });
   }
+
   updateTotalChart(){
     this.siteNamesTotal = [];
     this.timesTotal = [];
     this.apiService.getWebActivitiesInTimespan("0", new Date().getTime().toString()).subscribe((timespanData : any) => {
       let sites: any[] = []
       let first = Infinity;
-      
+
       for(let entry of timespanData){
         let baseUrl:string = entry.url.split('/')[2];
         let timespan:number = entry.endtime - entry.starttime;
@@ -373,12 +374,17 @@ export class StatisticsComponent implements OnInit {
         this.dayChart = null;
       }
 
-      this.allData.bestSite = this.siteNamesTotal[this.timesTotal.indexOf(Math.max(...this.timesTotal))];
-      this.allData.firstTime = this.getPrettyDate(first);
-      this.allData.allTime = this.getPrettyTime(sum);
-      this.allData.avgTime = this.getPrettyTime(sum/this.timesTotal.length);
+      this.createFunfacts(sum, first);
+
       this.createTotalDoughnut();
     });
+  }
+
+  createFunfacts(sum: any, first: any ){
+    this.allData.bestSite = this.siteNamesTotal[this.timesTotal.indexOf(Math.max(...this.timesTotal))];
+    this.allData.firstTime = this.getPrettyDate(first);
+    this.allData.allTime = this.getPrettyTime(sum);
+    this.allData.avgTime = this.getPrettyTime(sum/this.timesTotal.length);
   }
 
   createMonthChart(){
@@ -410,7 +416,7 @@ export class StatisticsComponent implements OnInit {
         scales: {
           x: {stacked: true},
           y: {stacked: true},
-          
+
           yAxes: [
             {
               ticks: {beginAtZero: true},
@@ -593,7 +599,7 @@ export class StatisticsComponent implements OnInit {
 
   getEndWeek(start: Date) {
     let end = new Date(start);
-    end.setDate(start.getDate() + 7); 
+    end.setDate(start.getDate() + 7);
     end.setHours(0);
     end.setMinutes(0);
     end.setSeconds(-1);
