@@ -105,13 +105,11 @@ server.get("/webActivities", authUser, (req,res)=>{
   });
 });
 
-server.post("/webActivities", authUser, async (req,res)=>{
-  console.log("Received tracking call");
-  for(i in req.body){
-    let obj = req.body[i];
-    WEBACTIVITY.addWebActivity(obj.url, req.userID, obj.faviconUrl, obj.starttime, obj.endtime, ()=>{});
-  }
-  res.send({message: "success"});
+server.post("/webActivity", authUser, async (req,res)=>{
+  console.log("Received tracking call", req.body);
+  WEBACTIVITY.addWebActivity(req.body.url, req.userID, req.body.faviconUrl, req.body.starttime, req.body.endtime, ()=>{
+    res.send({message: "success"});
+  });
 });
 
 server.get("/getOAuthUrl", (req, res) => {
