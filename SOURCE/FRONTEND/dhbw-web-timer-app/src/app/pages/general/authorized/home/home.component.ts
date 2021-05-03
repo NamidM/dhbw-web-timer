@@ -5,6 +5,7 @@ import { SnackBarService } from 'src/app/services/snack-bar/snack-bar.service';
 import {ApiService} from "../../../../services/api/api.service";
 import {Site} from "../../../../interfaces";
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { StatisticsService } from 'src/app/services/statistics/statistics.service';
 
 @Component({
   selector: 'app-home',
@@ -14,13 +15,9 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 
 // @ts-ignore: Object is possibly 'null'.
 export class HomeComponent implements OnInit, AfterViewInit {
-
   public dayChart: any;
-  public siteNames: string[] = [];
-  public times: number[] = [];
   public sites: Site[] = [];
   public displayedColumns: string[] = ['favicon', 'url', 'visits', 'percentage', 'time'];
-
 
   public imageToShow: any;
   public isImageLoading: boolean = false;
@@ -36,63 +33,15 @@ export class HomeComponent implements OnInit, AfterViewInit {
   // @ts-ignore
   @ViewChild('visits') visits: ElementRef<HTMLElement>;
 
-  constructor(private snackService: SnackBarService, private apiService: ApiService, public authService: AuthService) { }
+  constructor(private apiService: ApiService, public authService: AuthService, private statisticsService: StatisticsService) { }
 
   async ngOnInit(){
-    this.grabWebActivityData();
-  }
-
-  grabWebActivityData(){
-    let date = new Date();
-    let currentTime = Date.now();
-    let millisecondsInDay = date.getHours()*60*60*1000 + date.getMinutes()*60*1000;
-
-    let startOfDay = currentTime - millisecondsInDay;
-
-    this.apiService.getWebActivitiesInTimespan(startOfDay.toString(), currentTime.toString()).subscribe((timespanData : any) => {
-      let sites: any[] = []
-
-      for(let entry of timespanData){
-        let baseUrl:string = entry.url.split('/')[2];
-        let timespan:number = entry.endtime - entry.starttime;
-        let index = this.findIndexOfSiteWithURL(sites, baseUrl);
-
-        if(index == -1){
-          sites.push({url: baseUrl, time: timespan, favicon: entry.faviconUrl, percentage: 0, visits: 1, prettyTime: ""});
-        } else{
-          sites[index].time += timespan;
-          sites[index].visits++;
-
-          if(sites[index].favicon.startsWith("chrome://") && !entry.faviconUrl.startsWith("chrome://")){
-            sites[index].favicon = entry.faviconUrl;
-          }
-        }
-      }
-
-      sites.sort((a: any, b: any)=>{
-        return b.time-a.time;
-      });
-      if(sites.length > 10) {
-        let others = {url: "Andere", time: 0, visits: 0, favicon: "/assets/defaultFavicon.png" };
-        for(let j = 9; j < sites.length; j++) {
-          others.time += sites[j].time;
-          others.visits++;
-        }
-        sites.splice(9, 0, others);
-        sites.splice(10, sites.length-1);
-      }
-
-      sites = this.setPercentage(sites);
-      sites = this.setPrettyTime(sites);
-
-      for(let i=0; i<sites.length; i++){
-        this.siteNames.push(sites[i].url);
-        this.times.push(sites[i].time);
-      }
+    let currentTime = new Date();
+    let millisecondsInDay = currentTime.getHours()*60*60*1000 + currentTime.getMinutes()*60*1000;
+    let startOfDay = currentTime.getTime() - millisecondsInDay;
+    this.statisticsService.getDougnutChart(startOfDay, currentTime.getTime(), (chart: any, sites: any) => {
+      this.dayChart = chart;
       this.sites = sites;
-      if(sites.length > 0) {
-        this.createDoughnut();
-      }
     });
   }
 
@@ -107,23 +56,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.visits.nativeElement.innerHTML = "Visits: " + site.visits.toString();
   }
 
-  createDoughnut(){
-    this.dayChart = {
-       options: {
-        tooltips: {
-          enabled: false
-        },
-        responsive: true
-       },
-      type: 'doughnut',
-      legend: true,
-      data: [
-        {data: this.times, label: 'Time spent'},
-      ],
-      labels: this.siteNames
-    }
-  }
-
   convertMilliseconds(milliseconds: number){
     let totalHours = Math.floor(milliseconds / 1000 / 60 / 60);
     let remainingTime = milliseconds - (totalHours * 60 * 60 * 1000);
@@ -131,40 +63,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     remainingTime = remainingTime - (totalMinutes * 60 * 1000);
     let totalSeconds = Math.floor(remainingTime / 1000);
     return totalHours + "h " + totalMinutes + "m " + totalSeconds + "s";
-  }
-
-  findIndexOfSiteWithURL(sites: any[], url: any){
-    for(let i=0; i<sites.length; i++){
-      let site = sites[i];
-
-      if(typeof site.url !== "undefined" && site.url.localeCompare(url) == 0){
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  setPercentage(sites: any[]){
-    let completeTime: number = 0;
-
-    for(let i=0; i<sites.length; i++){
-      completeTime += sites[i].time;
-    }
-
-    for(let i=0; i<sites.length; i++){
-      let percent = (sites[i].time/completeTime) * 100;
-      let rounded =  Math.round(percent * 10) / 10;
-      sites[i].percentage = rounded;
-    }
-
-    return sites;
-  }
-
-  setPrettyTime(sites: any[]){
-    for(let i=0; i<sites.length; i++){
-      sites[i].prettyTime = this.convertMilliseconds(sites[i].time);
-    }
-    return sites;
   }
 
   register() {
