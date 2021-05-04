@@ -38,6 +38,8 @@ import { UpdateDialogComponent } from './shared/dialogs/update-dialog/update-dia
 import { PostDialogComponent } from './shared/dialogs/post-dialog/post-dialog.component';
 import { CommunityComponent } from './pages/general/authorized/community/community.component';
 import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
+import {MatExpansionModule} from '@angular/material/expansion';
+
 registerLocaleData(localeDe);
 
 @Injectable()
@@ -98,7 +100,8 @@ export class MatPaginatorIntlDE extends MatPaginatorIntl {
     MatProgressSpinnerModule,
     MatDialogModule,
     MatTableModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatExpansionModule
   ],
   bootstrap: [AppComponent],
   providers: [

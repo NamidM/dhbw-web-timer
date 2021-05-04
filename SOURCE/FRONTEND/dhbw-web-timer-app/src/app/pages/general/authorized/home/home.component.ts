@@ -17,6 +17,8 @@ export class HomeComponent implements OnInit {
   public sites: Site[] = [];
   public site: any;
   public displayedColumns: string[] = ['favicon', 'url', 'visits', 'percentage', 'time'];
+  public generalInformation: any;
+
 
   public imageToShow: any;
   public isImageLoading: boolean = false;
@@ -31,6 +33,7 @@ export class HomeComponent implements OnInit {
       this.dayChart = chart;
       this.sites = sites;
       this.site = sites[0];
+      this.createGeneralInformation();
     });
   }
 
@@ -45,5 +48,32 @@ export class HomeComponent implements OnInit {
       height: '75vh',
       data: {sites: this.sites, type: 'daily', startTime: new Date()}
     });
+  }
+  public createGeneralInformation(){
+
+    this.generalInformation = {};
+
+    let totalTime = 0;
+    let totalVisits = 0;
+
+    for(let i=0; i<this.sites.length; i++){
+      totalTime += this.sites[i].time;
+      totalVisits += this.sites[i].visits;
+    }
+
+    this.generalInformation.url = "Gesamtdaten:";
+    this.generalInformation.favicon = "/assets/images/logo.png"
+    this.generalInformation.prettyTime = this.getPrettyTime(totalTime);
+    this.generalInformation.percentage = "100%";
+    this.generalInformation.visits = totalVisits;
+  }
+
+  getPrettyTime(milliseconds: number){
+    let totalHours = Math.floor(milliseconds / 1000 / 60 / 60);
+    let remainingTime = milliseconds - (totalHours * 60 * 60 * 1000);
+    let totalMinutes = Math.floor(remainingTime / 1000 / 60);
+    remainingTime = remainingTime - (totalMinutes * 60 * 1000);
+    let totalSeconds = Math.floor(remainingTime / 1000);
+    return totalHours + "h " + totalMinutes + "m " + totalSeconds + "s";
   }
 }

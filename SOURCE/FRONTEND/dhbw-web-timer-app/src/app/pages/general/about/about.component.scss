@@ -5,3 +5,42 @@
     text-decoration: none;
     color: black;
   }
+
+.cards{
+  display: flex;
+}
+
+.accordion{
+  margin-bottom: 50px;
+  max-width: 1000px;
+}
+
+mat-expansion-panel{
+  width: 90%;
+}
+
+.team-card{
+  float: left;
+  margin: 50px 50px;
+  max-width: 500px;
+}
+
+.function-card{
+  float: left;
+  margin: 50px 50px;
+  max-width: 800px;
+}
+.functionImage{
+  max-width: 1000px;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+
+.teamImage{
+  max-width: 200px;
+  border-radius: 50%;
+  display:block;
+  margin:auto;
+}
+

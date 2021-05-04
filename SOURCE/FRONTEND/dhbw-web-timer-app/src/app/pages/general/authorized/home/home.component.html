@@ -1,7 +1,7 @@
 <div *ngIf="!authService.username && !authService.loading" class="container main-page">
   <h1>Willkommen auf DHBW Web-Timer</h1>
   <h3>Um diese Seite zu benutzen müssen sie eingeloggt sein!</h3><br>
-  <label>Noch kein Account?</label><br>
+  <label >Noch kein Account?</label><br>
   <button class="register-btn" mat-raised-button color="primary" (click)="authService.sendRegisterRequest()">Registrieren mit Google</button><br><br>
   <label>Bereits registriert?</label><br>
   <button mat-raised-button color="primary" (click)="authService.sendLoginRequest()">Einloggen mit Google</button>
@@ -45,38 +45,62 @@
         <!-- Favicon Column -->
         <ng-container matColumnDef="favicon">
           <th class="smallColumn" mat-header-cell *matHeaderCellDef> </th>
-          <td class="smallColumn" mat-cell *matCellDef="let site">
-            <img class="faviconInTable" [src]="site.favicon" onerror="this.src = '/assets/images/defaultFavicon.png';"/>
-          </td>
+          <td class="smallColumn" mat-cell *matCellDef="let site"> <img class="faviconInTable" [src]="site.favicon"  onerror="this.src = '/assets/images/defaultFavicon.png';"/> </td>
+          <td class="smallColumn" mat-footer-cell *matFooterCellDef> </td>
         </ng-container>
 
         <!-- URL Column -->
         <ng-container matColumnDef="url">
           <th mat-header-cell *matHeaderCellDef>Url</th>
           <td mat-cell *matCellDef="let site">{{ site.url }}</td>
+          <td mat-footer-cell *matFooterCellDef> Gesamt: </td>
         </ng-container>
 
         <!-- Visits Column -->
         <ng-container matColumnDef="visits">
           <th class="smallColumn" mat-header-cell *matHeaderCellDef>Visits</th>
           <td class="smallColumn" mat-cell *matCellDef="let site">{{ site.visits }}</td>
+          <td class="smallColumn" mat-footer-cell *matFooterCellDef> {{generalInformation.visits}} </td>
         </ng-container>
 
         <!-- Percentage Column -->
         <ng-container matColumnDef="percentage">
           <th class="smallColumn" mat-header-cell *matHeaderCellDef>Percentage</th>
           <td class="smallColumn" mat-cell *matCellDef="let site">{{ site.percentage }} %</td>
+          <td class="smallColumn" mat-footer-cell *matFooterCellDef> 100 % </td>
         </ng-container>
 
         <!-- Time Column -->
         <ng-container matColumnDef="time">
           <th mat-header-cell *matHeaderCellDef>Time spent</th>
           <td mat-cell *matCellDef="let site">{{ site.prettyTime }}</td>
+          <td footer *matFooterCellDef="let site">{{ generalInformation.prettyTime }}</td>
+        </ng-container>
+
+        <!-- Total Favicon Column -->
+        <ng-container matColumnDef="totalfavicon">
+          <th class="smallColumn second-header-row" mat-header-cell *matHeaderCellDef> </th>
+        </ng-container>
+        <!-- Total Url Column -->
+        <ng-container matColumnDef="totalUrl">
+          <th class="second-header-row" mat-header-cell *matHeaderCellDef> Gesamt: </th>
+        </ng-container>
+        <!-- Total Visits Column -->
+        <ng-container matColumnDef="totalVisits">
+          <th class="smallColumn second-header-row" mat-header-cell *matHeaderCellDef> {{generalInformation.visits}} </th>
+        </ng-container>
+        <!-- Total Percentage Column -->
+        <ng-container matColumnDef="totalPercentage">
+          <th class="smallColumn second-header-row" mat-header-cell *matHeaderCellDef> {{generalInformation.percentage}} </th>
+        </ng-container>
+        <!-- Total time Column -->
+        <ng-container matColumnDef="totalTime">
+          <th class="second-header-row" mat-header-cell *matHeaderCellDef> {{generalInformation.prettyTime}} </th>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-header-row *matHeaderRowDef="['totalfavicon', 'totalUrl', 'totalVisits', 'totalPercentage', 'totalTime']"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-
       </table>
   </div>
 </div>
