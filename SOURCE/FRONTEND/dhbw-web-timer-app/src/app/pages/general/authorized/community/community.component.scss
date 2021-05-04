@@ -1,0 +1,52 @@
+.chart {
+    width: 40vw;
+}
+.example-card {
+    max-width: 60vw;
+    margin: 40px auto;
+}
+.post-content {
+    margin-left: 15px;
+}
+.post-wrapper {
+    display: flex;
+    justify-content: center;
+}
+.info-card {
+    width: 25%;
+    margin-top: 5%;
+    margin-left: 5%;
+    margin-right: 3%;
+    float: right;
+    height: 50%;
+}
+.favicon{
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+.center {
+    text-align: center;
+}
+.type {
+    font-size: medium;
+    opacity: 80%;
+    color: gray;
+}
+.main-page {
+    padding-bottom: 20px;
+}
+.paging {
+    font-size: medium !important;
+}
+.delete-btn {
+    float: right;
+}
+.post-header {
+    justify-content: space-between;
+}
+.paging-wrapper {
+    padding-bottom: 25px;
+    display: flex;
+    justify-content: center;
+}

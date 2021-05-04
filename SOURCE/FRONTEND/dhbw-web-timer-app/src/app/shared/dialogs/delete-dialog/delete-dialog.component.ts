@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { CommunityComponent } from 'src/app/pages/general/authorized/community/community.component';
 import { SettingsComponent } from 'src/app/pages/general/authorized/settings/settings.component';
 
 @Component({
@@ -9,7 +10,7 @@ import { SettingsComponent } from 'src/app/pages/general/authorized/settings/set
 })
 export class DeleteDialogComponent implements OnInit {
 
-  constructor(private dialogRef: MatDialogRef<SettingsComponent>) { }
+  constructor(private dialogRef: MatDialogRef<SettingsComponent|CommunityComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
   ngOnInit(): void {
   }

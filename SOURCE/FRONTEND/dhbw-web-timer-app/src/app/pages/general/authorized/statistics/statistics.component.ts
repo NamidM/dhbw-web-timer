@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Site } from 'src/app/interfaces';
 import { StatisticsService } from 'src/app/services/statistics/statistics.service';
+import { PostDialogComponent } from 'src/app/shared/dialogs/post-dialog/post-dialog.component';
 
 @Component({
   selector: 'app-statistics',
@@ -35,7 +37,7 @@ export class StatisticsComponent implements OnInit {
   public imageToShow: any;
   public isImageLoading: boolean = false;
 
-  constructor(private formBuilder: FormBuilder, private statisticsService: StatisticsService) {
+  constructor(private formBuilder: FormBuilder, private statisticsService: StatisticsService, private dialog: MatDialog) {
   }
 
   async ngOnInit(){
@@ -59,8 +61,23 @@ export class StatisticsComponent implements OnInit {
     this.statisticsService.getDougnutChart(0, new Date().getTime(), (chart: any, sites: any, allData: any)=>{
       this.totalChart = chart;
       this.sitesTotal = sites;
-      this.allData = allData;
-      this.siteTotal = sites[0];
+      this.allData = allData? allData : {};
+      this.siteTotal = sites? sites[0]: undefined;
+    });
+  }
+
+  postStatistics(type: string) {
+    let sites, startTime;
+    switch(type) {
+      case 'daily': sites = this.sites; startTime = this.rangeDay.controls.startDay.value; break;
+      case 'total': sites = this.sitesTotal; break;
+      case 'weekly': sites = this.weekTime; break;
+      case 'monthly': sites = this.monthTime; break;
+    }
+    this.dialog.open(PostDialogComponent, {
+      width: '70vw',
+      height: '75vh',
+      data: {sites, type, startTime}
     });
   }
 
@@ -79,7 +96,7 @@ export class StatisticsComponent implements OnInit {
     let start = new Date(this.addedWeeks[i].controls["startWeek"].value);
     let end = this.getEndWeek(start);
     this.addedWeeks[i].controls["endWeek"].setValue(end);
-    this.updateWeekChart(start, end);
+    this.updateWeekChart(start, end, i);
   }
 
   startDateSelectionMonth(i?: any){
@@ -116,7 +133,7 @@ export class StatisticsComponent implements OnInit {
     this.statisticsService.getDougnutChart(startOfDay, endOfDay, (chart: any, sites: any) =>{
       this.dayChart = chart;
       this.sites = sites;
-      this.site = sites[0];
+      this.site = sites? sites[0] : undefined;
     })
   }
 

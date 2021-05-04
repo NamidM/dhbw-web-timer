@@ -9,7 +9,7 @@
   <button mat-raised-button color="accent"><a href="assets/downloads/EXTENSION.crx" class="download-btn" download="dhbw-web-timer.crx">Extension herunterladen</a></button>
 </div>
 <div *ngIf="authService.username" class="container main-page">
-  <h1 class="center">Statistik für: Heute</h1>
+  <h3 class="center">Statistik für: Heute</h3>
   <div *ngIf="!dayChart">
     <h3>Noch keine Einträge für heute!</h3>
   </div>
@@ -25,17 +25,20 @@
       </canvas>
     </div>
 
-    <mat-card class="example-card" #detailsCard>
-      <div class="center">
-        <img onerror="this.src = '/assets/images/defaultFavicon.png';" #favicon class="favicon" src="{{sites[0].favicon}}" alt="favicon"/>
-        <b><p class="title">{{site.url}}</p></b>
-        <p>{{site.prettyTime}}</p>
-        <p>{{site.percentage.toString() + "%"}}</p>
-        <p>{{"Visits: " + site.visits.toString()}}</p>
-      </div>
-    </mat-card>
 
     <div class="mat-elevation-z8">
+      <div class="post-btn-wrapper"><div class="post-btn-wrapper-center">
+        <button mat-raised-button color="primary" class="post-btn" (click)="postStatistics()">Statistik posten</button>
+      </div></div>
+      <mat-card class="info-card" #detailsCard>
+        <div class="center">
+          <img onerror="this.src = '/assets/images/defaultFavicon.png';" #favicon class="favicon" src="{{site.favicon}}" alt="favicon"/>
+          <b><p class="title">{{site.url}}</p></b>
+          <p>{{site.prettyTime}}</p>
+          <p>{{site.percentage.toString() + "%"}}</p>
+          <p>{{"Visits: " + site.visits.toString()}}</p>
+        </div>
+      </mat-card>
       <!-- Table -->
       <table mat-table [dataSource]="sites">
 

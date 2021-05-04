@@ -8,6 +8,7 @@ import {LoginComponent} from "./pages/general/login/login.component";
 import { RegisterComponent } from './pages/general/register/register.component';
 import { SettingsComponent } from './pages/general/authorized/settings/settings.component';
 import { AuthorizedComponent } from './pages/general/authorized/authorized.component';
+import { CommunityComponent } from './pages/general/authorized/community/community.component';
 
 const routes: Routes = [
   {
@@ -37,6 +38,10 @@ const routes: Routes = [
           {
             path: 'settings',
             component: SettingsComponent
+          },
+          {
+            path: 'community',
+            component: CommunityComponent
           },
           {
             path: '',

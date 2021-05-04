@@ -1,0 +1,40 @@
+.post-text {
+    resize: none;
+    height: 7vh;
+}
+.post-text-field {
+    width: 90%;
+    height: 7vh;
+    margin: 0 5%;
+    resize: none;
+}
+.post-btn-wrapper, .post-title-wrapper {
+    display: flex;
+    justify-content: center;
+}
+.post-title {
+    width: 20vw;
+}
+.chart-wrapper {
+    display: flex;
+    justify-content: center;
+}
+.chart {
+    width: 60%;
+}
+.info-card {
+    width: 35%;
+    margin-top: 10%;
+    margin-left: 12%;
+    margin-right: 3%;
+    float: right;
+    height: 50%;
+}
+.center {
+    text-align: center;
+}
+.favicon{
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}

@@ -4,7 +4,7 @@
 .timeStatistics {
     border: 0px solid gray;
     border-radius: 3px;
-    padding-bottom: 35px;
+    padding-bottom: 50px;
 }
 .day-wrapper, .total-wrapper {
     display: block;
@@ -66,23 +66,10 @@
 }
 
 .funfact{
-  font-family: Roboto;
-  background-color: #f1ebeb;
-  color: black;
   min-width: 150px;
   margin: 20px 20px;
-  border-radius: 20px;
   text-align: center;
   float: left;
-  border: 2px solid black;
-  p{
-    font-size: medium;
-  }
-}
-
-
-.funfact:hover{
-  opacity: 80%;
 }
 
 .headline{
@@ -118,10 +105,12 @@
     padding-bottom: 35px;
 }
 
-.example-card {
+.info-card {
     width: 27%;
-    margin-top: 9.5%;
+    margin-top: 2%;
     margin-right: 3%;
+    max-width: 300px;
+    float: right;
 }
 
 .center {
@@ -150,4 +139,15 @@ table{
     margin: auto;
     min-width: 500px;
     width: 100%;
+}
+
+.post-btn-wrapper {
+    width: 30%;
+    margin-top: 5%;
+    float: right;
+}
+  
+.post-btn-wrapper-center {
+    width: 50%;
+    margin: 0 auto;
 }

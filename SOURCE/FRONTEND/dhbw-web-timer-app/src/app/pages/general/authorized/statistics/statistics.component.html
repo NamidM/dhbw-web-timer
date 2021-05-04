@@ -1,7 +1,3 @@
-<div class="statisticsHeader container">
-  <h1>Statistiken zu Benutzung</h1>
-</div>
-
 <div class="timeStatistics">
   <mat-tab-group mat-stretch-tabs>
     <mat-tab label="Tag">
@@ -35,17 +31,19 @@
             </canvas>
           </div>
 
-          <mat-card class="example-card" #detailsCard>
-            <div class="center">
-              <img onerror="this.src = 'assets/images/defaultFavicon.png';" #favicon class="favicon" src="{{site.favicon}}" alt="favicon"/>
-              <b><p class="title">{{site.url}}</p></b>
-              <p>{{site.prettyTime}}</p>
-              <p>{{site.percentage.toString() + "%"}}</p>
-              <p>{{"Visits: " + site.visits.toString()}}</p>
-            </div>
-          </mat-card>
-
           <div class="mat-elevation-z8">
+            <div class="post-btn-wrapper"><div class="post-btn-wrapper-center">
+              <button mat-raised-button color="primary" class="post-btn" (click)="postStatistics('daily')">Statistik posten</button>
+            </div></div>
+            <mat-card class="info-card" #detailsCard>
+              <div class="center">
+                <img onerror="this.src = 'assets/images/defaultFavicon.png';" #favicon class="favicon" src="{{site.favicon}}" alt="favicon"/>
+                <b><p class="title">{{site.url}}</p></b>
+                <p>{{site.prettyTime}}</p>
+                <p>{{site.percentage.toString() + "%"}}</p>
+                <p>{{"Visits: " + site.visits.toString()}}</p>
+              </div>
+            </mat-card>
             <!-- Table -->
             <table mat-table [dataSource]="sites">
 
@@ -93,7 +91,8 @@
       <div class="week-wrapper row">
         <div class="col-3">
           <div class="center">
-            <button mat-raised-button color="primary" class="addweek-btn" (click)="addWeek()">Woche hinzufügen</button>
+            <button mat-raised-button color="primary" class="post-btn" (click)="postStatistics('weekly')">Statistik posten</button><br><br>
+            <button mat-raised-button color="accent" class="addweek-btn" (click)="addWeek()">Woche hinzufügen</button>
           </div>
           <ng-container *ngFor="let addedWeek of addedWeeks; index as i">
             <form class="week-form center" onsubmit="return false;">
@@ -133,7 +132,8 @@
       <div class="month-wrapper row">
         <div class="col-3">
           <div class="center">
-            <button mat-raised-button color="primary" class="addmonth-btn" (click)="addMonth()">Monat hinzufügen</button>
+            <button mat-raised-button color="primary" class="post-btn" (click)="postStatistics('monthly')">Statistik posten</button><br><br>
+            <button mat-raised-button color="accent" class="addmonth-btn" (click)="addMonth()">Monat hinzufügen</button>
           </div>
           <ng-container *ngFor="let addedMonth of addedMonths; index as i">
             <form class="month-form center" onsubmit="return false;">
@@ -172,20 +172,19 @@
     <mat-tab label="Gesamt">
       <div class="total-wrapper">
         <div class="funfacts">
-          <div class="funfact">
+          <mat-card class="funfact">
             <h3 class="headline"> <b>Gesamtzeit:</b></h3><p>{{allData.allTime}}</p>
-          </div>
-          <div class="funfact">
+          </mat-card>
+          <mat-card class="funfact">
             <h3 class="headline"><b>Erste Benutzung:</b></h3><p>{{allData.firstTime}}</p>
-          </div>
-          <div class="funfact">
+          </mat-card>
+          <mat-card class="funfact">
             <h3 class="headline"><b>Durchschnittliche Benutzung pro Seite:</b></h3><p>{{allData.avgTime}}</p>
-          </div>
-          <div class="funfact">
+          </mat-card>
+          <mat-card class="funfact">
             <h3 class="headline"><b>Beliebteste Seite:</b></h3><p>{{allData.bestSite}}</p>
-          </div>
+          </mat-card>
         </div>
-
 
         <div class="wrapper" *ngIf="totalChart">
           <div style="display: block" id="totalChart" class="chart">
@@ -199,17 +198,19 @@
             </canvas>
           </div>
 
-          <mat-card class="example-card" #detailsCard>
-            <div class="center">
-              <img onerror="this.src = '/assets/images/defaultFavicon.png';" #faviconTotal class="favicon" src="{{siteTotal.favicon}}" alt="favicon"/>
-              <b><p class="title">{{siteTotal.url}}</p></b>
-              <p>{{siteTotal.prettyTime}}</p>
-              <p>{{siteTotal.percentage.toString() + "%"}}</p>
-              <p>{{"Visits: " + siteTotal.visits.toString()}}</p>
-            </div>
-          </mat-card>
-
           <div class="mat-elevation-z8">
+            <div class="post-btn-wrapper"><div class="post-btn-wrapper-center">
+              <button mat-raised-button color="primary" class="post-btn" (click)="postStatistics('total')">Statistik posten</button>
+            </div></div>
+            <mat-card class="info-card" #detailsCard>
+              <div class="center">
+                <img onerror="this.src = '/assets/images/defaultFavicon.png';" #faviconTotal class="favicon" src="{{siteTotal.favicon}}" alt="favicon"/>
+                <b><p class="title">{{siteTotal.url}}</p></b>
+                <p>{{siteTotal.prettyTime}}</p>
+                <p>{{siteTotal.percentage.toString() + "%"}}</p>
+                <p>{{"Visits: " + siteTotal.visits.toString()}}</p>
+              </div>
+            </mat-card>
             <!-- Table -->
             <table mat-table [dataSource]="sitesTotal">
 

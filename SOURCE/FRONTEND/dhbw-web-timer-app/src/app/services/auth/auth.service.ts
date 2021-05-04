@@ -11,6 +11,7 @@ import { SnackBarService } from '../snack-bar/snack-bar.service';
 export class AuthService {
   public loading: boolean = true;
   public username?: string;
+  public userID?: string;
 
   constructor(private apiService: ApiService, private router: Router, private snackBarService: SnackBarService) {}
 
@@ -30,13 +31,15 @@ export class AuthService {
     this.apiService.logout().subscribe((response)=> {
       if(response.message == "success") {
         delete(this.username);
+        delete(this.userID);
       }
     });
   }
 
-  loginUser(username?: string) {
+  loginUser(username?: string, userID?: string) {
     this.loading = false;
     this.username = username;
+    this.userID = userID;
   }
 
   silentLogin(callback: Function) {
@@ -44,13 +47,15 @@ export class AuthService {
       this.loading = false;
       if(response.message == "success") {
         this.username = response.username;
+        this.userID = response.userID;
         callback();
       } else {
-        let authorizedSites = ["/home", "/settings", "/statistics"];
+        let authorizedSites = ["/home", "/settings", "/statistics", "/community"];
         if(authorizedSites.includes(this.router.url)) {
           this.router.navigateByUrl("/");
         }
         delete(this.username);
+        delete(this.userID);
       }
     });
   }

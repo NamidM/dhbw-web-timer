@@ -8,6 +8,82 @@ export class StatisticsService {
 
   constructor(private apiService: ApiService) { }
 
+  showDoughnutChart(sites: any, callback: Function) {
+    let siteNames = [];
+    let times = [];
+    for(let i=0; i<sites.length; i++){
+      siteNames.push(sites[i].url);
+      times.push(sites[i].time);
+    }
+    if(sites.length > 0) {
+      callback({
+        options: {
+         tooltips: {
+           enabled: false
+         },
+         responsive: true
+        },
+       type: 'doughnut',
+       legend: true,
+       data: [
+         {data: times, label: 'Time spent'},
+       ],
+       labels: siteNames
+     })
+    } else {
+      callback(null);
+    }
+  }
+
+  showBarChart(sites: any, callback: Function) {
+    callback({
+      options: {scaleShowVerticalLines: false,
+        responsive: true,
+        scales: {
+          x: {stacked: true},
+          y: {stacked: true},
+          
+          yAxes: [
+            {
+              ticks: {beginAtZero: true},
+              scaleLabel: {
+                display: true,
+                labelString: 'Minuten'
+              }
+            }
+          ]
+        }
+      },
+      labels: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
+      type: 'bar',
+      legend: false,
+      data: sites
+    })
+  }
+
+  showLineChart(sites: any, callback: Function) {
+    let labels = [];
+    for(let i = 0; i < 31; i++){
+      labels[i] = i+1;
+    }
+    callback({
+      options: {scaleShowVerticalLines: false,
+        elements: {
+          line: {tension: 0}
+      },
+        responsive: true,
+        scales: {yAxes: [{ticks: {beginAtZero: true}, scaleLabel: {
+          display: true,
+          labelString: 'Stunden'
+        }}]}
+      },
+      labels: labels,
+      type: 'line',
+      legend: true,
+      data: sites
+    });
+  }
+
   getDougnutChart(startTime: number, endTime: number, callback: Function) {
     let siteNames: String[] = [];
     let times: number[] = [];
@@ -36,7 +112,7 @@ export class StatisticsService {
         return b.time-a.time;
       });
       if(sites.length > 10) {
-        let others = {url: "Andere", time: 0, visits: 0 };
+        let others = {url: "Andere", time: 0, visits: 0, favicon: 'chrome://favicon/'};
         for(let j = 9; j < sites.length; j++) {
           others.time += sites[j].time;
           others.visits++;
@@ -44,19 +120,24 @@ export class StatisticsService {
         sites.splice(9, 0, others);
         sites.splice(10, sites.length-1);
       }
+      sites.sort((a: any, b: any)=>{
+        return b.time-a.time;
+      });
 
       sites = this.setPercentage(sites);
       sites = this.setPrettyTime(sites);
       let sum = 0;
-
       for(let i=0; i<sites.length; i++){
         siteNames.push(sites[i].url);
         times.push(sites[i].time);
         sum += sites[i].time;
       }
       if(sites.length > 0) {
+        let bestSite = siteNames[times.indexOf(Math.max(...times))] != "Andere" 
+        ? siteNames[0]
+        : siteNames[1];
         let allData = {
-          bestSite: siteNames[times.indexOf(Math.max(...times))],
+          bestSite,
           firstTime: this.getPrettyDate(first),
           allTime: this.getPrettyTime(sum),
           avgTime: this.getPrettyTime(sum/times.length)
@@ -139,7 +220,7 @@ export class StatisticsService {
               return b.time-a.time;
             });
             if(week[i].length > 10) {
-              let others = {time: 0, url: "Andere", startTime: 0};
+              let others = {time: 0, url: "Andere", startTime: 0, favicon: 'chrome://favicon/'};
   
               for(let j = 9; j < week[i].length; j++) {
                 others.startTime = week[i][j].startTime;
@@ -165,9 +246,7 @@ export class StatisticsService {
                 weekTime[urls[baseUrl].num] = {
                   data: [0,0,0,0,0,0,0], 
                   label: baseUrl, 
-                  stack: stack.toString(),
-                  // backgroundColor: urls[baseUrl].color, 
-                  // hoverBackgroundColor: urls[baseUrl].color
+                  stack: stack.toString()
                 };
               }
               weekTime[urls[baseUrl].num].data[weekIndex] += Math.floor(week[i][j].time/1000/6)/10;

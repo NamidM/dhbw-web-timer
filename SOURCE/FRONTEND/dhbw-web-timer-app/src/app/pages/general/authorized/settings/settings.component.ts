@@ -18,7 +18,8 @@ export class SettingsComponent implements OnInit {
 
   openDeleteDialog() {
     const dialogRef = this.dialog.open(DeleteDialogComponent, {
-      width: '300px'
+      width: '300px',
+      data: {message: 'Wollen Sie Ihr Konto wirklich löschen?'}
     });
 
     dialogRef.afterClosed().subscribe(result => {

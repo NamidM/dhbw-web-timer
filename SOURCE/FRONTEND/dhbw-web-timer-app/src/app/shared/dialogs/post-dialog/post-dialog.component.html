@@ -1,0 +1,37 @@
+<h2>Diese Statistik posten:</h2>
+<form [formGroup]="postForm">
+    <div class="post-title-wrapper">
+        <mat-form-field class="post-title">
+            <mat-label>Post Titel</mat-label>
+            <input formControlName="title" matInput placeholder="Schreibe einen Titel">
+        </mat-form-field>
+    </div>
+    <div class="chart-wrapper">
+        <div id="postChart" class="chart">
+            <canvas baseChart
+                [datasets]="postChart.data"
+                [labels]="postChart.labels"
+                [options]="postChart.options"
+                [legend]="postChart.legend"
+                [chartType]="postChart.type"
+                (chartHover)="chartHovered($event)">
+            </canvas>
+        </div>
+        <mat-card class="info-card" #detailsCard *ngIf="data.type == 'daily' || data.type == 'total'">
+            <div class="center">
+              <img onerror="this.src = '/assets/images/defaultFavicon.png';" #favicon class="favicon" src="{{site.favicon}}" alt="favicon"/>
+              <b><p class="title">{{site.url}}</p></b>
+              <p>{{site.prettyTime}}</p>
+              <p>{{site.percentage.toString() + "%"}}</p>
+              <p>{{"Visits: " + site.visits.toString()}}</p>
+            </div>
+        </mat-card>
+    </div>
+    <mat-form-field class="post-text-field">
+        <mat-label>Post Inhalt</mat-label>
+        <textarea formControlName="content" matInput class="post-text" placeholder="Schreibe etwas über diese Statistik"></textarea>
+      </mat-form-field><br><br>
+    <div class="post-btn-wrapper">
+        <button mat-raised-button color="accent" class="post-btn" (click)="post()" [disabled]="postForm.invalid">Posten</button>
+    </div>
+  </form>

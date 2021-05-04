@@ -1,0 +1,47 @@
+<div class="main-page">
+    <ng-container *ngFor="let post of dataSource; index as i">
+        <mat-card class="example-card">
+            <mat-card-header class="post-header">
+                <mat-card-title>{{post.title}} <span class="type">({{post.typeText}})</span></mat-card-title>
+                <mat-card-subtitle>Gepostet am: {{post.postTime | date:"dd.MM.yyyy HH:mm"}} von <b>{{post.username}}</b></mat-card-subtitle>
+                <button mat-fab color="warn" class="delete-btn" *ngIf="post.userID == authService.userID" (click)="deletePost(post._id)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </mat-card-header>
+            <mat-card-content>
+                <p class="post-content">{{post.content}}</p>
+                <div class="post-wrapper">
+                    <div style="display: block" id="postChart" class="chart">
+                        <canvas baseChart *ngIf="post.chart"
+                                [datasets]="post.chart.data"
+                                [labels]="post.chart.labels"
+                                [options]="post.chart.options"
+                                [legend]="post.chart.legend"
+                                [chartType]="post.chart.type"
+                                (chartHover)="chartHovered($event, i + currentPage*pageSize)">
+                        </canvas>
+                    </div>
+                    <mat-card class="info-card" #detailsCard *ngIf="post.type == 'daily' || post.type == 'total'">
+                        <div class="center">
+                        <img onerror="this.src = '/assets/images/defaultFavicon.png';" #favicon class="favicon" src="{{post.site.favicon}}" alt="favicon"/>
+                        <b><p class="title">{{post.site.url}}</p></b>
+                        <p>{{post.site.prettyTime}}</p>
+                        <p>{{post.site.percentage.toString() + "%"}}</p>
+                        <p>{{"Visits: " + post.site.visits.toString()}}</p>
+                        </div>
+                    </mat-card>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </ng-container>
+    <div class="paging-wrapper" *ngIf="length > 0">
+        <mat-paginator class="paging"
+            [length]="length"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="[5, 10, 25, 100]"
+            [showFirstLastButtons]="true"
+            [pageIndex]="currentPage"
+            (page)="handlePage($event)">
+        </mat-paginator>
+    </div>
+</div>

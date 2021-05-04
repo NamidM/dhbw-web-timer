@@ -21,6 +21,7 @@ const port = process.env.APP_PORT;
 const server = express();
 const USER = require('./models/user');
 const WEBACTIVITY = require('./models/webActivity');
+const POST = require('./models/post');
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
@@ -112,6 +113,27 @@ server.post("/webActivity", authUser, async (req,res)=>{
   });
 });
 
+server.get("/post", authUser, async (req,res)=>{
+  console.log("Received post call", req.query.title);
+  getUserName(req.userID, (username)=>{
+    POST.addPost(req.query.title, req.query.content, username, req.userID, req.query.type, JSON.parse(req.query.sites), new Date(), req.query.startTime, (error, post)=>{
+      console.log(error);
+      res.send({message: "success"});
+    });
+  })
+});
+
+server.get("/allPosts", authUser, async (req,res)=>{
+  console.log("Received allPosts call");
+  POST.getPosts((error, posts)=>{
+    if(error || !posts) {
+      res.send({message: "error"});
+    } else {
+      res.send({message: "success", posts });
+    }
+  });
+});
+
 server.get("/getOAuthUrl", (req, res) => {
   let nonce = encodeURIComponent(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
   let state = encodeURIComponent(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
@@ -161,7 +183,7 @@ server.get("/login", (req,res)=>{
             secure: production
           });
         getUserName(decodedIT.sub, (username)=>{
-          res.send({message: "success", username: username});
+          res.send({message: "success", username: username, userID: decodedIT.sub});
         })
       } catch(e) {
         res.send({message: "error"});
@@ -173,7 +195,7 @@ server.get("/login", (req,res)=>{
 server.get("/silentLogin", authUser, (req,res)=>{
   console.log("silentLogin");
   getUserName(req.userID, (username)=>{
-    res.send({message: "success", username: username})
+    res.send({message: "success", username: username, userID: req.userID})
   });
 });
 
@@ -207,6 +229,17 @@ server.delete("/user", authUser, (req, res) => {
           res.send({message: "success"});
         }
       });
+    }
+  });
+})
+
+server.delete("/post", authUser, (req, res) => {
+  console.log("delete user");
+  POST.deletePost(req.query._id, req.userID, (error, post)=>{
+    if(error || !post) {
+      res.send({message: "error"});
+    } else {
+      res.send({message: "success"});
     }
   });
 })
@@ -256,7 +289,7 @@ server.get("/register", (req,res)=>{
                 secure: production
               });
             getUserName(decoded.sub, (username)=>{
-              res.send({message: "success", username: username});
+              res.send({message: "success", username: username, userID: decoded.sub});
             })
           }
         });

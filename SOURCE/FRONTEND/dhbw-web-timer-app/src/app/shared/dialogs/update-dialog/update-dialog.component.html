@@ -9,5 +9,5 @@
 </form>
 <div mat-dialog-actions>
     <button mat-raised-button color="basic" (click)="onNoClick()">Abbrechen</button>
-    <button mat-raised-button color="accent" (click)="onYesClick()">Ändern</button>
+    <button mat-raised-button color="accent" (click)="onYesClick()" [disabled]="updateForm.invalid">Ändern</button>
 </div>

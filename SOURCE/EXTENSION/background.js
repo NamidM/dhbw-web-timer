@@ -63,6 +63,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if(data.message == "success") {
         username = data.username;
         sendResponse(username);
+      } else {
+        sendResponse();
       }
     });
     getActiveTab(activeTab => {
@@ -133,7 +135,9 @@ function updateTabEntry (id, isCloseEvent) {
           id: activeTab.id,
           faviconUrl: getFavicon(activeTab),
           url: activeTab.url,
-          active: true
+          active: true,
+          startime: currentTime,
+          endtime: currentTime
         });
       }
     }

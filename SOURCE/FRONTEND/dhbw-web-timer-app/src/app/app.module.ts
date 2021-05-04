@@ -1,4 +1,4 @@
-import { LOCALE_ID, NgModule } from '@angular/core';
+import { Injectable, LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -35,7 +35,29 @@ import { AuthorizedComponent } from './pages/general/authorized/authorized.compo
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { DeleteDialogComponent } from './shared/dialogs/delete-dialog/delete-dialog.component';
 import { UpdateDialogComponent } from './shared/dialogs/update-dialog/update-dialog.component';
+import { PostDialogComponent } from './shared/dialogs/post-dialog/post-dialog.component';
+import { CommunityComponent } from './pages/general/authorized/community/community.component';
+import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 registerLocaleData(localeDe);
+
+@Injectable()
+export class MatPaginatorIntlDE extends MatPaginatorIntl {
+  itemsPerPageLabel = 'Posts pro Seite';
+  nextPageLabel     = 'Nächste Seite';
+  previousPageLabel = 'Vorherige Seite';
+  getRangeLabel = function (page: any, pageSize: any, length: any) {
+    if (length === 0 || pageSize === 0) {
+      return '0 von ' + length;
+    }
+    length = Math.max(length, 0);
+    const startIndex = page * pageSize;
+    const endIndex = startIndex < length ?
+      Math.min(startIndex + pageSize, length) :
+      startIndex + pageSize;
+    return startIndex + 1 + ' - ' + endIndex + ' von ' + length;
+  };
+
+}
 
 @NgModule({
   declarations: [
@@ -52,6 +74,8 @@ registerLocaleData(localeDe);
     AuthorizedComponent,
     DeleteDialogComponent,
     UpdateDialogComponent,
+    PostDialogComponent,
+    CommunityComponent,
   ],
   imports: [
     BrowserModule,
@@ -73,12 +97,14 @@ registerLocaleData(localeDe);
     MatCardModule,
     MatProgressSpinnerModule,
     MatDialogModule,
-    MatTableModule
+    MatTableModule,
+    MatPaginatorModule
   ],
   bootstrap: [AppComponent],
   providers: [
     CookieService,
     { provide: LOCALE_ID, useValue: 'de-DE' },
+    { provide: MatPaginatorIntl, useClass: MatPaginatorIntlDE}
   ]
 })
 export class AppModule { }
