@@ -64,6 +64,7 @@ export class StatisticsComponent implements OnInit {
       this.sitesTotal = sites;
       this.allData = allData;
       this.siteTotal = sites[0];
+      this.createGeneralInformationTotal();
     });
   }
 
@@ -120,6 +121,7 @@ export class StatisticsComponent implements OnInit {
       this.dayChart = chart;
       this.sites = sites;
       this.site = sites[0];
+      this.createGeneralInformationTag();
     })
   }
 
@@ -232,5 +234,51 @@ export class StatisticsComponent implements OnInit {
     } else {
       this.site = this.sites[hovered._index];
     }
+  }
+
+  public createGeneralInformationTag(){
+
+    this.generalInformationTag = {};
+
+    let totalTime = 0;
+    let totalVisits = 0;
+
+    for(let i=0; i<this.sites.length; i++){
+      totalTime += this.sites[i].time;
+      totalVisits += this.sites[i].visits;
+    }
+
+    this.generalInformationTag.url = "Gesamtdaten:";
+    this.generalInformationTag.favicon = "/assets/images/logo.png"
+    this.generalInformationTag.prettyTime = this.getPrettyTime(totalTime);
+    this.generalInformationTag.percentage = "100%";
+    this.generalInformationTag.visits = totalVisits;
+  }
+
+  public createGeneralInformationTotal(){
+    this.generalInformationTotal = {};
+
+    let totalTime = 0;
+    let totalVisits = 0;
+
+    for(let i=0; i<this.sitesTotal.length; i++){
+      totalTime += this.sitesTotal[i].time;
+      totalVisits += this.sitesTotal[i].visits;
+    }
+
+    this.generalInformationTotal.url = "Gesamtdaten:";
+    this.generalInformationTotal.favicon = "/assets/images/logo.png"
+    this.generalInformationTotal.prettyTime = this.getPrettyTime(totalTime);
+    this.generalInformationTotal.percentage = "100%";
+    this.generalInformationTotal.visits = totalVisits;
+  }
+
+  getPrettyTime(milliseconds: number){
+    let totalHours = Math.floor(milliseconds / 1000 / 60 / 60);
+    let remainingTime = milliseconds - (totalHours * 60 * 60 * 1000);
+    let totalMinutes = Math.floor(remainingTime / 1000 / 60);
+    remainingTime = remainingTime - (totalMinutes * 60 * 1000);
+    let totalSeconds = Math.floor(remainingTime / 1000);
+    return totalHours + "h " + totalMinutes + "m " + totalSeconds + "s";
   }
 }
