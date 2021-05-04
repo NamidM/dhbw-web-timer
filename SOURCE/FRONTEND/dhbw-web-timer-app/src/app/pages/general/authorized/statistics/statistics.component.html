@@ -38,7 +38,7 @@
 
           <mat-card class="example-card" #detailsCard>
             <div class="center">
-              <img #favicon class="favicon" src="{{sites[0].favicon}}"/>
+              <img onerror="this.src = '/assets/defaultFavicon.png';" #favicon class="favicon" src="{{sites[0].favicon}}"/>
               <b><p #title class="title">{{sites[0].url}}</p></b>
               <p #detailsCardAbsoluteTime>{{sites[0].prettyTime}}</p>
               <p #detailsCardPercent>{{sites[0].percentage.toString() + "%"}}</p>
@@ -53,7 +53,7 @@
               <!-- Favicon Column -->
               <ng-container matColumnDef="favicon">
                 <th class="smallColumn" mat-header-cell *matHeaderCellDef> </th>
-                <td class="smallColumn" mat-cell *matCellDef="let site"> <img class="faviconInTable" [src]="site.favicon" /> </td>
+                <td class="smallColumn" mat-cell *matCellDef="let site"> <img onerror="this.src = '/assets/defaultFavicon.png';" class="faviconInTable" [src]="site.favicon" /> </td>
               </ng-container>
 
               <!-- URL Column -->
@@ -80,7 +80,29 @@
                 <td mat-cell *matCellDef="let site">{{ site.prettyTime }}</td>
               </ng-container>
 
+              <!-- Total Favicon Column -->
+              <ng-container matColumnDef="totalfavicon">
+                <th class="smallColumn second-header-row" mat-header-cell *matHeaderCellDef> </th>
+              </ng-container>
+              <!-- Total Url Column -->
+              <ng-container matColumnDef="totalUrl">
+                <th class="second-header-row" mat-header-cell *matHeaderCellDef> Gesamt: </th>
+              </ng-container>
+              <!-- Total Visits Column -->
+              <ng-container matColumnDef="totalVisits">
+                <th class="smallColumn second-header-row" mat-header-cell *matHeaderCellDef> {{generalInformationTag.visits}} </th>
+              </ng-container>
+              <!-- Total Percentage Column -->
+              <ng-container matColumnDef="totalPercentage">
+                <th class="smallColumn second-header-row" mat-header-cell *matHeaderCellDef> {{generalInformationTag.percentage}} </th>
+              </ng-container>
+              <!-- Total time Column -->
+              <ng-container matColumnDef="totalTime">
+                <th class="second-header-row" mat-header-cell *matHeaderCellDef> {{generalInformationTag.prettyTime}} </th>
+              </ng-container>
+
               <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-header-row *matHeaderRowDef="['totalfavicon', 'totalUrl', 'totalVisits', 'totalPercentage', 'totalTime']"></tr>
               <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 
             </table>
@@ -211,16 +233,16 @@
       <div class="total-wrapper">
         <div class="funfacts">
           <div class="funfact">
-            <h3 class="headline"> <b>Gesamtzeit:</b></h3><p>{{allData.allTime}}</p>
+            <h4 class="headline"> <b>Gesamtzeit:</b></h4><p>{{allData.allTime}}</p>
           </div>
           <div class="funfact">
-            <h3 class="headline"><b>Erste Benutzung:</b></h3><p>{{allData.firstTime}}</p>
+            <h4 class="headline"><b>Erste Benutzung:</b></h4><p>{{allData.firstTime}}</p>
           </div>
           <div class="funfact">
-            <h3 class="headline"><b>Durchschnittliche Benutzung pro Seite:</b></h3><p>{{allData.avgTime}}</p>
+            <h4 class="headline"><b>Durchschnittliche Benutzung pro Seite:</b></h4><p>{{allData.avgTime}}</p>
           </div>
           <div class="funfact">
-            <h3 class="headline"><b>Beliebteste Seite:</b></h3><p>{{allData.bestSite}}</p>
+            <h4 class="headline"><b>Beliebteste Seite:</b></h4><p>{{allData.bestSite}}</p>
           </div>
         </div>
 
@@ -239,7 +261,7 @@
 
           <mat-card class="example-card" #detailsCard>
             <div class="center">
-              <img #faviconTotal class="favicon" src="{{sitesTotal[0].favicon}}"/>
+              <img onerror="this.src = '/assets/defaultFavicon.png';" #faviconTotal class="favicon" src="{{sitesTotal[0].favicon}}"/>
               <b><p #titleTotal class="title">{{sitesTotal[0].url}}</p></b>
               <p #detailsCardAbsoluteTimeTotal>{{sitesTotal[0].prettyTime}}</p>
               <p #detailsCardPercentTotal>{{sitesTotal[0].percentage.toString() + "%"}}</p>
@@ -254,7 +276,7 @@
               <!-- Favicon Column -->
               <ng-container matColumnDef="favicon">
                 <th class="smallColumn" mat-header-cell *matHeaderCellDef> </th>
-                <td class="smallColumn" mat-cell *matCellDef="let site"> <img class="faviconInTable" [src]="site.favicon" /> </td>
+                <td class="smallColumn" mat-cell *matCellDef="let site"> <img onerror="this.src = '/assets/defaultFavicon.png';" class="faviconInTable" [src]="site.favicon" /> </td>
               </ng-container>
 
               <!-- URL Column -->
@@ -281,8 +303,31 @@
                 <td mat-cell *matCellDef="let site">{{ site.prettyTime }}</td>
               </ng-container>
 
+              <!-- Total Favicon Column -->
+              <ng-container matColumnDef="totalfavicon">
+                <th class="smallColumn second-header-row" mat-header-cell *matHeaderCellDef> </th>
+              </ng-container>
+              <!-- Total Url Column -->
+              <ng-container matColumnDef="totalUrl">
+                <th class="second-header-row" mat-header-cell *matHeaderCellDef> Gesamt: </th>
+              </ng-container>
+              <!-- Total Visits Column -->
+              <ng-container matColumnDef="totalVisits">
+                <th class="smallColumn second-header-row" mat-header-cell *matHeaderCellDef> {{generalInformationTotal.visits}} </th>
+              </ng-container>
+              <!-- Total Percentage Column -->
+              <ng-container matColumnDef="totalPercentage">
+                <th class="smallColumn second-header-row" mat-header-cell *matHeaderCellDef> {{generalInformationTotal.percentage}} </th>
+              </ng-container>
+              <!-- Total time Column -->
+              <ng-container matColumnDef="totalTime">
+                <th class="second-header-row" mat-header-cell *matHeaderCellDef> {{generalInformationTotal.prettyTime}} </th>
+              </ng-container>
+
               <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
               <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+              <tr mat-header-row *matHeaderRowDef="['totalfavicon', 'totalUrl', 'totalVisits', 'totalPercentage', 'totalTime']"></tr>
+
 
             </table>
           </div>

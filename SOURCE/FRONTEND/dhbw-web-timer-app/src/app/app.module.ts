@@ -35,6 +35,8 @@ import { AuthorizedComponent } from './pages/general/authorized/authorized.compo
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { DeleteDialogComponent } from './shared/dialogs/delete-dialog/delete-dialog.component';
 import { UpdateDialogComponent } from './shared/dialogs/update-dialog/update-dialog.component';
+import {MatExpansionModule} from '@angular/material/expansion';
+
 registerLocaleData(localeDe);
 
 @NgModule({
@@ -73,7 +75,8 @@ registerLocaleData(localeDe);
     MatCardModule,
     MatProgressSpinnerModule,
     MatDialogModule,
-    MatTableModule
+    MatTableModule,
+    MatExpansionModule
   ],
   bootstrap: [AppComponent],
   providers: [

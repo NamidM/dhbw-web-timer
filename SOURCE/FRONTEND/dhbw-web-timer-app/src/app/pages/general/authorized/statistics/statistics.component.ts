@@ -27,6 +27,9 @@ export class StatisticsComponent implements OnInit {
   public sites: Site[] = [];
   public sitesTotal: Site[] = [];
 
+  public generalInformationTotal: any;
+  public generalInformationTag: any;
+
   public displayedColumns: string[] = ['favicon', 'url', 'visits', 'percentage', 'time'];
 
   public allData: any = {};
@@ -315,6 +318,9 @@ export class StatisticsComponent implements OnInit {
         this.times.push(sites[i].time);
       }
       this.sites = sites;
+
+      this.createGeneralInformationTag();
+
       if(sites.length > 0) {
         this.createDayDoughnut();
       } else {
@@ -368,16 +374,58 @@ export class StatisticsComponent implements OnInit {
         this.timesTotal.push(sites[i].time);
       }
       this.sitesTotal = sites;
+
+      this.createGeneralInformationTotal();
+
       if(sites.length > 0) {
         this.createDayDoughnut();
       } else {
         this.dayChart = null;
       }
 
+
+
       this.createFunfacts(sum, first);
 
       this.createTotalDoughnut();
     });
+  }
+
+  public createGeneralInformationTag(){
+
+    this.generalInformationTag = {};
+
+    let totalTime = 0;
+    let totalVisits = 0;
+
+    for(let i=0; i<this.sites.length; i++){
+      totalTime += this.sites[i].time;
+      totalVisits += this.sites[i].visits;
+    }
+
+    this.generalInformationTag.url = "Gesamtdaten:";
+    this.generalInformationTag.favicon = "/assets/images/logo.png"
+    this.generalInformationTag.prettyTime = this.getPrettyTime(totalTime);
+    this.generalInformationTag.percentage = "100%";
+    this.generalInformationTag.visits = totalVisits;
+  }
+
+  public createGeneralInformationTotal(){
+    this.generalInformationTotal = {};
+
+    let totalTime = 0;
+    let totalVisits = 0;
+
+    for(let i=0; i<this.sitesTotal.length; i++){
+      totalTime += this.sitesTotal[i].time;
+      totalVisits += this.sitesTotal[i].visits;
+    }
+
+    this.generalInformationTotal.url = "Gesamtdaten:";
+    this.generalInformationTotal.favicon = "/assets/images/logo.png"
+    this.generalInformationTotal.prettyTime = this.getPrettyTime(totalTime);
+    this.generalInformationTotal.percentage = "100%";
+    this.generalInformationTotal.visits = totalVisits;
   }
 
   createFunfacts(sum: any, first: any ){

@@ -1,6 +1,165 @@
 <div class="container main-page">
     <br>
-    <h2>Über diese Seite:</h2>
-    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-    <button mat-raised-button color="accent"><a href="assets/downloads/EXTENSION.crx" class="download-btn" download="dhbw-web-timer.crx">Extension herunterladen</a></button>
+
+
+  <br><br><br>
+
+  <mat-tab-group animationDuration="0ms">
+    <mat-tab label="DHBW Web Timer">
+      <br><br>
+      <h1>Über diese Seite:</h1>
+      <hr>
+      <p>Der DHBW Web Timer trackt wie viel Zeit du im Internet verbringst und präsentiert dir informative und intuitive Statistiken
+        über dein Browserverhalten.
+      </p>
+
+
+      <mat-accordion class="accordion">
+        <mat-expansion-panel [expanded]="true"  hideToggle>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Home Page
+            </mat-panel-title>
+            <mat-panel-description>
+              <p>Auf der Homepage siehst du dein Verhalten am aktuellen Tag</p>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <p>Auf der Homepage siehst du dein Verhalten am aktuellen Tag</p>
+            <img class="functionImage" src="assets/images/home.PNG" alt="home page">
+            <br>
+              <ul>
+                <li>Hover über den Doughnut um detaillierte Infos über dein Verhalten auf der aktuellen Seite zu erfahren</li>
+                <li>Die Tabelle zeigt alle Infos auf einen Blick</li>
+              </ul>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Statistik: Tag
+            </mat-panel-title>
+            <mat-panel-description>
+              <p>Browsingverhalten an einem wählbaren Tag</p>
+            </mat-panel-description>
+
+          </mat-expansion-panel-header>
+          <p>Auf der Tag Seite siehst du dein Verhalten an einem bestimmten Tag</p>
+          <img class="functionImage" src="assets/images/tag.PNG" alt="tag page">
+          <br>
+          <ul>
+            <li>Nutze den Datepicker oben, um deinen Tag auszuwählen</li>
+            <li>Restliche Funktionen</li>
+          </ul>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Statistik: Woche
+            </mat-panel-title>
+            <mat-panel-description>
+              Browsingverhalten an einer Woche oder vielen Wochen
+            </mat-panel-description>
+
+          </mat-expansion-panel-header>
+          <p>Auf der Wochen Seite siehst du dein Verhalten an einer bestimmten Woche</p>
+          <img class="functionImage" src="assets/images/woche.PNG" alt="wochen page">
+          <br>
+          <ul>
+            <li>Klicke auf "Woche hinzufügen" um mehrere Wochen miteinander zu vergleichen. Nutze den date-picker um deine gewünschte Woche auszuwählen</li>
+            <li>Entferne Wochen aus der Statistik mit dem Mülleimer icon</li>
+            <li>Die Balken zeigen dein Verhalten an den einzelnen Tagen der Wochen und sind nach Seiten aufgeteilt</li>
+          </ul>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Statistik: Monat
+            </mat-panel-title>
+            <mat-panel-description>
+              Browsingverhalten an einem Monat oder vielen Monaten
+            </mat-panel-description>
+
+          </mat-expansion-panel-header>
+          <p>Auf der Monatsseite siehst du dein Verhalten an einer oder vielen bestimmten Monaten</p>
+          <img class="functionImage" src="assets/images/woche.PNG" alt="wochen page">
+          <br>
+          <ul>
+            <li>Klicke auf "Monat hinzufügen" um mehrere Monate miteinander zu vergleichen. Nutze den date-picker um deinen gewünschten Monat auszuwählen</li>
+            <li>Entferne Monate aus der Statistik mit dem Mülleimer icon</li>
+            <li>Die Line-Chart zeigen dein Verhalten an den einzelnen Tagen der Monate an</li>
+          </ul>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Statistik: Gesamt
+            </mat-panel-title>
+            <mat-panel-description>
+              Browsingverhalten über den gesamten erfassten Zeitraum
+            </mat-panel-description>
+
+          </mat-expansion-panel-header>
+          <p>Auf der Gesamtseite siehst du dein Verhalten über den kompletten Zeitraum</p>
+          <img class="functionImage" src="assets/images/gesamt.PNG" alt="gesamt page">
+          <br>
+          <ul>
+            <li>Die Funfacts oben zeihen *witzige* Informationen über dein Browserverhalten</li>
+            <li>Hover über den Doughnut um detaillierte Infos über dein Verhalten auf der aktuellen Seite zu erfahren</li>
+            <li>Die Tabelle zeigt alle Infos auf einen Blick</li>
+          </ul>
+        </mat-expansion-panel>
+      </mat-accordion>
+
+      <br><br><br>
+
+
+      <h1>Installation:</h1>
+      <hr>
+      <ol>
+        <li>Downloade die aktuelle Version der Chrome Extension über den Download Button unten</li>
+        <li>Öffne den Chrome Browser und navigiere nach chrome://extensions/ und schalte den Entwicklermodus rechts oben ein</li>
+        <li>Klicke links oben auf "Entpacke Erweiterung laden"</li>
+        <li>Browser zum src Folder des entpackten Chrome Extension die du gerade heruntergeladen hast und bestätige</li>
+      </ol>
+
+      <p>Die Extension sollte jetzt rechts oben in der Extensionbar des Chome browsers verfügbar sein</p>
+      <button mat-raised-button color="accent"><a href="assets/downloads/EXTENSION.crx" class="download-btn" download="dhbw-web-timer.crx">Extension herunterladen</a></button>
+    </mat-tab>
+    <mat-tab label="Second">Content 2</mat-tab>
+    <mat-tab label="Das Team">
+      <div class="cards">
+        <mat-card class="team-card">
+          <mat-card-header>
+            <!-- <div mat-card-avatar class="johannes-header-image"></div> -->
+            <mat-card-title>Johannes Timter</mat-card-title>
+            <mat-card-subtitle>sehr cool</mat-card-subtitle>
+          </mat-card-header>
+          <img class="teamImage" mat-card-image src="assets/images/johannes.jpg" alt="johannes">
+          <br>
+          <mat-card-content>
+            <p>
+              <b>Github: </b> <a href="https://github.com/UdolfSeelenfrost">https://github.com/UdolfSeelenfrost</a>  <br>
+              <b>Email: </b> inf19220@lehre.dhbw-stuttgart.de
+            </p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="team-card">
+          <mat-card-header>
+            <!-- <div mat-card-avatar class="namid-header-image"></div> -->
+            <mat-card-title>Namid Faro Marxen</mat-card-title>
+            <mat-card-subtitle>nicht sehr cool</mat-card-subtitle>
+          </mat-card-header>
+          <img class="teamImage" mat-card-image src="assets/images/namid.jpg" alt="namid">
+          <br>
+          <mat-card-content>
+            <p>
+              <b>Github: </b> <a href="https://github.com/NamidM">https://github.com/NamidM</a> <br>
+              <b>Email: </b> inf19054@lehre.dhbw-stuttgart.de
+            </p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
 </div>

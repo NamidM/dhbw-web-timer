@@ -20,6 +20,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
   public times: number[] = [];
   public sites: Site[] = [];
   public displayedColumns: string[] = ['favicon', 'url', 'visits', 'percentage', 'time'];
+  public generalInformation: any;
+
+  public lastHoveredTimestamp = 0;
 
 
   public imageToShow: any;
@@ -90,13 +93,38 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.times.push(sites[i].time);
       }
       this.sites = sites;
+
+      this.createGeneralInformation();
+
+
       if(sites.length > 0) {
         this.createDoughnut();
       }
+
     });
   }
 
+  public createGeneralInformation(){
+
+    this.generalInformation = {};
+
+    let totalTime = 0;
+    let totalVisits = 0;
+
+    for(let i=0; i<this.sites.length; i++){
+        totalTime += this.sites[i].time;
+        totalVisits += this.sites[i].visits;
+    }
+
+    this.generalInformation.url = "Gesamtdaten:";
+    this.generalInformation.favicon = "/assets/images/logo.png"
+    this.generalInformation.prettyTime = this.convertMilliseconds(totalTime);
+    this.generalInformation.percentage = "100%";
+    this.generalInformation.visits = totalVisits;
+  }
+
   public chartHovered({ event, active }: { event: MouseEvent, active: {}[] }): void {
+
     const hovered : any = active[0];
     let site = this.sites[hovered._index];
 
@@ -105,6 +133,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.detailsCardPercent.nativeElement.innerHTML = site.percentage.toString() + "%";
     this.favicon.nativeElement.setAttribute("src", site.favicon);
     this.visits.nativeElement.innerHTML = "Visits: " + site.visits.toString();
+
+    //let currentTimestamp = Date.now();
+    //console.log(currentTimestamp - this.lastHoveredTimestamp, active);
+    //this.lastHoveredTimestamp = currentTimestamp;
   }
 
   createDoughnut(){
