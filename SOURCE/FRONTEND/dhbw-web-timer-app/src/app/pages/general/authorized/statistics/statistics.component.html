@@ -1,5 +1,4 @@
 <div class="timeStatistics">
-
   <mat-tab-group mat-stretch-tabs>
     <mat-tab label="Tag">
       <div class="day-wrapper">
@@ -31,7 +30,6 @@
                     (chartHover)="chartHovered($event)">
             </canvas>
           </div>
-
           <div class="mat-elevation-z8">
             <div class="post-btn-wrapper"><div class="post-btn-wrapper-center">
               <button mat-raised-button color="primary" class="post-btn" (click)="postStatistics('daily')">Statistik posten</button>
@@ -114,7 +112,7 @@
       <div class="week-wrapper row">
         <div class="col-3">
           <div class="center">
-            <button mat-raised-button color="primary" class="post-btn" (click)="postStatistics('weekly')">Statistik posten</button><br><br>
+            <button mat-raised-button color="primary" class="post-btn" [disabled]="weekTime.length == 0" (click)="postStatistics('weekly')">Statistik posten</button><br><br>
             <button mat-raised-button color="accent" class="addweek-btn" (click)="addWeek()">Woche hinzufügen</button>
           </div>
           <ng-container *ngFor="let addedWeek of addedWeeks; index as i">
@@ -155,7 +153,7 @@
       <div class="month-wrapper row">
         <div class="col-3">
           <div class="center">
-            <button mat-raised-button color="primary" class="post-btn" (click)="postStatistics('monthly')">Statistik posten</button><br><br>
+            <button mat-raised-button color="primary" class="post-btn" [disabled]="monthDataValid" (click)="postStatistics('monthly')">Statistik posten</button><br><br>
             <button mat-raised-button color="accent" class="addmonth-btn" (click)="addMonth()">Monat hinzufügen</button>
           </div>
           <ng-container *ngFor="let addedMonth of addedMonths; index as i">

@@ -11,7 +11,6 @@ import { SnackBarService } from '../snack-bar/snack-bar.service';
 export class AuthService {
   public loading: boolean = true;
   public username?: string;
-  public userID?: string;
 
   constructor(private apiService: ApiService, private router: Router, private snackBarService: SnackBarService) {}
 
@@ -31,15 +30,13 @@ export class AuthService {
     this.apiService.logout().subscribe((response)=> {
       if(response.message == "success") {
         delete(this.username);
-        delete(this.userID);
       }
     });
   }
 
-  loginUser(username?: string, userID?: string) {
+  loginUser(username?: string) {
     this.loading = false;
     this.username = username;
-    this.userID = userID;
   }
 
   silentLogin(callback: Function) {
@@ -47,7 +44,6 @@ export class AuthService {
       this.loading = false;
       if(response.message == "success") {
         this.username = response.username;
-        this.userID = response.userID;
         callback();
       } else {
         let authorizedSites = ["/home", "/settings", "/statistics", "/community"];
@@ -55,7 +51,6 @@ export class AuthService {
           this.router.navigateByUrl("/");
         }
         delete(this.username);
-        delete(this.userID);
       }
     });
   }
@@ -72,7 +67,6 @@ export class AuthService {
     this.apiService.updateUser(username).subscribe((response)=>{
       if(response.message == "success") {
         this.username = response.username;
-        console.log(response);
         this.snackBarService.openSnackBar("Benutzername wurde geändert" + this.username, "Ok");
       }
     });

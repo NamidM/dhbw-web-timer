@@ -22,7 +22,8 @@
       <ul class="navbar-nav my-2 my-sm-0" *ngIf="authService.username">
         <li class="nav-item" [class.active]="router.isActive('/about', true)">
           <span class="username nav-link">
-            Eingeloggt als: <b>{{authService.username}}</b>
+            <mat-icon class="account" aria-hidden="false">account_circle</mat-icon>
+            <b>{{authService.username}}</b>
             <mat-icon class="settings" aria-hidden="false" [routerLink]="['/settings']">settings</mat-icon>
           </span>
         </li>

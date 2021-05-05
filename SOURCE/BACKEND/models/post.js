@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const POST = module.exports = mongoose.model("Post", mongoose.Schema({
     title: {
         type: String,
@@ -9,12 +8,8 @@ const POST = module.exports = mongoose.model("Post", mongoose.Schema({
         type: String,
         required: true
     },
-    username: {
-        type: String,
-        required: true
-    },
     userID: {
-        type: Number,
+        type: String,
         required: true
     },
     timeData: {
@@ -79,17 +74,20 @@ const POST = module.exports = mongoose.model("Post", mongoose.Schema({
 }));
 
 module.exports.getPosts = (callback, limit)=>{
-    POST.find({},{},{sort: {postTime: -1}},callback).limit(limit);
+    POST.aggregate([
+        { $sort: {"postTime": -1} },
+        { $lookup: { from: "users", localField: 'googleId', foreignField: 'userID', as: "users"} }
+    ], callback);
 };
 
 module.exports.deletePost = (_id, userID, callback)=>{
     POST.deleteOne({ _id, userID }, callback);
 };
 
-module.exports.addPost = (title, content, username, userID, type, sites, postTime, time, callback)=>{
+module.exports.addPost = (title, content, userID, type, sites, postTime, time, callback)=>{
     if(type == 'daily' || type == 'total') {
-        POST.create({title, content, username, userID, sites, postTime, type, time}, callback);
+        POST.create({title, content, userID, sites, postTime, type, time}, callback);
     } else {
-        POST.create({title, content, username, userID, timeData: sites, postTime, type, time}, callback);
+        POST.create({title, content, userID, timeData: sites, postTime, type, time}, callback);
     }
 };

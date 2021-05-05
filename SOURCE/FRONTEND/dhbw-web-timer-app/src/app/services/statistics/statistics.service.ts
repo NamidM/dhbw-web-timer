@@ -11,10 +11,18 @@ export class StatisticsService {
   showDoughnutChart(sites: any, callback: Function) {
     let siteNames = [];
     let times = [];
+    let totalTime: any = 0, totalVisits = 0, generalInformation: any = {};
     for(let i=0; i<sites.length; i++){
       siteNames.push(sites[i].url);
       times.push(sites[i].time);
+      totalTime += sites[i].time;
+      totalVisits += sites[i].visits;
     }
+    generalInformation.url = "Gesamtdaten:";
+    generalInformation.favicon = "/assets/images/logo.png"
+    generalInformation.prettyTime = this.getPrettyTime(totalTime);
+    generalInformation.percentage = "100%";
+    generalInformation.visits = totalVisits;
     if(sites.length > 0) {
       callback({
         options: {
@@ -29,7 +37,7 @@ export class StatisticsService {
          {data: times, label: 'Time spent'},
        ],
        labels: siteNames
-     })
+     }, generalInformation)
     } else {
       callback(null);
     }
@@ -127,11 +135,22 @@ export class StatisticsService {
       sites = this.setPercentage(sites);
       sites = this.setPrettyTime(sites);
       let sum = 0;
+      let generalInformation: any = {};
+      let totalTime = 0;
+      let totalVisits = 0;
       for(let i=0; i<sites.length; i++){
         siteNames.push(sites[i].url);
         times.push(sites[i].time);
         sum += sites[i].time;
+        totalTime += sites[i].time;
+        totalVisits += sites[i].visits;
       }
+      generalInformation.url = "Gesamtdaten:";
+      generalInformation.favicon = "/assets/images/logo.png"
+      generalInformation.prettyTime = this.getPrettyTime(totalTime);
+      generalInformation.percentage = "100%";
+      generalInformation.visits = totalVisits;
+
       if(sites.length > 0) {
         let bestSite = siteNames[times.indexOf(Math.max(...times))] != "Andere" 
         ? siteNames[0]
@@ -155,7 +174,7 @@ export class StatisticsService {
            {data: times, label: 'Time spent'},
          ],
          labels: siteNames
-       }, sites, allData)
+       }, sites, allData, generalInformation)
       } else {
         callback(null);
       }
@@ -284,9 +303,14 @@ export class StatisticsService {
     if(startTime == undefined || endTime == undefined) {
       monthTime = monthTime.filter((e: any) => e.stack != monthForm);
       let labels = [];
+      let noData = true;
       for(let i = 0; i < 31; i++){
         labels[i] = i+1;
+        if(monthTime[monthForm].data[i]) noData = false;
       }
+      if(noData){
+        monthTime[monthForm].data = [];
+      } 
       callback({
         options: {scaleShowVerticalLines: false,
           elements: {
@@ -323,7 +347,6 @@ export class StatisticsService {
         ];
         let stack = monthForm != undefined ? monthForm : -1;
         let indexFromStack = monthTime.findIndex((e: any) => e.stack == stack);
-        console.log(monthNames[startTime.getMonth()], startTime);
         if(monthTime[indexFromStack]) {
           monthTime[indexFromStack] = {
             data: monthData, 
@@ -338,8 +361,13 @@ export class StatisticsService {
           });
         }
         let labels = [];
+        let noData = true;
         for(let i = 0; i < 31; i++){
           labels[i] = i+1;
+          if(monthTime[monthForm].data[i]) noData = false;
+        }
+        if(noData){
+          monthTime[monthForm].data = [];
         }
         callback({
           options: {scaleShowVerticalLines: false,

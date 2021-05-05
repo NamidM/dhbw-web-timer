@@ -37,11 +37,11 @@ export class CommunityComponent implements OnInit {
         this.length = response.posts.length;
 
         for(let i = 0; i<this.posts.length; i++) {
-          this.posts[i].site = this.posts[i].sites[0];
           switch(this.posts[i].type) {
             case 'daily':
-              this.statisticsService.showDoughnutChart(this.posts[i].sites, (chart: any) => {
+              this.statisticsService.showDoughnutChart(this.posts[i].sites, (chart: any, generalInformation: any) => {
                 this.posts[i].chart = chart;
+                this.posts[i].site = generalInformation;
               });
               let prettyTime: any = new Date(this.posts[i].time);
               let date = prettyTime.getDate() < 9 ? "0" + prettyTime.getDate() : prettyTime.getDate();
@@ -62,8 +62,9 @@ export class CommunityComponent implements OnInit {
               this.posts[i].typeText = 'Monatliche Statistik';
               break;
             case 'total':
-              this.statisticsService.showDoughnutChart(this.posts[i].sites, (chart: any) => {
+              this.statisticsService.showDoughnutChart(this.posts[i].sites, (chart: any, generalInformation: any) => {
                 this.posts[i].chart = chart;
+                this.posts[i].site = generalInformation;
               }); 
               this.posts[i].typeText = 'Gesamt Statistik';
           }

@@ -5,9 +5,12 @@
     position: relative;
     top: -6px;
 }
-.settings {
+.settings, .account {
     position: relative;
     top: 7px;
+}
+.account {
+    color: gray;
 }
 .settings:hover {
     cursor: pointer;

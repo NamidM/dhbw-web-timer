@@ -78,17 +78,13 @@ export class ApiService {
         }
       }
     }
-    let params = new HttpParams();
-    params = params.append('title', title);
-    params = params.append('content', content);
-    params = params.append('type', type);
-    params = params.append('sites', JSON.stringify(sites));
     if(startTime) {
-      params = params.append('startTime', startTime.toString());
+      startTime = startTime.toString();
     }
-
-    return this.http.get<{message: 'success' | 'error'}>(`${this.baseUrl}post`, 
-    { params: params, withCredentials: true});
+    const body = { title, content, type, sites, startTime }
+    console.log(body);
+    return this.http.post<{message: 'success' | 'error'}>(`${this.baseUrl}post`, 
+    body , { withCredentials: true, headers: new HttpHeaders().set('Content-Type', 'application/json') });
   }
 
   getAllPosts() {
