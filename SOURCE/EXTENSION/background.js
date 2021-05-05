@@ -144,7 +144,7 @@ function updateTabEntry (id, isCloseEvent) {
 }
 
 function getFavicon(tab){
-  let favicon = favicon? tab.favIconUrl : 'chrome://favicon/';
+  let favicon = favicon? tab.favIconUrl : '/assets/images/defaultFavicon.png';
   return favicon;
 }
 
