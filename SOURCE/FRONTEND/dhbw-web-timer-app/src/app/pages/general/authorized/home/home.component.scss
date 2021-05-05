@@ -42,28 +42,30 @@ td,th {
   width: 25%;
   font-size: 15px;
 }
-
 tr.mat-footer-row {
   font-weight: bold;
 }
-
 .second-header-row{
   font-weight: bold;
   color: black !important;
 }
-
+.logo {
+  width: 150px;
+  margin-bottom: 1em;
+}
 .smallColumn{
   width: 5%;
 }
-
+.bottom-txt {
+  margin-top: 1em;
+}
+.failed {
+  color: red;
+}
 .faviconInTable{
   height: 26px;
   width: 26px;
-
-  //-webkit-filter: drop-shadow(0px 0px 3px #000000);
-  //filter: drop-shadow(0px 0px 3px #000000	);
 }
-
 table{
   margin: auto;
   min-width: 500px;

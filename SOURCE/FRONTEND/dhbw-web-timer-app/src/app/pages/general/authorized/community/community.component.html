@@ -1,4 +1,7 @@
 <div class="main-page">
+    <div *ngIf="length > 0" class="container heading">
+        <h2>Posts der Community</h2>
+    </div>
     <ng-container *ngFor="let post of dataSource; index as i">
         <mat-card class="example-card">
             <mat-card-header class="post-header">

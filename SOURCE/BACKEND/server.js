@@ -165,9 +165,9 @@ server.delete("/post", authUser, (req, res) => {
 server.put("/user", authUser, (req, res) => {
   USER.updateUser(req.userID, req.body.username, (error, user)=>{
     if(error || !user) {
-      res.send({message: "Username update failed"});
+      res.send({message: "error"});
     } else {
-      res.send({message: "Username changed successfully", username: user.name});
+      res.send({message: "success", username: user.name});
     }
   });
 })
@@ -179,7 +179,7 @@ server.delete("/user", authUser, (req, res) => {
     } else {
       res.send({message: "success"});
       /* If user was successfully deleted, also delete posts from that user */
-      WEBACTIVITY.deleteAllFromUser(req.userID);
+      WEBACTIVITY.deleteAllFromUser(req.userID, ()=>{});
     }
   });
 })
@@ -289,20 +289,25 @@ server.get("/login", (req,res)=>{
         res.send({message: "error"});
       } else {
         try {
-          /* Set cookies for refresh_token and id_token */
           let decodedIT = jwt.decode(req.query.id_token);
-          res.cookie('refresh_token', data.refresh_token,  
-            { maxAge: 7*24*60*60*1000,
-              httpOnly: true,
-              secure: production
-            });
-          res.cookie('id_token', data.id_token,  
-            { maxAge: 60*60*1000,
-              httpOnly: true,
-              secure: production
-            });
           getUserName(decodedIT.sub, (username)=>{
-            res.send({message: "success", username: username});
+            if(username) {
+              /* Set cookies for refresh_token and id_token */
+              res.cookie('refresh_token', data.refresh_token,  
+                { maxAge: 7*24*60*60*1000,
+                  httpOnly: true,
+                  secure: production
+                });
+              res.cookie('id_token', data.id_token,  
+                { maxAge: 60*60*1000,
+                  httpOnly: true,
+                  secure: production
+                });
+              res.send({message: "success", username: username});
+            } else {
+              /* User not registered */
+              res.send({message: "error"});
+            }
           })
         } catch(e) {
           /* id_token invalid -> decode failed */

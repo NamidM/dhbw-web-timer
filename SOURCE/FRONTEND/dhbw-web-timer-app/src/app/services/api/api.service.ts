@@ -82,7 +82,6 @@ export class ApiService {
       startTime = startTime.toString();
     }
     const body = { title, content, type, sites, startTime }
-    console.log(body);
     return this.http.post<{message: 'success' | 'error'}>(`${this.baseUrl}post`, 
     body , { withCredentials: true, headers: new HttpHeaders().set('Content-Type', 'application/json') });
   }

@@ -30,6 +30,7 @@ export class AuthService {
     this.apiService.logout().subscribe((response)=> {
       if(response.message == "success") {
         delete(this.username);
+        this.router.navigateByUrl("/");
       }
     });
   }
@@ -67,9 +68,8 @@ export class AuthService {
     this.apiService.updateUser(username).subscribe((response)=>{
       if(response.message == "success") {
         this.username = response.username;
-        this.snackBarService.openSnackBar("Benutzername wurde geändert" + this.username, "Ok");
+        this.snackBarService.openSnackBar("Benutzername erfolgreich geändert", "Ok");
       }
     });
   }
-
 }

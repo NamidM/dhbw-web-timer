@@ -116,7 +116,7 @@
       <div class="week-wrapper row">
         <div class="col-3">
           <div class="center">
-            <button mat-raised-button color="primary" class="post-btn" [disabled]="weekTime.length == 0" (click)="postStatistics('weekly')">Statistik posten</button><br><br>
+            <button mat-raised-button color="primary" class="post-btn" [disabled]="!weekTime || weekTime.length == 0" (click)="postStatistics('weekly')">Statistik posten</button><br><br>
             <button mat-raised-button color="accent" class="addweek-btn" [disabled]="addedWeeks.length > 5" (click)="addWeek()">Woche hinzufügen</button>
           </div>
           <ng-container *ngFor="let addedWeek of addedWeeks; index as i">

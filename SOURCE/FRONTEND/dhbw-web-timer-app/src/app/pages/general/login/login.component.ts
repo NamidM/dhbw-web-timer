@@ -30,6 +30,8 @@ export class LoginComponent implements OnInit {
           this.snackBarService.openSnackBar("Eingeloggt!", "Ok");
           this.router.navigateByUrl("/");
         } else {
+          this.snackBarService.openSnackBar("Fehler: Account ist nicht registriert!", "Ok");
+          this.router.navigate(["/"], {state: {loginFailed: true}});
           this.loading = false;
         }
       });

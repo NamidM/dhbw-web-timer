@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/services/api/api.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
@@ -13,7 +13,6 @@ import { SnackBarService } from 'src/app/services/snack-bar/snack-bar.service';
 export class RegisterComponent implements OnInit {
   private id_token: string = "";
   private authorization_code: string = "";
-  public alreadyRegistered: boolean = false;
   public loading: boolean = true;
   registerForm: FormGroup;
 
@@ -36,7 +35,7 @@ export class RegisterComponent implements OnInit {
       this.apiService.registerCheck(this.id_token).subscribe((response)=>{
         this.loading = false;
         if(response.message != "success") {
-          this.alreadyRegistered = true;
+          this.router.navigate(["/"], {state: {registerFailed: true}});
         }
       });
     }

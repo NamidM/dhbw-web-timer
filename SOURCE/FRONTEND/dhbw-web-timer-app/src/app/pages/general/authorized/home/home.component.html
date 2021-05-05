@@ -1,12 +1,14 @@
 <div *ngIf="!authService.username && !authService.loading" class="container main-page">
-  <h1>Willkommen auf DHBW Web-Timer</h1>
-  <h3>Um diese Seite zu benutzen müssen sie eingeloggt sein!</h3><br>
+  <img src="assets/images/logo.png" class="logo"/>
+  <h1>Willkommen bei DHBW Web-Timer</h1>
+  <h3>Um diese Seite zu benutzen müssen Sie eingeloggt sein!</h3><br>
   <label >Noch kein Account?</label><br>
   <button class="register-btn" mat-raised-button color="primary" (click)="authService.sendRegisterRequest()">Registrieren mit Google</button><br><br>
+  <h3 *ngIf="registerFailed" class="failed">Fehler: Account bereits registriert</h3>
   <label>Bereits registriert?</label><br>
-  <button mat-raised-button color="primary" (click)="authService.sendLoginRequest()">Einloggen mit Google</button>
-  <br><br>
-  <button mat-raised-button color="accent"><a href="assets/downloads/EXTENSION.crx" class="download-btn" download="dhbw-web-timer.crx">Extension herunterladen</a></button>
+  <button mat-raised-button color="accent" (click)="authService.sendLoginRequest()">Einloggen mit Google</button>
+  <h3 *ngIf="loginFailed" class="failed">Fehler: Account ist nicht registriert</h3>
+  <h3 class="bottom-txt">Damit Sie Ihre Nutzungszeit tracken können, können Sie sich <a href="{{extension_link}}">unsere Extension</a> herunterladen</h3>
 </div>
 <div *ngIf="authService.username" class="container main-page">
   <h3 class="center">Statistik für: Heute</h3>

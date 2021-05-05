@@ -5,6 +5,7 @@ import { StatisticsService } from 'src/app/services/statistics/statistics.servic
 import { MatDialog } from '@angular/material/dialog';
 import { PostDialogComponent } from 'src/app/shared/dialogs/post-dialog/post-dialog.component';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -19,6 +20,9 @@ export class HomeComponent implements OnInit {
   public loading: boolean = true;
   public displayedColumns: string[] = ['favicon', 'url', 'visits', 'percentage', 'time'];
   public generalInformation: any;
+  public extension_link: any = environment.extension_link;
+  public loginFailed: any = history.state.loginFailed;
+  public registerFailed: any = history.state.registerFailed;
 
   constructor(public authService: AuthService, private statisticsService: StatisticsService, private dialog: MatDialog, private router: Router) { }
 

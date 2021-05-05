@@ -111,7 +111,6 @@ export class StatisticsService {
 
         if(index == -1){
           sites.push({url: baseUrl, time: timespan, favicon: entry.faviconUrl, percentage: 0, visits: 1, prettyTime: ""});
-          console.log("pushed: ", entry.faviconUrl);
         } else{
           sites[index].time += timespan;
           sites[index].visits++;
@@ -201,7 +200,9 @@ export class StatisticsService {
 
   getBarChart(startTime: any, endTime: any, weekTime: any, weekForm: number, callback: Function) {
     if(startTime == undefined || weekTime == undefined) {
-      weekTime = weekTime.filter((e: any) => e.stack != weekForm.toString());
+      if(weekTime.length > 0) {
+        weekTime = weekTime.filter((e: any) => e.stack != weekForm.toString());
+      }
       callback({
         options: {scaleShowVerticalLines: false,
           responsive: true,
@@ -227,7 +228,9 @@ export class StatisticsService {
       }, weekTime);
     } else {
       let stack = weekForm != undefined ? weekForm : -1;
-      weekTime = weekTime.filter((e:any) => e.stack != stack.toString());
+      if(weekTime.length > 0) {
+        weekTime = weekTime.filter((e: any) => e.stack != stack.toString());
+      }
       this.apiService.getWebActivitiesInTimespan(startTime.toString(), endTime.toString()).subscribe((timespanData : any) => {
         let week: any[] = [];
         let urls = [];

@@ -1,5 +1,5 @@
 <div *ngIf="!loading">
-    <div class="container main-content" *ngIf="!alreadyRegistered">
+    <div class="container main-content">
         <h1>Registrieren</h1>
         <h3>Um die Registrierung abzuschließen, geben Sie bitte einen Nutzernamen ein:</h3>
         <form [formGroup]="registerForm">
@@ -9,11 +9,6 @@
             </mat-form-field><br>
             <button mat-raised-button color="primary" (click)="register()" [disabled]="registerForm.invalid">Registrierung abschließen</button>
         </form>
-    </div>
-    <div class="container main-content" *ngIf="alreadyRegistered">
-        <h1>Fehler</h1>
-        <h3>Account ist bereits registriert.</h3>
-        <button mat-raised-button color="primary" [routerLink]="['/']">Zurück</button>
     </div>
 </div>
 <div *ngIf="loading">

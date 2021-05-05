@@ -36,6 +36,6 @@ module.exports.getWebActivitiesInTimespan = (startTime, endTime, userId, callbac
     WEBACTIVITY.find({starttime: {$gte: startTime}, endtime: {$lte: endTime}, userID: userId}, callback);
 };
 /* Function to delete all webactivities from user */
-module.exports.deleteAllFromUser = (userId, callback)=>{
-    WEBACTIVITY.deleteMany({userID: userId}, callback);
+module.exports.deleteAllFromUser = (userID, callback)=>{
+    WEBACTIVITY.deleteMany({ userID }, callback);
 };
