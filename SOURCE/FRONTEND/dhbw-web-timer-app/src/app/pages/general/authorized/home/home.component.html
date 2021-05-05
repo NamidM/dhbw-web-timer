@@ -32,7 +32,7 @@
       </div></div>
       <mat-card class="info-card" #detailsCard>
         <div class="center">
-          <img onerror="this.src = '/assets/images/defaultFavicon.png';" #favicon class="favicon" src="{{site.favicon}}" alt="favicon"/>
+          <img #favicon class="favicon" (error)="onImgError($event)" src="{{site.favicon}}" alt="favicon"/>
           <b><p class="title">{{site.url}}</p></b>
           <p>{{site.prettyTime}}</p>
           <p>{{site.percentage.toString() + "%"}}</p>
@@ -45,7 +45,7 @@
         <!-- Favicon Column -->
         <ng-container matColumnDef="favicon">
           <th class="smallColumn" mat-header-cell *matHeaderCellDef> </th>
-          <td class="smallColumn" mat-cell *matCellDef="let site"> <img class="faviconInTable" [src]="site.favicon"  onerror="this.src = '/assets/images/defaultFavicon.png';"/> </td>
+          <td class="smallColumn" mat-cell *matCellDef="let site"> <img class="faviconInTable" [src]="site.favicon"  (error)="onImgError($event)"/> </td>
           <td class="smallColumn" mat-footer-cell *matFooterCellDef> </td>
         </ng-container>
 

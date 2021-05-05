@@ -50,7 +50,7 @@ export class StatisticsService {
         scales: {
           x: {stacked: true},
           y: {stacked: true},
-          
+
           yAxes: [
             {
               ticks: {beginAtZero: true},
@@ -95,7 +95,7 @@ export class StatisticsService {
   getDougnutChart(startTime: number, endTime: number, callback: Function) {
     let siteNames: String[] = [];
     let times: number[] = [];
-    this.apiService.getWebActivitiesInTimespan(startTime.toString(), endTime.toString()).subscribe((timespanData : any) => {
+    this.apiService.getWebActivitiesInTimespan(startTime.toString(), endTime.toString()).subscribe( async (timespanData : any) => {
       let sites: any[] = [];
       let first = Infinity;
 
@@ -105,11 +105,17 @@ export class StatisticsService {
         let index = this.findIndexOfSiteWithURL(sites, baseUrl);
         first = Math.min(first, entry.starttime);
 
+        await this.testImage(entry.faviconUrl).catch((url: any) => {
+          entry.faviconUrl = url;
+        });
+
         if(index == -1){
           sites.push({url: baseUrl, time: timespan, favicon: entry.faviconUrl, percentage: 0, visits: 1, prettyTime: ""});
+          console.log("pushed: ", entry.faviconUrl);
         } else{
           sites[index].time += timespan;
           sites[index].visits++;
+
           if(sites[index].favicon.startsWith("chrome://") && !entry.faviconUrl.startsWith("chrome://")){
             sites[index].favicon = entry.faviconUrl;
           }
@@ -120,7 +126,7 @@ export class StatisticsService {
         return b.time-a.time;
       });
       if(sites.length > 10) {
-        let others = {url: "Andere", time: 0, visits: 0, favicon: 'chrome://favicon/'};
+        let others = {url: "Andere", time: 0, visits: 0, favicon: '/assets/images/defaultFavicon.png'};
         for(let j = 9; j < sites.length; j++) {
           others.time += sites[j].time;
           others.visits++;
@@ -152,7 +158,7 @@ export class StatisticsService {
       generalInformation.visits = totalVisits;
 
       if(sites.length > 0) {
-        let bestSite = siteNames[times.indexOf(Math.max(...times))] != "Andere" 
+        let bestSite = siteNames[times.indexOf(Math.max(...times))] != "Andere"
         ? siteNames[0]
         : siteNames[1];
         let allData = {
@@ -182,6 +188,17 @@ export class StatisticsService {
 
   }
 
+  testImage(url: any) : any {
+    const imgPromise = new Promise(function imgPromise(resolve, reject) {
+
+      const imgElement = new Image();
+      imgElement.onload = () => resolve(url);
+      imgElement.onerror = () => reject("/assets/images/defaultFavicon.png");
+      imgElement.src = url;
+    });
+    return imgPromise;
+  }
+
   getBarChart(startTime: any, endTime: any, weekTime: any, weekForm: number, callback: Function) {
     if(startTime == undefined || weekTime == undefined) {
       weekTime = weekTime.filter((e: any) => e.stack != weekForm.toString());
@@ -191,7 +208,7 @@ export class StatisticsService {
           scales: {
             x: {stacked: true},
             y: {stacked: true},
-            
+
             yAxes: [
               {
                 ticks: {beginAtZero: true},
@@ -240,7 +257,7 @@ export class StatisticsService {
             });
             if(week[i].length > 10) {
               let others = {time: 0, url: "Andere", startTime: 0, favicon: 'chrome://favicon/'};
-  
+
               for(let j = 9; j < week[i].length; j++) {
                 others.startTime = week[i][j].startTime;
                 others.time += week[i][j].time;
@@ -248,7 +265,7 @@ export class StatisticsService {
               week[i].splice(9, 0, others);
               week[i].splice(10, week[i].length-1);
             }
-  
+
             for(let j = 0; j < week[i].length; j++) {
               let baseUrl = week[i][j].url;
               startTime.setTime(week[i][j].startTime);
@@ -263,22 +280,22 @@ export class StatisticsService {
               }
               if(!weekTime[urls[baseUrl].num]){
                 weekTime[urls[baseUrl].num] = {
-                  data: [0,0,0,0,0,0,0], 
-                  label: baseUrl, 
+                  data: [0,0,0,0,0,0,0],
+                  label: baseUrl,
                   stack: stack.toString()
                 };
               }
               weekTime[urls[baseUrl].num].data[weekIndex] += Math.floor(week[i][j].time/1000/6)/10;
             }
           }
-        }       
+        }
         callback({
           options: {scaleShowVerticalLines: false,
             responsive: true,
             scales: {
               x: {stacked: true},
               y: {stacked: true},
-              
+
               yAxes: [
                 {
                   ticks: {beginAtZero: true},
@@ -310,7 +327,7 @@ export class StatisticsService {
       }
       if(noData){
         monthTime[monthForm].data = [];
-      } 
+      }
       callback({
         options: {scaleShowVerticalLines: false,
           elements: {
@@ -349,13 +366,13 @@ export class StatisticsService {
         let indexFromStack = monthTime.findIndex((e: any) => e.stack == stack);
         if(monthTime[indexFromStack]) {
           monthTime[indexFromStack] = {
-            data: monthData, 
+            data: monthData,
             label: monthNames[startTime.getMonth()],
             stack: stack
           };
         } else {
           monthTime.push({
-            data: monthData, 
+            data: monthData,
             label: monthNames[startTime.getMonth()],
             stack: stack
           });

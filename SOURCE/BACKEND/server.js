@@ -218,9 +218,9 @@ server.get("/logout", (req,res)=>{
 server.put("/user", authUser, (req, res) => {
   USER.updateUser(req.userID, req.body.username, (error, user)=>{
     if(error || !user) {
-      res.send({message: "error"});
+      res.send({message: "Username update failed"});
     } else {
-      res.send({message: "success", username: user.name});
+      res.send({message: "Username changed successfully", username: user.name});
     }
   });
 })

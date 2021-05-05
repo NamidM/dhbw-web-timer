@@ -49,4 +49,8 @@ export class HomeComponent implements OnInit {
       data: {sites: this.sites, type: 'daily', startTime: new Date()}
     });
   }
+
+  onImgError(event: any){
+    event.target.src = '/assets/images/defaultFavicon.png';
+  }
 }
