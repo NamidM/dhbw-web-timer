@@ -106,6 +106,10 @@
             </table>
           </div>
         </div>
+
+        <div *ngIf="!dayChart && !loading">
+          <app-not-found></app-not-found>
+        </div>
       </div>
     </mat-tab>
     <mat-tab label="Woche">
@@ -113,7 +117,7 @@
         <div class="col-3">
           <div class="center">
             <button mat-raised-button color="primary" class="post-btn" [disabled]="weekTime.length == 0" (click)="postStatistics('weekly')">Statistik posten</button><br><br>
-            <button mat-raised-button color="accent" class="addweek-btn" (click)="addWeek()">Woche hinzufügen</button>
+            <button mat-raised-button color="accent" class="addweek-btn" [disabled]="addedWeeks.length > 5" (click)="addWeek()">Woche hinzufügen</button>
           </div>
           <ng-container *ngFor="let addedWeek of addedWeeks; index as i">
             <form class="week-form center" onsubmit="return false;">
@@ -154,7 +158,7 @@
         <div class="col-3">
           <div class="center">
             <button mat-raised-button color="primary" class="post-btn" [disabled]="monthDataValid" (click)="postStatistics('monthly')">Statistik posten</button><br><br>
-            <button mat-raised-button color="accent" class="addmonth-btn" (click)="addMonth()">Monat hinzufügen</button>
+            <button mat-raised-button color="accent" class="addmonth-btn" [disabled]="addedMonths.length > 5" (click)="addMonth()">Monat hinzufügen</button>
           </div>
           <ng-container *ngFor="let addedMonth of addedMonths; index as i">
             <form class="month-form center" onsubmit="return false;">
@@ -192,7 +196,7 @@
     </mat-tab>
     <mat-tab label="Gesamt">
       <div class="total-wrapper">
-        <div class="funfacts">
+        <div class="funfacts" *ngIf="totalChart">
           <mat-card class="funfact">
             <h3 class="headline"> <b>Gesamtzeit:</b></h3><p>{{allData.allTime}}</p>
           </mat-card>
@@ -295,6 +299,9 @@
 
             </table>
           </div>
+        </div>
+        <div *ngIf="!totalChart">
+          <app-not-found></app-not-found>
         </div>
       </div>
     </mat-tab>

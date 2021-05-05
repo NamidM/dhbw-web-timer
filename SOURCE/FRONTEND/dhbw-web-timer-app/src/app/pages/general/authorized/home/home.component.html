@@ -10,8 +10,8 @@
 </div>
 <div *ngIf="authService.username" class="container main-page">
   <h3 class="center">Statistik für: Heute</h3>
-  <div *ngIf="!dayChart">
-    <h3>Noch keine Einträge für heute!</h3>
+  <div *ngIf="!dayChart && !loading">
+    <app-not-found></app-not-found>
   </div>
   <div class="wrapper" *ngIf="dayChart">
     <div style="display: block" id="dayChart" class="chart">

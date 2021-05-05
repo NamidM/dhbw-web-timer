@@ -16,12 +16,9 @@ export class HomeComponent implements OnInit {
   public dayChart: any;
   public sites: Site[] = [];
   public site: any;
+  public loading: boolean = true;
   public displayedColumns: string[] = ['favicon', 'url', 'visits', 'percentage', 'time'];
   public generalInformation: any;
-
-
-  public imageToShow: any;
-  public isImageLoading: boolean = false;
 
   constructor(public authService: AuthService, private statisticsService: StatisticsService, private dialog: MatDialog, private router: Router) { }
 
@@ -29,11 +26,12 @@ export class HomeComponent implements OnInit {
     let currentTime = new Date();
     let millisecondsInDay = currentTime.getHours()*60*60*1000 + currentTime.getMinutes()*60*1000;
     let startOfDay = currentTime.getTime() - millisecondsInDay;
-    this.statisticsService.getDougnutChart(startOfDay, currentTime.getTime(), (chart: any, sites: any, allData:any, generalInformation: any) => {
+    this.statisticsService.getDonutChart(startOfDay, currentTime.getTime(), (chart: any, sites: any, allData:any, generalInformation: any) => {
       this.dayChart = chart;
       this.sites = sites;
       this.site = generalInformation;
       this.generalInformation = generalInformation;
+      this.loading = false;
     });
   }
 

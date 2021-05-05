@@ -78,10 +78,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-
 function pushNewTabEntry(id){
   chrome.tabs.get(id, (x)=>{
-    if(x.url !== "chrome://newtab/" && x.url !== "" && !x.url.startsWith("chrome://")) {
+    if(x.url !== "chrome://newtab/" && x.url !== "" && !x.url.startsWith("chrome://") && !x.url.startsWith("file://")) {
       getActiveTab(activeTab=>{
         if(activeTab){
           let currentTime = new Date().getTime();
@@ -145,11 +144,7 @@ function updateTabEntry (id, isCloseEvent) {
 }
 
 function getFavicon(tab){
-  var favicon = tab.favIconUrl;
-  if (favicon === undefined) {
-    favicon = 'chrome://favicon/'; //+ tab.url;
-  }
-  console.log(favicon);
+  let favicon = favicon? tab.favIconUrl : 'chrome://favicon/';
   return favicon;
 }
 
@@ -188,7 +183,6 @@ function sendTab(tabToSend, sync){
           setActiveTab(null);
         }
       }
-      console.log("Sending data", tabToSend);
       postData(base_url + 'webActivity', tabToSend)
       .then(async response => {
         if(response.status == 200) {

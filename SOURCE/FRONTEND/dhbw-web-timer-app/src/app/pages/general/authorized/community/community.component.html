@@ -44,4 +44,7 @@
             (page)="handlePage($event)">
         </mat-paginator>
     </div>
+    <div *ngIf="length == 0" class="container not-found">
+        <app-not-found></app-not-found>
+    </div>
 </div>

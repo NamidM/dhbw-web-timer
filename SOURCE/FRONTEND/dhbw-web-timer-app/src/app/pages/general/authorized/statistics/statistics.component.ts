@@ -25,6 +25,7 @@ export class StatisticsComponent implements OnInit {
   public monthDataValid: boolean = false;
   public sites: Site[] = [];
   public site: any;
+  public loading: boolean = true;
   public sitesTotal: Site[] = [];
   public siteTotal: any;
 
@@ -37,9 +38,6 @@ export class StatisticsComponent implements OnInit {
   rangeDay = new FormGroup({
     startDay: new FormControl()
   });
-
-  public imageToShow: any;
-  public isImageLoading: boolean = false;
 
   constructor(private formBuilder: FormBuilder, private statisticsService: StatisticsService, private dialog: MatDialog) {
   }
@@ -62,7 +60,7 @@ export class StatisticsComponent implements OnInit {
     this.addedMonths[0].controls["endMonth"].setValue(endOfMonth);
 
     this.updateDayChart(new Date());
-    this.statisticsService.getDougnutChart(0, new Date().getTime(), (chart: any, sites: any, allData: any, generalInformation: any)=>{
+    this.statisticsService.getDonutChart(0, new Date().getTime(), (chart: any, sites: any, allData: any, generalInformation: any)=>{
       this.totalChart = chart;
       this.sitesTotal = sites;
       this.allData = allData? allData : {};
@@ -136,11 +134,12 @@ export class StatisticsComponent implements OnInit {
     let millisecondsInDay = day.getHours()*60*60*1000 + day.getMinutes()*60*1000 + day.getSeconds()*1000;
     let startOfDay = day.getTime() - millisecondsInDay;
     let endOfDay = startOfDay + 24*60*60*1000;
-    this.statisticsService.getDougnutChart(startOfDay, endOfDay, (chart: any, sites: any, allData: any, generalInformation: any) =>{
+    this.statisticsService.getDonutChart(startOfDay, endOfDay, (chart: any, sites: any, allData: any, generalInformation: any) =>{
       this.dayChart = chart;
       this.sites = sites;
       this.site = generalInformation;
       this.generalInformationTag = generalInformation;
+      this.loading = false;
     })
   }
 
@@ -216,7 +215,7 @@ export class StatisticsComponent implements OnInit {
   }
 
   addMonth(){
-    if(this.addedMonths.length <= 4) {
+    if(this.addedMonths.length <= 5) {
       this.addedMonths.push(this.formBuilder.group({
         startMonth: new FormControl(),
         endMonth: new FormControl(),

@@ -92,7 +92,7 @@ export class StatisticsService {
     });
   }
 
-  getDougnutChart(startTime: number, endTime: number, callback: Function) {
+  getDonutChart(startTime: number, endTime: number, callback: Function) {
     let siteNames: String[] = [];
     let times: number[] = [];
     this.apiService.getWebActivitiesInTimespan(startTime.toString(), endTime.toString()).subscribe((timespanData : any) => {
@@ -104,7 +104,6 @@ export class StatisticsService {
         let timespan:number = entry.endtime - entry.starttime;
         let index = this.findIndexOfSiteWithURL(sites, baseUrl);
         first = Math.min(first, entry.starttime);
-
         if(index == -1){
           sites.push({url: baseUrl, time: timespan, favicon: entry.faviconUrl, percentage: 0, visits: 1, prettyTime: ""});
         } else{
@@ -145,11 +144,13 @@ export class StatisticsService {
         totalTime += sites[i].time;
         totalVisits += sites[i].visits;
       }
-      generalInformation.url = "Gesamtdaten:";
-      generalInformation.favicon = "/assets/images/logo.png"
-      generalInformation.prettyTime = this.getPrettyTime(totalTime);
-      generalInformation.percentage = "100%";
-      generalInformation.visits = totalVisits;
+      generalInformation = {
+        url: "Gesamtdaten:",
+        favicon: "/assets/images/logo.png",
+        prettyTime: this.getPrettyTime(totalTime),
+        percentage: "100%",
+        visits: totalVisits
+      }
 
       if(sites.length > 0) {
         let bestSite = siteNames[times.indexOf(Math.max(...times))] != "Andere" 
@@ -179,7 +180,6 @@ export class StatisticsService {
         callback(null);
       }
     });
-
   }
 
   getBarChart(startTime: any, endTime: any, weekTime: any, weekForm: number, callback: Function) {
@@ -303,14 +303,9 @@ export class StatisticsService {
     if(startTime == undefined || endTime == undefined) {
       monthTime = monthTime.filter((e: any) => e.stack != monthForm);
       let labels = [];
-      let noData = true;
       for(let i = 0; i < 31; i++){
         labels[i] = i+1;
-        if(monthTime[monthForm].data[i]) noData = false;
       }
-      if(noData){
-        monthTime[monthForm].data = [];
-      } 
       callback({
         options: {scaleShowVerticalLines: false,
           elements: {

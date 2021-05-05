@@ -39,6 +39,7 @@ import { PostDialogComponent } from './shared/dialogs/post-dialog/post-dialog.co
 import { CommunityComponent } from './pages/general/authorized/community/community.component';
 import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import {MatExpansionModule} from '@angular/material/expansion';
+import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 
 registerLocaleData(localeDe);
 
@@ -78,6 +79,7 @@ export class MatPaginatorIntlDE extends MatPaginatorIntl {
     UpdateDialogComponent,
     PostDialogComponent,
     CommunityComponent,
+    NotFoundComponent,
   ],
   imports: [
     BrowserModule,
