@@ -98,8 +98,8 @@ export class StatisticsService {
     this.apiService.getWebActivitiesInTimespan(startTime.toString(), endTime.toString()).subscribe( async (timespanData : any) => {
       let sites: any[] = [];
       let first = Infinity;
-
-      for(let entry of timespanData){
+      for(let i = 0; i<timespanData.length; i++){
+        let entry = timespanData[i];
         let baseUrl:string = entry.url.split('/')[2];
         let timespan:number = entry.endtime - entry.starttime;
         let index = this.findIndexOfSiteWithURL(sites, baseUrl);

@@ -2,8 +2,7 @@
     "manifest_version": 3, 
     "version": "1.0", 
     "name": "DHBW Web-Timer",
-    "description": "DHBW web Timer Extension",
-    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA14eUFlOh4EDvjR3oLJXNwfyDoVs5mRcHh54uWmwX5Wg9f74FPyWTZyiv8YSUbkTmWCNizKCZKwzhAb14GUNMRVEPOH3tV75T/7KbPUGPWlvZL9mMI+4l3cWz243zehoJwOgpqIMFcIFIC4iFpi8AZ6uXQUy5fOoj4FZ124yYdZSebHAl7RHZHGQKpONElEDkO+cdBeVs0usheQCZgxCoJuPQdf+ZDPPzsMsaBX2auQ3tRRov9W8bS9AoOmFO0OuJZE+0HD7zyDuC4QMr9BldZvi0iByMYblWxwFljzZ0cM9JqesKQo/bg1cO4/M1Tuk9AKGC6U/NtVGVL2Yu/oyi1QIDAQAB",
+    "description": "Eine Extension zum tracken der Nutzungszeit auf verschiedenen Webseiten",
     "action": {
         "default_popup": "popup.html",
         "default_icon": {
@@ -26,5 +25,5 @@
         "http://*/", 
         "https://*/"
     ],
-    "permissions": ["storage", "activeTab", "scripting", "background", "webNavigation", "tabs","notifications", "identity"]
+    "permissions": ["storage", "activeTab", "scripting", "background", "tabs", "identity"]
 }

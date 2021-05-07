@@ -51,11 +51,7 @@ server.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 server.use(bodyParser.json());
 server.use(cookieParser());
 /* Start mongo connection */
-if(production) {
-    mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_DOMAIN}:${process.env.DB_PORT}/${process.env.DB_TABLE}?authSource=admin`);
-} else {
-    mongoose.connect(`mongodb://${process.env.DB_DOMAIN}:${process.env.DB_PORT}/${process.env.DB_TABLE}`);
-}
+mongoose.connect(`mongodb://${process.env.DB_DOMAIN}:${process.env.DB_PORT}/${process.env.DB_TABLE}`);
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 

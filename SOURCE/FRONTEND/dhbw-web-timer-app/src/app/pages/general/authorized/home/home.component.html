@@ -4,7 +4,7 @@
   <h3>Um diese Seite zu benutzen müssen Sie eingeloggt sein!</h3><br>
   <label >Noch kein Account?</label><br>
   <button class="register-btn" mat-raised-button color="primary" (click)="authService.sendRegisterRequest()">Registrieren mit Google</button><br><br>
-  <h3 *ngIf="registerFailed" class="failed">Fehler: Account bereits registriert</h3>
+  <h3 *ngIf="registerFailed" class="failed">Fehler: Registrierung fehlgeschlagen</h3>
   <label>Bereits registriert?</label><br>
   <button mat-raised-button color="accent" (click)="authService.sendLoginRequest()">Einloggen mit Google</button>
   <h3 *ngIf="loginFailed" class="failed">Fehler: Account ist nicht registriert</h3>

@@ -4,8 +4,7 @@ const USER = module.exports = mongoose.model("User", mongoose.Schema({
     /* Username -> Can be changed */
     name: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     /* googleId -> locked to google Account */
     googleId: {

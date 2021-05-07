@@ -47,6 +47,8 @@ export class RegisterComponent implements OnInit {
         this.authService.loginUser(response.username);
         this.snackBarService.openSnackBar("Registriert!", "Ok");
         this.router.navigateByUrl("/");
+      } else {
+        this.router.navigate(["/"], {state: {registerFailed: true}});
       }
     });
   }

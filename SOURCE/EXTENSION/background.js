@@ -1,6 +1,6 @@
 const TIMELIMIT = 30000;
 let username, tracking;
-const base_url = 'http://127.0.0.1:3000/'
+const base_url = 'https://gruppe10.testsites.info:3000/'
 /* Send request too backend to check if user is logged in */
 fetch(base_url + 'silentLogin')
 .then(response => response.json())
@@ -21,28 +21,32 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       .then(response => response.json())
       .then(data => {
         /* Start oAuth window */
+        console.log(data.url)
         chrome.identity.launchWebAuthFlow({
           url: data.url,
           interactive: true
         }, function(redirect_url) {
           /* Extract id_token and auth_code from url */
-          let id_token = redirect_url.substring(redirect_url.indexOf('id_token=') + 9)
-          id_token = id_token.substring(0, id_token.indexOf('&'));
-          let authorization_code = redirect_url.substring(redirect_url.indexOf('code=') + 5);
-          authorization_code = authorization_code.substring(0, authorization_code.indexOf('&'));
-          /* Send both to backend to login user */
-          fetch(`${base_url}login?authorization_code=${authorization_code}&id_token=${id_token}&extension=true`)
-          .then(response => response.json())
-          .then(data => {
-            if(data.message == "error") {
-              // TODO add message that login failed
-            } else {
+          if(redirect_url) {
+            let id_token = redirect_url.substring(redirect_url.indexOf('id_token=') + 9)
+            id_token = id_token.substring(0, id_token.indexOf('&'));
+            let authorization_code = redirect_url.substring(redirect_url.indexOf('code=') + 5);
+            authorization_code = authorization_code.substring(0, authorization_code.indexOf('&'));
+            /* Send both to backend to login user */
+            fetch(`${base_url}login?authorization_code=${authorization_code}&id_token=${id_token}&extension=true`)
+            .then(response => response.json())
+            .then(data => {
+              if(data.message == "success") {
+                startTracking();
+              }
               username = data.username;
               chrome.runtime.sendMessage({message: 'login', username: username});
-              startTracking();
-            }
-            return true;
-          });
+              return true;
+            });
+          } else {
+            /* If no redirect_url was given -> Login failed */
+            chrome.runtime.sendMessage({message: 'login', username: null});
+          }
         });
       });
     }
@@ -190,13 +194,7 @@ function sendTab(tabToSend, sync){
           setActiveTab(null);
         }
       }
-      postData(base_url + 'webActivity', tabToSend)
-      .then(async response => {
-        if(response.status != 200) {
-          // TODO add message that sending failed
-          console.log("Failed to reach backend")
-        }
-      });
+      postData(base_url + 'webActivity', tabToSend);
     }
   }
 }

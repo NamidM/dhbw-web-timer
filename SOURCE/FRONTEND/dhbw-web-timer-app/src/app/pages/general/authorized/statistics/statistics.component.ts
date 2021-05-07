@@ -120,7 +120,6 @@ export class StatisticsComponent implements OnInit {
     this.statisticsService.getBarChart(startOfWeek?.getTime(), endOfWeek?.getTime(), this.weekTime, weekForm, (chart: any, weekTime: any)=>{
       this.weekChart = chart;
       this.weekTime = weekTime;
-      console.log(weekTime)
       if(this.weekTime.length == 0 || this.weekTime[0].data.length == 0) this.weekTimeIvalid = true;
       else this.weekTimeIvalid = false;
     })
