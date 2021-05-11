@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HomeComponent } from './pages/general/authorized/home/home.component';
 import { AboutComponent } from './pages/general/about/about.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
@@ -40,6 +40,7 @@ import { CommunityComponent } from './pages/general/authorized/community/communi
 import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
+import { ApiInterceptorInterceptor } from './interceptors/api-interceptor.interceptor';
 
 registerLocaleData(localeDe);
 
@@ -109,7 +110,8 @@ export class MatPaginatorIntlDE extends MatPaginatorIntl {
   providers: [
     CookieService,
     { provide: LOCALE_ID, useValue: 'de-DE' },
-    { provide: MatPaginatorIntl, useClass: MatPaginatorIntlDE}
+    { provide: MatPaginatorIntl, useClass: MatPaginatorIntlDE},
+    { provide: HTTP_INTERCEPTORS, useClass: ApiInterceptorInterceptor, multi: true }
   ]
 })
 export class AppModule { }

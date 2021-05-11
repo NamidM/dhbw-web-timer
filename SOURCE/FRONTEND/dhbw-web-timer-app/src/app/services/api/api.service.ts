@@ -65,7 +65,7 @@ export class ApiService {
     params = params.append('startTime', startTime);
     params = params.append('endTime', endTime);
 
-    return this.http.get(`${this.baseUrl}webActivities`, { params: params, withCredentials: true});
+    return this.http.get<{webActivities?: any}>(`${this.baseUrl}webActivities`, { params: params, withCredentials: true});
   }
 
   postStatistics(title: string, content: string, type: 'daily' | 'weekly' | 'monthly' | 'total', sites: any[], startTime: any) {

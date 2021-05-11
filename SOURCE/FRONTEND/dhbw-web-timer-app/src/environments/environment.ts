@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   baseUrl: "http://localhost:3000/",
-  extension_link: "http://www.google.de"
+  extension_link: "https://chrome.google.com/webstore/detail/dhbw-web-timer/hodkhjecjnmdpcfehkjncedmpleancdd/"
 };
 
 /*

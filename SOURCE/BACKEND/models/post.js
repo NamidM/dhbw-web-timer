@@ -85,7 +85,7 @@ module.exports.getPosts = (callback, limit)=>{
     /* Join post on user.googleID = post.userID and sort by date */
     POST.aggregate([
         { $sort: {"postTime": -1} },
-        { $lookup: { from: "users", localField: 'googleId', foreignField: 'userID', as: "users"} }
+        { $lookup: { from: "users", localField: 'userID', foreignField: 'googleId', as: "users"} }
     ], callback);
 };
 /* Function to delete post by _id */

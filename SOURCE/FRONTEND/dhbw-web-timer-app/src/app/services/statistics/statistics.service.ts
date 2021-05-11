@@ -190,6 +190,7 @@ export class StatisticsService {
 
   testImage(url: any) : any {
     const imgPromise = new Promise(function imgPromise(resolve, reject) {
+      setTimeout(()=>{reject("/assets/images/defaultFavicon.png");}, 100)
       const imgElement = new Image();
       imgElement.onload = () => resolve(url);
       imgElement.onerror = () => reject("/assets/images/defaultFavicon.png");
@@ -209,7 +210,6 @@ export class StatisticsService {
           scales: {
             x: {stacked: true},
             y: {stacked: true},
-
             yAxes: [
               {
                 ticks: {beginAtZero: true},
@@ -298,7 +298,6 @@ export class StatisticsService {
             scales: {
               x: {stacked: true},
               y: {stacked: true},
-
               yAxes: [
                 {
                   ticks: {beginAtZero: true},

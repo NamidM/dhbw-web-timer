@@ -8,7 +8,7 @@
                 <mat-card-title>{{post.title}} <span class="type">({{post.typeText}})</span></mat-card-title>
                 <mat-card-subtitle>Gepostet am: {{post.postTime | date:"dd.MM.yyyy HH:mm"}} von <b>{{post.username}}</b></mat-card-subtitle>
                 <button mat-mini-fab color="warn" class="delete-btn" *ngIf="post.self" (click)="deletePost(post._id)">
-                    <mat-icon>delete</mat-icon>
+                    <span class="mat-icon">delete</span>
                 </button>
             </mat-card-header>
             <mat-card-content>

@@ -1,9 +1,7 @@
 .username{
     margin-right: 0.5vw;
-    opacity: 100% !important;
     color: black !important;
     position: relative;
-    top: -6px;
 }
 .settings, .account {
     position: relative;
@@ -17,4 +15,8 @@
 }
 .logo {
     width: 40px;
+}
+.mat-icon {
+    font-family: 'Material Icons';
+    font-size: x-large;
 }

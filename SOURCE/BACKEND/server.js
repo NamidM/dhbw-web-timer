@@ -81,7 +81,9 @@ authUser = (req, res, next) => {
       }, (data)=>{
         if(data.error || !data.id_token) {
           /* Google request failed */
-          res.send({message: "error"});
+          res.clearCookie('refresh_token');
+          res.clearCookie('id_token');
+          res.send({message: "error", logout: true});
         } else {
           /* Set id_token cookie */
           let decodedIT = jwt.decode(data.id_token);
@@ -96,7 +98,9 @@ authUser = (req, res, next) => {
       });
     } else {
       /* Unauthorized -> No refresh token given */
-      res.send({message: "error"});
+      res.clearCookie('refresh_token');
+      res.clearCookie('id_token');
+      res.send({message: "error", logout: true});
     }
   }
 }

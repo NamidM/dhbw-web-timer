@@ -21,10 +21,10 @@
       </ul>
       <ul class="navbar-nav my-2 my-sm-0" *ngIf="authService.username">
         <li class="nav-item" [class.active]="router.isActive('/about', true)">
-          <span class="username nav-link">
-            <mat-icon class="account" aria-hidden="false">account_circle</mat-icon>
+          <span class="username">
+            <span icon class="account mat-icon" aria-hidden="false">account_circle</span>
             <b>{{authService.username}}</b>
-            <mat-icon class="settings" aria-hidden="false" [routerLink]="['/settings']">settings</mat-icon>
+            <span class="settings mat-icon" aria-hidden="false" [routerLink]="['/settings']">settings</span>
           </span>
         </li>
         <li class="nav-item" [class.active]="router.isActive('/about', true)">

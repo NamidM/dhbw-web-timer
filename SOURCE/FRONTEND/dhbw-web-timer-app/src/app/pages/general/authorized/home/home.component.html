@@ -38,7 +38,7 @@
           <b><p class="title">{{site.url}}</p></b>
           <p>{{site.prettyTime}}</p>
           <p>{{site.percentage.toString() + "%"}}</p>
-          <p>{{"Visits: " + site.visits.toString()}}</p>
+          <p>{{"Besuche: " + site.visits.toString()}}</p>
         </div>
       </mat-card>
       <!-- Table -->
@@ -60,21 +60,21 @@
 
         <!-- Visits Column -->
         <ng-container matColumnDef="visits">
-          <th class="smallColumn" mat-header-cell *matHeaderCellDef>Visits</th>
+          <th class="smallColumn" mat-header-cell *matHeaderCellDef>Besuche</th>
           <td class="smallColumn" mat-cell *matCellDef="let site">{{ site.visits }}</td>
           <td class="smallColumn" mat-footer-cell *matFooterCellDef> {{generalInformation.visits}} </td>
         </ng-container>
 
         <!-- Percentage Column -->
         <ng-container matColumnDef="percentage">
-          <th class="smallColumn" mat-header-cell *matHeaderCellDef>Percentage</th>
+          <th class="smallColumn" mat-header-cell *matHeaderCellDef>Prozent</th>
           <td class="smallColumn" mat-cell *matCellDef="let site">{{ site.percentage }} %</td>
           <td class="smallColumn" mat-footer-cell *matFooterCellDef> 100 % </td>
         </ng-container>
 
         <!-- Time Column -->
         <ng-container matColumnDef="time">
-          <th mat-header-cell *matHeaderCellDef>Time spent</th>
+          <th mat-header-cell *matHeaderCellDef>Gesamtzeit</th>
           <td mat-cell *matCellDef="let site">{{ site.prettyTime }}</td>
           <td footer *matFooterCellDef="let site">{{ generalInformation.prettyTime }}</td>
         </ng-container>

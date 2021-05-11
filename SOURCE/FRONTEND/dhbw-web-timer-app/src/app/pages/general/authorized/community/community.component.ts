@@ -12,9 +12,9 @@ import { DeleteDialogComponent } from 'src/app/shared/dialogs/delete-dialog/dele
 })
 export class CommunityComponent implements OnInit {
 
-  public posts: any;
+  public posts: any = [];
   public sites: any = [];
-  public dataSource: any;
+  public dataSource: any = [];
 
   public currentPage = 0;
   pageSize: number = 5;
@@ -71,6 +71,8 @@ export class CommunityComponent implements OnInit {
 
         }
         this.dataSource = this.posts.slice(0, this.pageSize);
+      } else {
+        this.length = 0;
       }
     });
   }
