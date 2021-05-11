@@ -1,9 +1,11 @@
 # DHBW Web Timer
-
-![Logo](https://github.com/NamidM/dhbw-web-timer/blob/main/SOURCE/FRONTEND/dhbw-web-timer-app/src/assets/images/logo.png)
+<img src="https://github.com/NamidM/dhbw-web-timer/blob/main/SOURCE/FRONTEND/dhbw-web-timer-app/src/assets/images/logo.png" alt="drawing" width="300"/>
 
 Eine Extension zum tracken der Nutzungszeit auf verschiedenen Webseiten.
 
+## Mitwirkende
+- [Namid Marxen](https://github.com/NamidM)
+- [Johannes Timter](https://github.com/UdolfSeelenfrost)
 
 ## Über das Projekt
 
