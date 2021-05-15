@@ -21,7 +21,7 @@ export class StatisticsService {
     generalInformation.url = "Gesamtdaten:";
     generalInformation.favicon = "/assets/images/logo.png"
     generalInformation.prettyTime = this.getPrettyTime(totalTime);
-    generalInformation.percentage = "100%";
+    generalInformation.percentage = "100";
     generalInformation.visits = totalVisits;
     if(sites.length > 0) {
       callback({
@@ -154,7 +154,7 @@ export class StatisticsService {
         url: "Gesamtdaten:",
         favicon: "/assets/images/logo.png",
         prettyTime: this.getPrettyTime(totalTime),
-        percentage: "100%",
+        percentage: "100",
         visits: totalVisits
       }
 

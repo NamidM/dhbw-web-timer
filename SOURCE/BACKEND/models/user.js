@@ -4,7 +4,8 @@ const USER = module.exports = mongoose.model("User", mongoose.Schema({
     /* Username -> Can be changed */
     name: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     /* googleId -> locked to google Account */
     googleId: {
@@ -32,4 +33,8 @@ module.exports.deleteUser = (googleId, callback)=>{
 /* Function to update username */
 module.exports.updateUser = (googleId, name, callback)=>{
     USER.findOneAndUpdate({ googleId }, { name }, {new: true} , callback);
+};
+/* Function to find a username to check if the name exists */
+module.exports.findUsername = (name, callback)=>{
+    USER.findOne({ name }, {}, {}, callback);
 };

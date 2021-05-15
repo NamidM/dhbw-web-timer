@@ -102,3 +102,7 @@ module.exports.addPost = (title, content, userID, type, sites, postTime, time, c
         POST.create({title, content, userID, timeData: sites, postTime, type, time}, callback);
     }
 };
+/* Function to delete all posts from user */
+module.exports.deleteAllFromUser = (userID, callback)=>{
+    POST.deleteMany({ userID }, callback);
+};

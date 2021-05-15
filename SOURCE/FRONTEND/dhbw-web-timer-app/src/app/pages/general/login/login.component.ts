@@ -27,10 +27,10 @@ export class LoginComponent implements OnInit {
       this.apiService.login(id_token, authorization_code).subscribe((response)=>{
         if(response.message == "success") {
           this.authService.loginUser(response.username);
-          this.snackBarService.openSnackBar("Eingeloggt!", "Ok");
+          this.snackBarService.openSnackbarSuccess("Eingeloggt!");
           this.router.navigateByUrl("/");
         } else {
-          this.snackBarService.openSnackBar("Fehler: Account ist nicht registriert!", "Ok");
+          this.snackBarService.openSnackbarError("Fehler: Account ist nicht registriert!");
           this.router.navigate(["/"], {state: {loginFailed: true}});
           this.loading = false;
         }

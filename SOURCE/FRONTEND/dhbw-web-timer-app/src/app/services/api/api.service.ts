@@ -35,7 +35,7 @@ export class ApiService {
     params = params.append('id_token', id_token);
     params = params.append('authorization_code', authorization_code);
     params = params.append('username', username);
-    return this.http.get<{ message: 'success' | 'error', username?: string, userID?: string}>(`${this.baseUrl}register`, { params: params, withCredentials: true });
+    return this.http.get<{ message: 'success' | 'error', nameTaken?: boolean, username?: string, userID?: string}>(`${this.baseUrl}register`, { params: params, withCredentials: true });
   }
 
   deleteUser() {

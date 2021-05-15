@@ -60,6 +60,7 @@ export class AuthService {
     this.apiService.deleteUser().subscribe((response)=>{
       if(response.message == "success") {
         this.logout();
+        this.snackBarService.openSnackbarSuccess("Account erfolgreich gelöscht!");
       }
     });
   }
@@ -68,7 +69,9 @@ export class AuthService {
     this.apiService.updateUser(username).subscribe((response)=>{
       if(response.message == "success") {
         this.username = response.username;
-        this.snackBarService.openSnackBar("Benutzername erfolgreich geändert", "Ok");
+        this.snackBarService.openSnackbarSuccess("Benutzername erfolgreich geändert");
+      } else {
+        this.snackBarService.openSnackbarError("Benutzername bereits vergeben");
       }
     });
   }

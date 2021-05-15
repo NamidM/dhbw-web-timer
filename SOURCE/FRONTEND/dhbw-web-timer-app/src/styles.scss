@@ -37,3 +37,20 @@ $dhbw-web-timer-app-theme: mat-light-theme((
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+.mat-snackbar-success {
+  color: white;
+  background-color: #4caf50;
+  .mat-simple-snackbar-action {
+    color: white;
+  }
+}
+
+.mat-snackbar-error {
+  color: white;
+  background-color: #f44336;
+  .mat-simple-snackbar-action {
+    color: white;
+  }
+}

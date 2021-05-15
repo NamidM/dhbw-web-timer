@@ -63,10 +63,10 @@ export class PostDialogComponent implements OnInit {
   post() {
     this.apiService.postStatistics(this.postForm.controls.title.value, this.postForm.controls.content.value, this.data.type, this.data.sites, this.data.startTime).subscribe((response)=>{
       if(response.message == "success") {
-        this.snackService.openSnackBar("Post erfolgreich hochgeladen", "Ok");
+        this.snackService.openSnackbarSuccess("Post erfolgreich hochgeladen");
         this.router.navigateByUrl("/community");
       } else {
-        this.snackService.openSnackBar("Fehler beim hochladen", "Ok");
+        this.snackService.openSnackbarError("Fehler beim hochladen");
       }
       this.dialogRef.close(response);
     });

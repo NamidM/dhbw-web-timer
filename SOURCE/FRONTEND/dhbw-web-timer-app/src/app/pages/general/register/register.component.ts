@@ -45,8 +45,10 @@ export class RegisterComponent implements OnInit {
     this.apiService.register(this.id_token, this.authorization_code, this.registerForm.controls['username'].value).subscribe((response)=>{
       if(response.message == "success") {
         this.authService.loginUser(response.username);
-        this.snackBarService.openSnackBar("Registriert!", "Ok");
+        this.snackBarService.openSnackbarSuccess("Registriert!");
         this.router.navigateByUrl("/");
+      } else if(response.nameTaken) {
+        this.snackBarService.openSnackbarError("Benutzername bereits vergeben!");
       } else {
         this.router.navigate(["/"], {state: {registerFailed: true}});
       }

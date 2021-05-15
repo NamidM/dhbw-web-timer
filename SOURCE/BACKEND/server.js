@@ -180,6 +180,7 @@ server.delete("/user", authUser, (req, res) => {
       res.send({message: "success"});
       /* If user was successfully deleted, also delete posts from that user */
       WEBACTIVITY.deleteAllFromUser(req.userID, ()=>{});
+      POST.deleteAllFromUser(req.userID, ()=>{});
     }
   });
 })
@@ -227,45 +228,51 @@ server.get("/registerCheck", (req,res)=>{
 /* Endpoint to register user */
 server.get("/register", (req,res)=>{
   if(req.query.authorization_code && req.query.id_token) {
-    /* Send request to google servers with authorization code */
-    googleRequest({
-      'code': req.query.authorization_code,
-      'grant_type': 'authorization_code',
-      'client_id': process.env.CLIENT_ID,
-      'client_secret': process.env.CLIENT_SECRET,
-      'redirect_uri': redirect_uri + "register"
-    }, (data) => {
-      if(data.error || !data.refresh_token || !data.id_token) {
-        /* Google request failed */
-        res.send({message: "error"});
-      } else {
-        try {
-          let decoded = jwt.decode(req.query.id_token);
-          USER.addUser(req.query.username, decoded.sub, (error, user)=>{
-            if(error || !user) {
-              /* User could not be added */
+    USER.findUsername(req.query.username, (error, user)=>{
+      if(!error && !user) {
+        /* Send request to google servers with authorization code */
+        googleRequest({
+          'code': req.query.authorization_code,
+          'grant_type': 'authorization_code',
+          'client_id': process.env.CLIENT_ID,
+          'client_secret': process.env.CLIENT_SECRET,
+          'redirect_uri': redirect_uri + "register"
+        }, (data) => {
+          if(data.error || !data.refresh_token || !data.id_token) {
+            /* Google request failed */
+            res.send({message: "error"});
+          } else {
+            try {
+              let decoded = jwt.decode(req.query.id_token);
+              USER.addUser(req.query.username, decoded.sub, (error, user)=>{
+                if(error || !user) {
+                  /* User could not be added */
+                  res.send({message: "error"});
+                } else {
+                  /* Set cookies for refresh_token and id_token */
+                  res.cookie('refresh_token', data.refresh_token,  
+                    { maxAge: 7*24*60*60*1000,
+                      httpOnly: true,
+                      secure: production
+                    });
+                  res.cookie('id_token', data.id_token,  
+                    { maxAge: 60*60*1000,
+                      httpOnly: true,
+                      secure: production
+                    });
+                  getUserName(decoded.sub, (username)=>{
+                    res.send({message: "success", username: username});
+                  })
+                }
+              });
+            } catch(e) {
+              /* ID_token is invalid */
               res.send({message: "error"});
-            } else {
-              /* Set cookies for refresh_token and id_token */
-              res.cookie('refresh_token', data.refresh_token,  
-                { maxAge: 7*24*60*60*1000,
-                  httpOnly: true,
-                  secure: production
-                });
-              res.cookie('id_token', data.id_token,  
-                { maxAge: 60*60*1000,
-                  httpOnly: true,
-                  secure: production
-                });
-              getUserName(decoded.sub, (username)=>{
-                res.send({message: "success", username: username});
-              })
-            }
-          });
-        } catch(e) {
-          /* ID_token is invalid */
-          res.send({message: "error"});
-        } 
+            } 
+          }
+        });
+      } else {
+        res.send({message: "error", nameTaken: true});
       }
     });
   } else {
