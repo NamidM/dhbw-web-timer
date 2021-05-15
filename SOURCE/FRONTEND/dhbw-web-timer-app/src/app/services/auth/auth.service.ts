@@ -13,19 +13,19 @@ export class AuthService {
   public username?: string;
 
   constructor(private apiService: ApiService, private router: Router, private snackBarService: SnackBarService) {}
-
+  /* Function to register user */
   sendRegisterRequest(){
     this.apiService.getOAuthUrl("register").subscribe((response)=>{
       window.location.href = response.url;
     });
   }
-
+  /* Function to login user */
   sendLoginRequest(){
     this.apiService.getOAuthUrl("login").subscribe((response)=>{
       window.location.href = response.url;
     });
   }
-
+  /* Function to logout user */
   logout() {
     this.apiService.logout().subscribe((response)=> {
       if(response.message == "success") {
@@ -34,12 +34,12 @@ export class AuthService {
       }
     });
   }
-
+  /* Function to set username */
   loginUser(username?: string) {
     this.loading = false;
     this.username = username;
   }
-
+  /* Function to check if user is logged in */
   silentLogin(callback: Function) {
     this.apiService.silentLogin().subscribe((response)=>{
       this.loading = false;
@@ -55,7 +55,7 @@ export class AuthService {
       }
     });
   }
-
+  /* Function to delete user */
   deleteUser() {
     this.apiService.deleteUser().subscribe((response)=>{
       if(response.message == "success") {
@@ -64,7 +64,7 @@ export class AuthService {
       }
     });
   }
-
+  /* Function to update username */
   updateUser(username: any) {
     this.apiService.updateUser(username).subscribe((response)=>{
       if(response.message == "success") {

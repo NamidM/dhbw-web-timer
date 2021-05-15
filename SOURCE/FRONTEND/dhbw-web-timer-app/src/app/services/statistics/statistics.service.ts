@@ -7,7 +7,7 @@ import { ApiService } from '../api/api.service';
 export class StatisticsService {
 
   constructor(private apiService: ApiService) { }
-
+  /* Function to show donut chart */
   showDoughnutChart(sites: any, callback: Function) {
     let siteNames = [];
     let times = [];
@@ -42,7 +42,7 @@ export class StatisticsService {
       callback(null);
     }
   }
-
+  /* Function to show bar chart */
   showBarChart(sites: any, callback: Function) {
     callback({
       options: {scaleShowVerticalLines: false,
@@ -68,7 +68,7 @@ export class StatisticsService {
       data: sites
     })
   }
-
+  /* Function to show line chart */
   showLineChart(sites: any, callback: Function) {
     let labels = [];
     for(let i = 0; i < 31; i++){
@@ -91,7 +91,7 @@ export class StatisticsService {
       data: sites
     });
   }
-
+  /* Function to get donut chart data */
   getDonutChart(startTime: number, endTime: number, callback: Function) {
     let siteNames: String[] = [];
     let times: number[] = [];
@@ -104,23 +104,19 @@ export class StatisticsService {
         let timespan:number = entry.endtime - entry.starttime;
         let index = this.findIndexOfSiteWithURL(sites, baseUrl);
         first = Math.min(first, entry.starttime);
-
         await this.testImage(entry.faviconUrl).catch((url: any) => {
           entry.faviconUrl = url;
         });
-
         if(index == -1){
           sites.push({url: baseUrl, time: timespan, favicon: entry.faviconUrl, percentage: 0, visits: 1, prettyTime: ""});
         } else{
           sites[index].time += timespan;
           sites[index].visits++;
-
           if(sites[index].favicon.startsWith("chrome://") && !entry.faviconUrl.startsWith("chrome://")){
             sites[index].favicon = entry.faviconUrl;
           }
         }
       }
-
       sites.sort((a: any, b: any)=>{
         return b.time-a.time;
       });
@@ -136,7 +132,6 @@ export class StatisticsService {
       sites.sort((a: any, b: any)=>{
         return b.time-a.time;
       });
-
       sites = this.setPercentage(sites);
       sites = this.setPrettyTime(sites);
       let sum = 0;
@@ -157,7 +152,6 @@ export class StatisticsService {
         percentage: "100",
         visits: totalVisits
       }
-
       if(sites.length > 0) {
         let bestSite = siteNames[times.indexOf(Math.max(...times))] != "Andere"
         ? siteNames[0]
@@ -187,7 +181,7 @@ export class StatisticsService {
       }
     });
   }
-
+  /* Function to check if favicon can be loaded */
   testImage(url: any) : any {
     const imgPromise = new Promise(function imgPromise(resolve, reject) {
       setTimeout(()=>{reject("/assets/images/defaultFavicon.png");}, 100)
@@ -198,7 +192,7 @@ export class StatisticsService {
     });
     return imgPromise;
   }
-
+  /* Function to get bar chart data */
   getBarChart(startTime: any, endTime: any, weekTime: any, weekForm: number, callback: Function) {
     if(startTime == undefined || weekTime == undefined) {
       if(weekTime.length > 0) {
@@ -268,7 +262,6 @@ export class StatisticsService {
               week[i].splice(9, 0, others);
               week[i].splice(10, week[i].length-1);
             }
-
             for(let j = 0; j < week[i].length; j++) {
               let baseUrl = week[i][j].url;
               startTime.setTime(week[i][j].startTime);
@@ -317,7 +310,7 @@ export class StatisticsService {
       });
     }
   }
-
+  /* Function to get line chart data */
   getLineChart(startTime: any, endTime: any, monthTime: any, monthForm: any, callback: Function) {
     if(startTime == undefined || endTime == undefined) {
       monthTime = monthTime.filter((e: any) => e.stack != monthForm);
@@ -402,8 +395,7 @@ export class StatisticsService {
       });
     }
   }
-
-
+  /* Function to get time string */
   getPrettyTime(milliseconds: number){
     let totalHours = Math.floor(milliseconds / 1000 / 60 / 60);
     let remainingTime = milliseconds - (totalHours * 60 * 60 * 1000);
@@ -412,41 +404,37 @@ export class StatisticsService {
     let totalSeconds = Math.floor(remainingTime / 1000);
     return totalHours + "h " + totalMinutes + "m " + totalSeconds + "s";
   }
-
+  /* Function to get date string */
   getPrettyDate(milliseconds: number) {
     let date = new Date(milliseconds);
     let d = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
     let m = date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth();
     return d + "." + m + "." + date.getFullYear();
   }
-
+  /* Function to find index of site */
   findIndexOfSiteWithURL(sites: any[], url: any){
     for(let i=0; i<sites.length; i++){
       let site = sites[i];
-
       if(typeof site.url !== "undefined" && site.url.localeCompare(url) == 0){
         return i;
       }
     }
     return -1;
   }
-
+  /* Function to get percentage string */
   setPercentage(sites: any[]){
     let completeTime: number = 0;
-
     for(let i=0; i<sites.length; i++){
       completeTime += sites[i].time;
     }
-
     for(let i=0; i<sites.length; i++){
       let percent = (sites[i].time/completeTime) * 100;
       let rounded =  Math.round(percent * 10) / 10;
       sites[i].percentage = rounded;
     }
-
     return sites;
   }
-
+  /* Function to set time string */
   setPrettyTime(sites: any[]){
     for(let i=0; i<sites.length; i++){
       sites[i].prettyTime = this.getPrettyTime(sites[i].time);

@@ -5,7 +5,7 @@
     <ng-container *ngFor="let post of dataSource; index as i">
         <mat-card class="example-card">
             <mat-card-header class="post-header">
-                <mat-card-title>{{post.title}} <span class="type">({{post.typeText}})</span></mat-card-title>
+                <mat-card-title class="title-txt">{{post.title}} <span class="type">({{post.typeText}})</span></mat-card-title>
                 <mat-card-subtitle>Gepostet am: {{post.postTime | date:"dd.MM.yyyy HH:mm"}} von <b>{{post.username}}</b></mat-card-subtitle>
                 <button mat-mini-fab color="warn" class="delete-btn" *ngIf="post.self" (click)="deletePost(post._id)">
                     <span class="mat-icon">delete</span>

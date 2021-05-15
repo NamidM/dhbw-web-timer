@@ -15,6 +15,7 @@ export class LoginComponent implements OnInit {
   constructor(public authService: AuthService, private router: Router, private apiService: ApiService, private snackBarService: SnackBarService) { }
 
   ngOnInit(): void {
+    /* Get tokens from url */
     let id_token = this.router.url.substring(this.router.url.indexOf('id_token=') + 9)
     id_token = id_token.substring(0, id_token.indexOf('&'));
 
@@ -22,6 +23,7 @@ export class LoginComponent implements OnInit {
     authorization_code = authorization_code.substring(0, authorization_code.indexOf('&'));
     this.router.navigateByUrl("/login");
     if(id_token == "" || authorization_code == "") {
+      /* No code was given -> Redirect to home */
       this.router.navigateByUrl("/");
     } else {
       this.apiService.login(id_token, authorization_code).subscribe((response)=>{

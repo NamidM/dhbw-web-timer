@@ -38,12 +38,12 @@ export class HomeComponent implements OnInit {
       this.loading = false;
     });
   }
-
+  /* Event that is triggered when the user hovers over the chart */
   public chartHovered({ event, active }: { event: MouseEvent, active: {}[] }): void {
     const hovered : any = active[0];
     this.site = this.sites[hovered._index];
   }
-
+  /* Function that is opened when user clicks on "Post" button */
   postStatistics() {
     this.dialog.open(PostDialogComponent, {
       width: '70vw',

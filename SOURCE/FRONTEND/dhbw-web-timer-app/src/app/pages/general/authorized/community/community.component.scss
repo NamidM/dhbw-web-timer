@@ -7,6 +7,7 @@
 }
 .post-content {
     margin-left: 15px;
+    word-break: break-word;
 }
 .post-wrapper {
     display: flex;
@@ -62,3 +63,6 @@
     font-family: 'Material Icons';
     font-size: x-large;
 }
+.title-txt {
+    word-break: break-word;
+} 

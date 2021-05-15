@@ -15,6 +15,7 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
   }
+  
   logout() {
     this.authService.logout();
     this.snackBarService.openSnackbarSuccess("Ausgeloggt!");

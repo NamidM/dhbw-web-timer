@@ -44,6 +44,7 @@ export class StatisticsComponent implements OnInit {
   }
 
   async ngOnInit(){
+    /* Create date pickers and statistics for current date/week/month */
     let day = new Date().getDay() == 0 ? 7 : new Date().getDay();
     this.startOfWeek = new Date((new Date().getMonth() + 1) + "." + (new Date().getDate() - day + 1) + "." + new Date().getFullYear());
     this.endOfWeek = this.getEndWeek(this.startOfWeek);
@@ -69,7 +70,7 @@ export class StatisticsComponent implements OnInit {
       this.generalInformationTotal = generalInformation;
     });
   }
-
+  /* Function to post a post */
   postStatistics(type: string) {
     let sites, startTime;
     switch(type) {
@@ -84,38 +85,38 @@ export class StatisticsComponent implements OnInit {
       data: {sites, type, startTime}
     });
   }
-
+  /* Function that is triggered, when user clicks on a specific date in the datepicker */
   dateSelectionDay(){
     this.updateDayChart(new Date(this.rangeDay.controls["startDay"].value));
   }
-
+  /* Function that is triggered, when user clicks on a specific date in the week datepicker */
   startDateSelectionWeek(i: any){
     let start = new Date(this.addedWeeks[i].controls["startWeek"].value);
     let day = start.getDay() == 0 ? 7 : start.getDay();
     start.setDate(start.getDate() - day + 1);
     this.addedWeeks[i].controls["startWeek"].setValue(start);
   }
-
+  /* Function to determine the end of the week */
   endDateSelectionWeek(i: any){
     let start = new Date(this.addedWeeks[i].controls["startWeek"].value);
     let end = this.getEndWeek(start);
     this.addedWeeks[i].controls["endWeek"].setValue(end);
     this.updateWeekChart(start, end, i);
   }
-
+  /* Function that is triggered, when user clicks on a specific date in the month datepicker */
   startDateSelectionMonth(i?: any){
     let start = new Date(this.addedMonths[i].controls["startMonth"].value);
     start.setDate(1);
     this.addedMonths[i].controls["startMonth"].setValue(start);
   }
-
+  /* Function to determine the end of the month */
   endDateSelectionMonth(i?: any){
     let start = new Date(this.addedMonths[i].controls["startMonth"].value);
     let end = new Date(start.getFullYear(), start.getMonth()+1, 0);
     this.addedMonths[i].controls["endMonth"].setValue(end);
     this.updateMonthChart(start, end);
   }
-
+  /* Function to update week chart */
   updateWeekChart(startOfWeek?: Date, endOfWeek?: Date, weekForm?: any) {
     this.statisticsService.getBarChart(startOfWeek?.getTime(), endOfWeek?.getTime(), this.weekTime, weekForm, (chart: any, weekTime: any)=>{
       this.weekChart = chart;
@@ -124,7 +125,7 @@ export class StatisticsComponent implements OnInit {
       else this.weekTimeIvalid = false;
     })
   }
-
+  /* Function to update month chart */
   updateMonthChart(startOfMonth?: Date, endOfMonth?: Date, monthForm?: any) {
     this.statisticsService.getLineChart(startOfMonth, endOfMonth, this.monthTime, monthForm, (chart: any, monthTime: any)=>{
       this.monthChart = chart;
@@ -132,7 +133,7 @@ export class StatisticsComponent implements OnInit {
       this.monthDataValid = monthTime.some((e:any)=> e.data.length==0);
     })
   }
-
+  /* Function to update day chart */
   updateDayChart(day: Date){
     let millisecondsInDay = day.getHours()*60*60*1000 + day.getMinutes()*60*1000 + day.getSeconds()*1000;
     let startOfDay = day.getTime() - millisecondsInDay;
@@ -145,21 +146,21 @@ export class StatisticsComponent implements OnInit {
       this.loading = false;
     })
   }
-
+  /* Function to select next day */
   nextDay() {
     let dayPlusOne = new Date(this.rangeDay.controls["startDay"].value);
     dayPlusOne.setTime(dayPlusOne.getTime()+24*60*60*1000);
     this.rangeDay.controls["startDay"].setValue(dayPlusOne);
     this.updateDayChart(dayPlusOne);
   }
-
+  /* Function to select previous day */
   prevDay() {
     let dayMinusOne = new Date(this.rangeDay.controls["startDay"].value);
     dayMinusOne.setTime(dayMinusOne.getTime()-24*60*60*1000);
     this.rangeDay.controls["startDay"].setValue(dayMinusOne);
     this.updateDayChart(dayMinusOne);
   }
-
+  /* Function to select next week */
   nextWeek(i: any) {
     let weekPlusOne = new Date(this.addedWeeks[i].controls["startWeek"].value);
     weekPlusOne.setTime(weekPlusOne.getTime()+24*60*60*1000*7);
@@ -168,7 +169,7 @@ export class StatisticsComponent implements OnInit {
     this.addedWeeks[i].controls["endWeek"].setValue(endWeekPlusOne);
     this.updateWeekChart(weekPlusOne, endWeekPlusOne, i);
   }
-
+  /* Function to select previous week */
   prevWeek(i: any) {
     let weekMinusOne = new Date(this.addedWeeks[i].controls["startWeek"].value);
     weekMinusOne.setTime(weekMinusOne.getTime()-24*60*60*1000*7);
@@ -177,7 +178,7 @@ export class StatisticsComponent implements OnInit {
     this.addedWeeks[i].controls["endWeek"].setValue(endWeekMinusOne);
     this.updateWeekChart(weekMinusOne, endWeekMinusOne, i);
   }
-
+  /* Function to select next month */
   nextMonth(i?: any) {
     let monthPlusOne = new Date(this.addedMonths[i].controls["startMonth"].value);
     monthPlusOne.setMonth(monthPlusOne.getMonth()+1);
@@ -186,7 +187,7 @@ export class StatisticsComponent implements OnInit {
     this.addedMonths[i].controls["endMonth"].setValue(endMonthPlusOne);
     this.updateMonthChart(monthPlusOne, endMonthPlusOne, i);
   }
-
+  /* Function to select previous month */
   prevMonth(i?: any) {
     let monthMinusOne = new Date(this.addedMonths[i].controls["startMonth"].value);
     monthMinusOne.setMonth(monthMinusOne.getMonth()-1);
@@ -195,7 +196,7 @@ export class StatisticsComponent implements OnInit {
     this.addedMonths[i].controls["endMonth"].setValue(endMonthMinusOne);
     this.updateMonthChart(monthMinusOne, endMonthMinusOne, i);
   }
-
+  /* Function to to add a week in the week chart */
   addWeek(){
     if(this.addedWeeks.length <= 5) {
       this.addedWeeks.push(this.formBuilder.group({
@@ -209,14 +210,14 @@ export class StatisticsComponent implements OnInit {
       this.updateWeekChart(this.startOfWeek, this.endOfWeek, this.addedWeeks.length - 1);
     }
   }
-
+  /* Function to to delete a week in the week chart */
   deleteWeek(i: any) {
     if(this.addedWeeks.length > 0) {
       this.addedWeeks = this.addedWeeks.filter(e => e.controls.index.value != i);
       this.updateWeekChart(undefined, undefined, i);
     }
   }
-
+  /* Function to to add a month in the month chart */
   addMonth(){
     if(this.addedMonths.length <= 5) {
       this.addedMonths.push(this.formBuilder.group({
@@ -233,21 +234,21 @@ export class StatisticsComponent implements OnInit {
       this.updateMonthChart(startOfMonth, endOfMonth, this.addedMonths.length - 1);
     }
   }
-
+  /* Function to to delete a month in the month chart */
   deleteMonth(i: any) {
     if(this.addedMonths.length > 0) {
       this.addedMonths = this.addedMonths.filter(e => e.controls.index.value != i);
       this.updateMonthChart(undefined, undefined, i);
     }
   }
-
+  /* Function returns the end of the week with a given date */
   getEndWeek(start: Date) {
     let end = new Date(start);
     end.setDate(start.getDate() + 7);
     end.setHours(0, 0 , -1);
     return end;
   }
-
+  /* Event that is triggered when the user hovers over the chart */
   public chartHovered({ event, active }: { event: MouseEvent, active: {}[] }, total?: boolean): void {
     const hovered : any = active[0];
     if(total) {

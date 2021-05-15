@@ -27,8 +27,9 @@ export class SettingsComponent implements OnInit {
       }
     });
   }
-
+  /* Function that opens when user cicks on "Change username" button */
   changeUsername() {
+    /* Open change dialog */
     const dialogRef = this.dialog.open(UpdateDialogComponent, {
       width: '300px',
       data: {username: this.authService.username}

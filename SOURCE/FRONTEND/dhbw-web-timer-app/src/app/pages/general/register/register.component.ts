@@ -23,6 +23,7 @@ export class RegisterComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    /* Get tokens from url */
     this.id_token = this.router.url.substring(this.router.url.indexOf('id_token=') + 9)
     this.id_token = this.id_token.substring(0, this.id_token.indexOf('&'));
 
@@ -30,6 +31,7 @@ export class RegisterComponent implements OnInit {
     this.authorization_code = this.authorization_code.substring(0, this.authorization_code.indexOf('&'));
     this.router.navigateByUrl("/register");
     if(this.id_token == "" || this.authorization_code == "" || this.authService.username) {
+      /* If no token was given -> Redirect to home */
       this.router.navigateByUrl("/");
     } else {
       this.apiService.registerCheck(this.id_token).subscribe((response)=>{
