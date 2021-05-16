@@ -104,9 +104,6 @@ export class StatisticsService {
         let timespan:number = entry.endtime - entry.starttime;
         let index = this.findIndexOfSiteWithURL(sites, baseUrl);
         first = Math.min(first, entry.starttime);
-        await this.testImage(entry.faviconUrl).catch((url: any) => {
-          entry.faviconUrl = url;
-        });
         if(index == -1){
           sites.push({url: baseUrl, time: timespan, favicon: entry.faviconUrl, percentage: 0, visits: 1, prettyTime: ""});
         } else{
@@ -139,6 +136,9 @@ export class StatisticsService {
       let totalTime = 0;
       let totalVisits = 0;
       for(let i=0; i<sites.length; i++){
+        await this.testImage(sites[i].favicon).catch((url: any) => {
+          sites[i].favicon = url;
+        });
         siteNames.push(sites[i].url);
         times.push(sites[i].time);
         sum += sites[i].time;
@@ -184,7 +184,8 @@ export class StatisticsService {
   /* Function to check if favicon can be loaded */
   testImage(url: any) : any {
     const imgPromise = new Promise(function imgPromise(resolve, reject) {
-      setTimeout(()=>{reject("/assets/images/defaultFavicon.png");}, 100)
+      setTimeout(()=>{
+        reject("/assets/images/defaultFavicon.png");}, 100)
       const imgElement = new Image();
       imgElement.onload = () => resolve(url);
       imgElement.onerror = () => reject("/assets/images/defaultFavicon.png");
