@@ -157,7 +157,7 @@
       <div class="month-wrapper row">
         <div class="col-3">
           <div class="center">
-            <button mat-raised-button color="primary" class="post-btn" [disabled]="monthDataValid" (click)="postStatistics('monthly')">Statistik posten</button><br><br>
+            <button mat-raised-button color="primary" class="post-btn" [disabled]="!monthDataInvalid" (click)="postStatistics('monthly')">Statistik posten</button><br><br>
             <button mat-raised-button color="accent" class="addmonth-btn" [disabled]="addedMonths.length > 5" (click)="addMonth()">Monat hinzufügen</button>
           </div>
           <ng-container *ngFor="let addedMonth of addedMonths; index as i">

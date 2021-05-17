@@ -22,7 +22,7 @@ export class StatisticsComponent implements OnInit {
 
   public weekTime: any[] = [];
   public monthTime: any[] = [];
-  public monthDataValid: boolean = false;
+  public monthDataInvalid: boolean = true;
   public weekTimeIvalid: boolean = false;
   public sites: Site[] = [];
   public site: any;
@@ -130,7 +130,7 @@ export class StatisticsComponent implements OnInit {
     this.statisticsService.getLineChart(startOfMonth, endOfMonth, this.monthTime, monthForm, (chart: any, monthTime: any)=>{
       this.monthChart = chart;
       this.monthTime = monthTime;
-      this.monthDataValid = monthTime.some((e:any)=> e.data.length==0);
+      this.monthDataInvalid = monthTime.some((e:any)=> e.data.length!=0);
     })
   }
   /* Function to update day chart */
