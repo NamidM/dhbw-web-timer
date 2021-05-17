@@ -154,7 +154,7 @@ server.post("/post", authUser, async (req,res)=>{
 /* Endpoint to delete post */
 server.delete("/post", authUser, (req, res) => {
   POST.deletePost(req.query._id, req.userID, (error, post)=>{
-    if(error || !post) {
+    if(error || post.deletedCount == 0) {
       res.send({message: "error"});
     } else {
       res.send({message: "success"});
